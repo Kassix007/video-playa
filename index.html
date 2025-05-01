@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ad-Free Video Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+    }
+    #player-wrapper {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+  <!-- Clappr Player -->
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+</head>
+<body>
+
+<div id="player-wrapper"></div>
+
+<script>
+  // Real video source (403 protected)
+  const originalStreamUrl = "https://goalstreamz.com/1111.m3u8";
+
+  // Use a public CORS proxy to avoid 403 errors
+  // AllOrigins mirrors the request and spoofs the referer
+  const proxiedUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(originalStreamUrl)}`;
+
+  // Initialize Clappr player
+  new Clappr.Player({
+    source: proxiedUrl,
+    parentId: "#player-wrapper",
+    autoPlay: true,
+    width: "100%",
+    height: "100%",
+    mimeType: "application/x-mpegURL",
+    playback: {
+      hlsUseNextLevel: true
+    },
+  });
+</script>
+
+</body>
+</html>
