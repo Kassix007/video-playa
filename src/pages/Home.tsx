@@ -70,7 +70,7 @@ export default function Home() {
   return (
     <>
       <Helmet>
-        <title>Home | Video Playa</title>
+        <title>Home | Video Playa  | Arnold Pilon</title>
       </Helmet>
 
       <SiteHeader
