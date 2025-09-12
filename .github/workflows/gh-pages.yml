@@ -19,6 +19,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          PROXY_TARGET: ${{ secrets.PROXY_TARGET }}  # ✅ inject secret
 
       # Deploy the built site to the gh-pages branch
       - name: Deploy
