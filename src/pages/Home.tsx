@@ -75,7 +75,7 @@ export default function Home() {
 
       <SiteHeader
         title="Welcome to Video Playa"
-        subtitle="A minimal, fast, and clean starter deployed on GitHub Pages."
+        subtitle="Arnold Pilon 2"
         rightSlot={
           <a className="btn" href="#/about">
             Learn more
