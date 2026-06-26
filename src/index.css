@@ -53,24 +53,6 @@ body {
   text-decoration: none;
   letter-spacing: 0.2px;
 }
-.nav-list {
-  list-style: none;
-  margin: 0; padding: 0;
-  display: flex; gap: 12px;
-}
-.nav-link {
-  display: inline-block;
-  padding: 8px 12px;
-  text-decoration: none;
-  color: var(--text);
-  border-radius: 8px;
-  border: 1px solid transparent;
-}
-.nav-link:hover { background: var(--panel); }
-.nav-link.active {
-  border-color: var(--brand);
-  background: linear-gradient(180deg, var(--panel-2), var(--panel));
-}
 
 /* Main area */
 .main-area {
