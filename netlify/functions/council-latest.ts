@@ -1,8 +1,9 @@
+import type { Context } from "@netlify/functions";
 import { createCouncilResultStore } from "../../server/council-store.js";
+import { createCouncilRuntimeEnvironment } from "../../server/netlify-runtime.js";
 
-const store = createCouncilResultStore();
-
-export default async function handler(): Promise<Response> {
+export default async function handler(_request: Request, context: Context): Promise<Response> {
+  const store = createCouncilResultStore(createCouncilRuntimeEnvironment(context));
   return Response.json(
     { result: await store.getLatest() },
     { headers: { "Cache-Control": "no-store" } },

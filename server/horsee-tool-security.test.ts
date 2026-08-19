@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { decorateHorseeToolSecuritySchemes } from "./horsee-tool-security.js";
+import { SAVE_COUNCIL_RESULT_ANNOTATIONS } from "./horsee-mcp.js";
 
 describe("HORSEE tool securitySchemes", () => {
   it("marks only save_council_result as OAuth-protected", () => {
@@ -24,5 +25,14 @@ describe("HORSEE tool securitySchemes", () => {
     assert.deepEqual(writeMeta.securitySchemes, [
       { type: "oauth2", scopes: ["horsee:council:write"] },
     ]);
+  });
+
+  it("marks publishing a Council result as an external destructive write", () => {
+    assert.deepEqual(SAVE_COUNCIL_RESULT_ANNOTATIONS, {
+      readOnlyHint: false,
+      destructiveHint: true,
+      idempotentHint: false,
+      openWorldHint: true,
+    });
   });
 });

@@ -258,7 +258,7 @@ export function createCouncilUnauthorizedResponse(
   return Response.json(
     { error, error_description: description },
     {
-      status: 401,
+      status: error === "insufficient_scope" ? 403 : 401,
       headers: {
         "Cache-Control": "no-store",
         "WWW-Authenticate": createCouncilAuthChallenge(policy, error, description),

@@ -1,4 +1,6 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import type { Config, Context } from "@netlify/functions";
+import { randomUUID } from "node:crypto";
 import {
   authenticateCouncilRequest,
   CouncilAuthenticationError,
@@ -6,14 +8,40 @@ import {
   getCouncilWritePolicy,
   resolveCouncilAuthConfig,
 } from "../../server/council-auth.js";
+import { logCouncilSecurityEvent } from "../../server/council-audit.js";
+import { guardCouncilMcpRequest } from "../../server/council-request-security.js";
 import { createCouncilResultStore } from "../../server/council-store.js";
 import { createHorseeMcpServer } from "../../server/horsee-mcp.js";
 import { addHorseeToolSecuritySchemes } from "../../server/horsee-tool-security.js";
+import { createCouncilRuntimeEnvironment } from "../../server/netlify-runtime.js";
 
-const store = createCouncilResultStore();
+export const config: Config = {
+  path: "/mcp",
+  rateLimit: {
+    windowLimit: 120,
+    windowSize: 60,
+    aggregateBy: ["ip", "domain"],
+  },
+};
 
-export default async function handler(request: Request): Promise<Response> {
-  const authConfig = resolveCouncilAuthConfig(request.url);
+export default async function handler(
+  incomingRequest: Request,
+  context: Context,
+): Promise<Response> {
+  const requestId = context.requestId || randomUUID();
+  const runtimeEnvironment = createCouncilRuntimeEnvironment(context);
+  const guardedRequest = await guardCouncilMcpRequest(incomingRequest, runtimeEnvironment);
+  if (!guardedRequest.allowed) {
+    logCouncilSecurityEvent("mcp_request_denied", {
+      request_id: requestId,
+      reason: guardedRequest.reason,
+      status: guardedRequest.response.status,
+    });
+    return guardedRequest.response;
+  }
+
+  const request = guardedRequest.request;
+  const authConfig = resolveCouncilAuthConfig(request.url, runtimeEnvironment);
   let authInfo;
 
   try {
@@ -25,11 +53,16 @@ export default async function handler(request: Request): Promise<Response> {
     const oauthError = error instanceof CouncilAuthenticationError
       ? error.oauthError
       : "invalid_token";
+    logCouncilSecurityEvent("mcp_authentication_failed", {
+      request_id: requestId,
+      reason: oauthError,
+    });
     return createCouncilUnauthorizedResponse(authConfig, description, oauthError);
   }
 
   const writePolicy = getCouncilWritePolicy(authConfig);
-  const server = createHorseeMcpServer(store, writePolicy);
+  const store = createCouncilResultStore(runtimeEnvironment);
+  const server = createHorseeMcpServer(store, writePolicy, { requestId });
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true,

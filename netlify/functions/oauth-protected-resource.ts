@@ -1,10 +1,15 @@
+import type { Context } from "@netlify/functions";
 import {
   getCouncilProtectedResourceMetadata,
   resolveCouncilAuthConfig,
 } from "../../server/council-auth.js";
+import { createCouncilRuntimeEnvironment } from "../../server/netlify-runtime.js";
 
-export default async function handler(request: Request): Promise<Response> {
-  const config = resolveCouncilAuthConfig(request.url);
+export default async function handler(request: Request, context: Context): Promise<Response> {
+  const config = resolveCouncilAuthConfig(
+    request.url,
+    createCouncilRuntimeEnvironment(context),
+  );
   const metadata = getCouncilProtectedResourceMetadata(config);
 
   if (!metadata) {

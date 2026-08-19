@@ -1,21 +1,43 @@
 import { getStore, type Store } from "@netlify/blobs";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import {
+  createCouncilWriteAuditEvent,
+  logCouncilSecurityEvent,
+  type CouncilWriteActor,
+  type CouncilWriteAuditEvent,
+} from "./council-audit.js";
 import { CouncilResultSchema, type CouncilResult } from "./council-schema.js";
 
 export const PRODUCTION_STORE_NAME = "horsee-council-results-production";
 const LATEST_KEY = "latest.json";
 const HISTORY_PREFIX = "results/";
+const AUDIT_PREFIX = "private-audit/";
 const HISTORY_LIMIT = 50;
+const AUDIT_LIMIT = 500;
 
 type NetlifyDeployEnvironment = Readonly<Record<string, string | undefined>>;
 
 export interface CouncilResultStore {
   readonly kind: "netlify-blobs" | "local-file";
-  save(result: CouncilResult): Promise<void>;
+  save(result: CouncilResult, actor: CouncilWriteActor): Promise<void>;
   getLatest(): Promise<CouncilResult | null>;
   getHistory(limit: number): Promise<CouncilResult[]>;
+}
+
+export function createCouncilHistoryKey(
+  occurredAt = Date.now(),
+  eventId: string = randomUUID(),
+): string {
+  if (!Number.isSafeInteger(occurredAt) || occurredAt < 0) {
+    throw new TypeError("Council storage time must be a non-negative safe integer.");
+  }
+  return `${HISTORY_PREFIX}${String(occurredAt).padStart(13, "0")}-${eventId}.json`;
+}
+
+function createCouncilAuditKey(event: CouncilWriteAuditEvent): string {
+  return `${AUDIT_PREFIX}${String(Date.parse(event.occurred_at)).padStart(13, "0")}-${event.event_id}.json`;
 }
 
 function parseStoredResult(value: unknown): CouncilResult | null {
@@ -79,24 +101,53 @@ class NetlifyCouncilResultStore implements CouncilResultStore {
 
   private readonly store: Store;
 
-  async save(result: CouncilResult): Promise<void> {
+  async save(result: CouncilResult, actor: CouncilWriteActor): Promise<void> {
     const validatedResult = CouncilResultSchema.parse(result);
-    const timestamp = String(Date.parse(validatedResult.analysed_at)).padStart(13, "0");
-    const historyKey = `${HISTORY_PREFIX}${timestamp}-${crypto.randomUUID()}.json`;
+    const occurredAt = Date.now();
+    const eventId = randomUUID();
+    const historyKey = createCouncilHistoryKey(occurredAt, eventId);
+    const auditEvent = createCouncilWriteAuditEvent(
+      validatedResult,
+      actor,
+      occurredAt,
+      eventId,
+    );
 
     await Promise.all([
       this.store.setJSON(historyKey, validatedResult),
       this.store.setJSON(LATEST_KEY, validatedResult),
     ]);
 
-    const listing = await this.store.list({ prefix: HISTORY_PREFIX });
-    const staleKeys = listing.blobs
-      .map((blob) => blob.key)
-      .sort()
-      .reverse()
-      .slice(HISTORY_LIMIT);
+    try {
+      await this.store.setJSON(createCouncilAuditKey(auditEvent), auditEvent);
+      const auditListing = await this.store.list({ prefix: AUDIT_PREFIX });
+      const staleAuditKeys = auditListing.blobs
+        .map((blob) => blob.key)
+        .sort()
+        .reverse()
+        .slice(AUDIT_LIMIT);
+      await Promise.all(staleAuditKeys.map((key) => this.store.delete(key)));
+    } catch {
+      logCouncilSecurityEvent("council_audit_persistence_failed", {
+        race_id: validatedResult.race_id,
+        event_id: eventId,
+      });
+    }
 
-    await Promise.all(staleKeys.map((key) => this.store.delete(key)));
+    try {
+      const historyListing = await this.store.list({ prefix: HISTORY_PREFIX });
+      const staleHistoryKeys = historyListing.blobs
+        .map((blob) => blob.key)
+        .sort()
+        .reverse()
+        .slice(HISTORY_LIMIT);
+      await Promise.all(staleHistoryKeys.map((key) => this.store.delete(key)));
+    } catch {
+      logCouncilSecurityEvent("council_history_pruning_failed", {
+        race_id: validatedResult.race_id,
+        event_id: eventId,
+      });
+    }
   }
 
   async getLatest(): Promise<CouncilResult | null> {
@@ -124,6 +175,11 @@ class LocalFileCouncilResultStore implements CouncilResultStore {
 
   constructor(
     private readonly filePath = resolve(process.cwd(), ".netlify", "horsee-council-results.json"),
+    private readonly auditFilePath = resolve(
+      process.cwd(),
+      ".netlify",
+      "horsee-council-write-audit.json",
+    ),
   ) {}
 
   private async readResults(): Promise<CouncilResult[]> {
@@ -147,11 +203,40 @@ class LocalFileCouncilResultStore implements CouncilResultStore {
     await rename(temporaryPath, this.filePath);
   }
 
-  async save(result: CouncilResult): Promise<void> {
+  private async readAuditEvents(): Promise<CouncilWriteAuditEvent[]> {
+    try {
+      const raw = JSON.parse(await readFile(this.auditFilePath, "utf8")) as unknown;
+      return Array.isArray(raw) ? raw as CouncilWriteAuditEvent[] : [];
+    } catch (error) {
+      if (error instanceof Error && "code" in error && error.code === "ENOENT") return [];
+      throw error;
+    }
+  }
+
+  private async writeAuditEvents(events: CouncilWriteAuditEvent[]): Promise<void> {
+    const temporaryPath = `${this.auditFilePath}.${process.pid}.tmp`;
+    await mkdir(dirname(this.auditFilePath), { recursive: true });
+    await writeFile(temporaryPath, JSON.stringify(events, null, 2), "utf8");
+    await rename(temporaryPath, this.auditFilePath);
+  }
+
+  async save(result: CouncilResult, actor: CouncilWriteActor): Promise<void> {
     const validatedResult = CouncilResultSchema.parse(result);
-    const results = await this.readResults();
+    const occurredAt = Date.now();
+    const [results, auditEvents] = await Promise.all([
+      this.readResults(),
+      this.readAuditEvents(),
+    ]);
     results.unshift(validatedResult);
+    auditEvents.unshift(createCouncilWriteAuditEvent(validatedResult, actor, occurredAt));
     await this.writeResults(results.slice(0, HISTORY_LIMIT));
+    try {
+      await this.writeAuditEvents(auditEvents.slice(0, AUDIT_LIMIT));
+    } catch {
+      logCouncilSecurityEvent("council_audit_persistence_failed", {
+        race_id: validatedResult.race_id,
+      });
+    }
   }
 
   async getLatest(): Promise<CouncilResult | null> {
@@ -163,9 +248,11 @@ class LocalFileCouncilResultStore implements CouncilResultStore {
   }
 }
 
-export function createCouncilResultStore(): CouncilResultStore {
-  if (process.env.NETLIFY === "true" && process.env.CONTEXT !== "dev") {
-    return new NetlifyCouncilResultStore(resolveCouncilStoreName());
+export function createCouncilResultStore(
+  environment: NetlifyDeployEnvironment = process.env,
+): CouncilResultStore {
+  if (environment.NETLIFY === "true" && environment.CONTEXT !== "dev") {
+    return new NetlifyCouncilResultStore(resolveCouncilStoreName(environment));
   }
 
   return new LocalFileCouncilResultStore();

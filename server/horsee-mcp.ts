@@ -5,6 +5,7 @@ import {
   createCouncilAuthChallenge,
   type CouncilWritePolicy,
 } from "./council-auth.js";
+import { logCouncilSecurityEvent } from "./council-audit.js";
 import { CouncilResultSchema } from "./council-schema.js";
 import type { CouncilResultStore } from "./council-store.js";
 import { createHorseeWidgetHtml } from "./widget-html.js";
@@ -22,6 +23,13 @@ const toolAnnotations = {
   destructiveHint: false,
   idempotentHint: true,
   openWorldHint: false,
+} as const;
+
+export const SAVE_COUNCIL_RESULT_ANNOTATIONS = {
+  readOnlyHint: false,
+  destructiveHint: true,
+  idempotentHint: false,
+  openWorldHint: true,
 } as const;
 
 export type HorseeSecurityScheme =
@@ -71,6 +79,7 @@ function authorizationFailure(
 export function createHorseeMcpServer(
   store: CouncilResultStore,
   writePolicy: CouncilWritePolicy,
+  securityContext: { requestId?: string } = {},
 ): McpServer {
   const server = new McpServer(
     { name: HORSEE_SERVER_NAME, version: HORSEE_SERVER_VERSION },
@@ -112,15 +121,10 @@ export function createHorseeMcpServer(
     "save_council_result",
     {
       title: "Save HORSEE Council result",
-      description: "Save the completed HORSEE Horse Racing Council analysis. Call this after every completed analysis, before giving the final response to the user. Every field is required; ranking must contain every declared runner exactly once and its probabilities must total approximately 100%.",
+      description: "Publish the completed HORSEE Horse Racing Council verdict to the publicly visible Equidia Selection Board and retain it in public Council history. This overwrites the current public latest result. Call it after every completed analysis, before the final response. Every field is required; ranking must contain every declared runner exactly once and its probabilities must total approximately 100%.",
       inputSchema: CouncilResultSchema,
       outputSchema: z.object({ saved: z.literal(true), result: CouncilResultSchema }).strict(),
-      annotations: {
-        readOnlyHint: false,
-        destructiveHint: false,
-        idempotentHint: false,
-        openWorldHint: true,
-      },
+      annotations: SAVE_COUNCIL_RESULT_ANNOTATIONS,
       _meta: {
         securitySchemes: getHorseeToolSecuritySchemes(
           "save_council_result",
@@ -131,6 +135,11 @@ export function createHorseeMcpServer(
     async (result, extra) => {
       const failure = authorizationFailure(writePolicy, extra.authInfo);
       if (failure) {
+        logCouncilSecurityEvent("council_write_denied", {
+          reason: failure.error,
+          request_id: securityContext.requestId,
+          client_id: extra.authInfo?.clientId.slice(0, 200),
+        });
         return {
           content: [{ type: "text", text: failure.message }],
           _meta: {
@@ -142,10 +151,22 @@ export function createHorseeMcpServer(
         };
       }
 
-      await store.save(result);
+      const authorizedAuthInfo = extra.authInfo!;
+      const actor = {
+        clientId: authorizedAuthInfo.clientId,
+        subject: typeof authorizedAuthInfo.extra?.subject === "string"
+          ? authorizedAuthInfo.extra.subject
+          : undefined,
+      };
+      await store.save(result, actor);
+      logCouncilSecurityEvent("council_write_succeeded", {
+        request_id: securityContext.requestId,
+        client_id: actor.clientId.slice(0, 200),
+        race_id: result.race_id,
+      });
       const output = { saved: true as const, result };
       return {
-        content: [{ type: "text", text: `Council result saved for ${result.racecourse} race ${result.race_number}. The Council panel is updated.` }],
+        content: [{ type: "text", text: `Council result published for ${result.racecourse} race ${result.race_number}. The public Council panel is updated.` }],
         structuredContent: output,
       };
     },

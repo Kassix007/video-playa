@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { CouncilResultSchema, type CouncilResult } from "./council-schema.js";
+import {
+  CouncilResultSchema,
+  MAX_COUNCIL_FIELD_SIZE,
+  type CouncilResult,
+} from "./council-schema.js";
 
 const validResult: CouncilResult = {
   race_id: "equidia-r1c1",
@@ -56,5 +60,13 @@ describe("CouncilResultSchema integrity", () => {
       index === 3 ? { ...runner, probability: 2 } : runner
     ));
     expectRejected({ ...validResult, ranking });
+  });
+
+  it("rejects oversized text fields", () => {
+    expectRejected({ ...validResult, strongest_loss_reason: "x".repeat(2_001) });
+  });
+
+  it("rejects a field size above the supported maximum", () => {
+    expectRejected({ ...validResult, field_size: MAX_COUNCIL_FIELD_SIZE + 1 });
   });
 });
