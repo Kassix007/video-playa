@@ -422,6 +422,13 @@
   margin: 0;
 }
 
+.equidia-council-results-head p {
+  color: var(--muted);
+  font-size: 0.58rem;
+  line-height: 1.5;
+  margin: 9px 0 0;
+}
+
 .equidia-council-results dl {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -452,6 +459,12 @@
   font-family: Georgia, Cambria, "Times New Roman", serif;
   font-size: 0.85rem;
   margin: 0;
+}
+
+.equidia-council-results dl > div[data-prominent="true"] dd {
+  color: var(--brand-strong);
+  font-size: 1rem;
+  font-weight: 800;
 }
 
 .equidia-signal-board {
