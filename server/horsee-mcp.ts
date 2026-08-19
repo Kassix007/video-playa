@@ -14,9 +14,19 @@ export const HORSEE_SERVER_NAME = "horsee-council";
 export const HORSEE_SERVER_VERSION = "1.0.0";
 export const HORSEE_WIDGET_URI = "ui://horsee-council/v1.html";
 
-const SERVER_INSTRUCTIONS = `When the user submits a race command from HORSEE, perform the complete Horse Racing Council analysis in the conversation. After the final Council verdict is complete, call save_council_result with the structured verdict.
+const WRITE_ENABLED_SERVER_INSTRUCTIONS = `When the user submits a race command from HORSEE, perform the complete Horse Racing Council analysis in the conversation. After the final Council verdict is complete, call save_council_result with the structured verdict.
 
 Use the current ChatGPT conversation context, any available racecard or browsing tools, and the user's requested mode. Do not call an OpenAI API from this MCP server. Keep the full analysis in the conversation and save only the structured final result. Ranking must include every declared runner exactly once, most_likely_winner must exactly match ranking[0], ranking probabilities must total approximately 100%, analysed_at must be an ISO 8601 timestamp, and confidence must be low, medium, or high. After saving, present the final result and tell the user the Council panel has been updated.`;
+
+const WRITE_DISABLED_SERVER_INSTRUCTIONS = `When the user submits a race command from HORSEE, perform the complete Horse Racing Council analysis in the ChatGPT conversation. HORSEE Council result publishing is not currently configured. Do not attempt to call save_council_result.
+
+Use the current ChatGPT conversation context, any available racecard or browsing tools, and the user's requested mode. Do not call an OpenAI API from this MCP server. Keep the full analysis and final Council verdict in the conversation. The HORSEE panel may continue to show the latest previously published result or await its first stored result.`;
+
+export function getHorseeServerInstructions(writePolicy: CouncilWritePolicy): string {
+  return writePolicy.enabled
+    ? WRITE_ENABLED_SERVER_INSTRUCTIONS
+    : WRITE_DISABLED_SERVER_INSTRUCTIONS;
+}
 
 const toolAnnotations = {
   readOnlyHint: true,
@@ -83,7 +93,7 @@ export function createHorseeMcpServer(
 ): McpServer {
   const server = new McpServer(
     { name: HORSEE_SERVER_NAME, version: HORSEE_SERVER_VERSION },
-    { instructions: SERVER_INSTRUCTIONS },
+    { instructions: getHorseeServerInstructions(writePolicy) },
   );
 
   registerAppTool(
@@ -117,60 +127,62 @@ export function createHorseeMcpServer(
     },
   );
 
-  server.registerTool(
-    "save_council_result",
-    {
-      title: "Save HORSEE Council result",
-      description: "Publish the completed HORSEE Horse Racing Council verdict to the publicly visible Equidia Selection Board and retain it in public Council history. This overwrites the current public latest result. Call it after every completed analysis, before the final response. Every field is required; ranking must contain every declared runner exactly once and its probabilities must total approximately 100%.",
-      inputSchema: CouncilResultSchema,
-      outputSchema: z.object({ saved: z.literal(true), result: CouncilResultSchema }).strict(),
-      annotations: SAVE_COUNCIL_RESULT_ANNOTATIONS,
-      _meta: {
-        securitySchemes: getHorseeToolSecuritySchemes(
-          "save_council_result",
-          writePolicy.writeScope,
-        ),
+  if (writePolicy.enabled) {
+    server.registerTool(
+      "save_council_result",
+      {
+        title: "Save HORSEE Council result",
+        description: "Publish the completed HORSEE Horse Racing Council verdict to the publicly visible Equidia Selection Board and retain it in public Council history. This overwrites the current public latest result. Call it after every completed analysis, before the final response. Every field is required; ranking must contain every declared runner exactly once and its probabilities must total approximately 100%.",
+        inputSchema: CouncilResultSchema,
+        outputSchema: z.object({ saved: z.literal(true), result: CouncilResultSchema }).strict(),
+        annotations: SAVE_COUNCIL_RESULT_ANNOTATIONS,
+        _meta: {
+          securitySchemes: getHorseeToolSecuritySchemes(
+            "save_council_result",
+            writePolicy.writeScope,
+          ),
+        },
       },
-    },
-    async (result, extra) => {
-      const failure = authorizationFailure(writePolicy, extra.authInfo);
-      if (failure) {
-        logCouncilSecurityEvent("council_write_denied", {
-          reason: failure.error,
-          request_id: securityContext.requestId,
-          client_id: extra.authInfo?.clientId.slice(0, 200),
-        });
-        return {
-          content: [{ type: "text", text: failure.message }],
-          _meta: {
-            "mcp/www_authenticate": [
-              createCouncilAuthChallenge(writePolicy, failure.error, failure.message),
-            ],
-          },
-          isError: true,
-        };
-      }
+      async (result, extra) => {
+        const failure = authorizationFailure(writePolicy, extra.authInfo);
+        if (failure) {
+          logCouncilSecurityEvent("council_write_denied", {
+            reason: failure.error,
+            request_id: securityContext.requestId,
+            client_id: extra.authInfo?.clientId.slice(0, 200),
+          });
+          return {
+            content: [{ type: "text", text: failure.message }],
+            _meta: {
+              "mcp/www_authenticate": [
+                createCouncilAuthChallenge(writePolicy, failure.error, failure.message),
+              ],
+            },
+            isError: true,
+          };
+        }
 
-      const authorizedAuthInfo = extra.authInfo!;
-      const actor = {
-        clientId: authorizedAuthInfo.clientId,
-        subject: typeof authorizedAuthInfo.extra?.subject === "string"
-          ? authorizedAuthInfo.extra.subject
-          : undefined,
-      };
-      await store.save(result, actor);
-      logCouncilSecurityEvent("council_write_succeeded", {
-        request_id: securityContext.requestId,
-        client_id: actor.clientId.slice(0, 200),
-        race_id: result.race_id,
-      });
-      const output = { saved: true as const, result };
-      return {
-        content: [{ type: "text", text: `Council result published for ${result.racecourse} race ${result.race_number}. The public Council panel is updated.` }],
-        structuredContent: output,
-      };
-    },
-  );
+        const authorizedAuthInfo = extra.authInfo!;
+        const actor = {
+          clientId: authorizedAuthInfo.clientId,
+          subject: typeof authorizedAuthInfo.extra?.subject === "string"
+            ? authorizedAuthInfo.extra.subject
+            : undefined,
+        };
+        await store.save(result, actor);
+        logCouncilSecurityEvent("council_write_succeeded", {
+          request_id: securityContext.requestId,
+          client_id: actor.clientId.slice(0, 200),
+          race_id: result.race_id,
+        });
+        const output = { saved: true as const, result };
+        return {
+          content: [{ type: "text", text: `Council result published for ${result.racecourse} race ${result.race_number}. The public Council panel is updated.` }],
+          structuredContent: output,
+        };
+      },
+    );
+  }
 
   server.registerTool(
     "get_latest_council_result",
