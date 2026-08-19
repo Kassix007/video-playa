@@ -9,8 +9,9 @@ export default function About() {
       </Helmet>
 
       <SiteHeader
-        title="About"
-        subtitle="What this project is and how it’s structured."
+        eyebrow="Behind the feed"
+        title="Less hunting. More watching."
+        subtitle="Video Playa turns a plain-text schedule into a direct, distraction-light viewing desk."
       />
 
       <section className="card">

@@ -10,7 +10,9 @@ export default function AppLayout() {
       <NavBar />
       <main className="main-area" role="main">
         <div className="container">
-          <Outlet />
+          <div className="route-stage" key={pathname}>
+            <Outlet />
+          </div>
         </div>
       </main>
       <Footer />

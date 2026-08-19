@@ -26,15 +26,15 @@ export default function ProgramTable({ day, items, onWatch }: ProgramTableProps)
               .sort((a, b) => a.time.localeCompare(b.time))
               .map((row, i) => (
                 <tr key={`${day}-${i}`}>
-                  <td className="cell-time">{row.time}</td>
-                  <td className="cell-matchup">{row.matchup}</td>
-                  <td className="cell-channel">
+                  <td className="cell-time" data-label="Time">{row.time}</td>
+                  <td className="cell-matchup" data-label="Matchup">{row.matchup}</td>
+                  <td className="cell-channel" data-label="Channel">
                     {[row.channelGroup, row.channelCode]
                       .filter(Boolean)
                       .map((s) => String(s).toUpperCase())
                       .join(" · ")}
                   </td>
-                  <td className="action-cell">
+                  <td className="action-cell" data-label="Links">
                     <a
                       href={row.url}
                       target="_blank"
@@ -46,9 +46,11 @@ export default function ProgramTable({ day, items, onWatch }: ProgramTableProps)
                     <button
                       onClick={() => onWatch(row.url)}
                       className="btn btn-outline"
-                      style={{ padding: "4px 8px", fontSize: "0.75rem" }}
+                      aria-label={`Open player for ${row.matchup}`}
+                      title="Open separately for browser playback, Picture-in-Picture, and casting controls"
+                      type="button"
                     >
-                      Watch here
+                      Open player <span aria-hidden="true">↗</span>
                     </button>
                   </td>
                 </tr>

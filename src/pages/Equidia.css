@@ -1,0 +1,620 @@
+.equidia-page {
+  display: grid;
+  gap: 22px;
+  min-width: 0;
+  padding-bottom: 8px;
+}
+
+.equidia-hero {
+  background:
+    linear-gradient(105deg, color-mix(in srgb, var(--brand-soft) 88%, var(--panel)) 0 54%, transparent 54%),
+    repeating-linear-gradient(90deg, transparent 0 58px, rgb(255 255 255 / 3%) 58px 59px),
+    var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px 24px 2px 24px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: clamp(28px, 6vw, 70px);
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.43fr);
+  min-height: 390px;
+  overflow: hidden;
+  padding: clamp(28px, 6vw, 66px) clamp(22px, 6vw, 62px) clamp(58px, 7vw, 72px);
+  position: relative;
+}
+
+.equidia-hero::before {
+  border: 1px solid rgb(255 255 255 / 9%);
+  border-radius: 50%;
+  content: "";
+  height: 260px;
+  pointer-events: none;
+  position: absolute;
+  right: -92px;
+  top: -70px;
+  transform: rotate(-12deg);
+  width: 440px;
+}
+
+.equidia-hero-copy,
+.equidia-tote {
+  align-self: center;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.equidia-live-line {
+  align-items: center;
+  color: var(--brand-strong);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.61rem;
+  font-weight: 900;
+  gap: 8px;
+  letter-spacing: 0.17em;
+  margin: 0 0 14px;
+  text-transform: uppercase;
+}
+
+.equidia-live-line > span {
+  background: var(--brand-strong);
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--brand) 20%, transparent);
+  height: 7px;
+  width: 7px;
+}
+
+.equidia-live-line b {
+  color: var(--muted);
+  font-weight: 750;
+  letter-spacing: 0.1em;
+}
+
+.equidia-hero h1 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: clamp(3.5rem, 9vw, 7.2rem);
+  letter-spacing: -0.085em;
+  line-height: 0.82;
+  margin: 0;
+  max-width: 720px;
+}
+
+.equidia-hero h1 em {
+  color: var(--brand-strong);
+  display: inline-block;
+  font-size: 0.31em;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  margin-left: 0.22em;
+  text-transform: uppercase;
+  transform: translateY(-0.7em) rotate(-3deg);
+}
+
+.equidia-deck {
+  color: var(--muted);
+  font-size: clamp(0.78rem, 1.5vw, 0.92rem);
+  line-height: 1.65;
+  margin: 24px 0 0;
+  max-width: 610px;
+}
+
+.equidia-hero-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 24px;
+}
+
+.equidia-hero-actions a,
+.equidia-boundary > a,
+.equidia-secondary-action {
+  align-items: center;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  display: inline-flex;
+  font-size: 0.65rem;
+  font-weight: 850;
+  gap: 12px;
+  justify-content: center;
+  letter-spacing: 0.06em;
+  min-height: 44px;
+  padding: 0 15px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.equidia-hero-actions .equidia-primary-action {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--button-text);
+}
+
+.equidia-hero-actions a:hover,
+.equidia-boundary > a:hover,
+.equidia-secondary-action:hover {
+  border-color: var(--brand-strong);
+  color: var(--brand-strong);
+}
+
+.equidia-hero-actions .equidia-primary-action:hover {
+  background: var(--brand-strong);
+  color: var(--button-text);
+}
+
+.equidia-hero-actions a:focus-visible,
+.equidia-boundary > a:focus-visible,
+.equidia-secondary-action:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.equidia-tote {
+  background: color-mix(in srgb, var(--bg) 74%, transparent);
+  border: 1px solid var(--border-strong);
+  border-left: 3px solid var(--brand);
+  display: grid;
+  gap: 20px;
+  padding: 22px;
+}
+
+.equidia-tote-index {
+  color: var(--brand-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: -0.09em;
+  line-height: 0.76;
+}
+
+.equidia-tote dl {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.equidia-tote dl > div {
+  align-items: baseline;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding-bottom: 10px;
+}
+
+.equidia-tote dt,
+.equidia-tote dd {
+  margin: 0;
+}
+
+.equidia-tote dt {
+  color: var(--muted);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.equidia-tote dd {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.equidia-tote > p {
+  color: var(--muted);
+  font-size: 0.62rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.equidia-running-rail {
+  align-items: center;
+  background: var(--brand);
+  bottom: 0;
+  color: var(--button-text);
+  display: grid;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.57rem;
+  font-weight: 900;
+  grid-template-columns: repeat(5, 1fr);
+  height: 32px;
+  left: 0;
+  letter-spacing: 0.08em;
+  position: absolute;
+  right: 0;
+}
+
+.equidia-running-rail span {
+  border-right: 1px solid rgb(255 255 255 / 30%);
+  padding-left: 12px;
+}
+
+.equidia-player-anchor {
+  scroll-margin-top: 92px;
+}
+
+.equidia-signal-board {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  min-width: 0;
+  padding: clamp(20px, 4vw, 34px);
+}
+
+.equidia-board-head {
+  align-items: end;
+  border-bottom: 1px solid var(--border-strong);
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  padding-bottom: 18px;
+}
+
+.equidia-section-mark {
+  color: var(--brand-strong);
+  display: block;
+  font-size: 0.57rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.equidia-board-head h2,
+.equidia-boundary h2 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: clamp(1.65rem, 4vw, 2.45rem);
+  letter-spacing: -0.05em;
+  margin: 0;
+}
+
+.equidia-board-status {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 0.6rem;
+  font-weight: 850;
+  gap: 8px;
+  letter-spacing: 0.09em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.equidia-board-status i {
+  background: currentColor;
+  border-radius: 50%;
+  height: 7px;
+  width: 7px;
+}
+
+.equidia-board-status[data-state="ready"] {
+  color: var(--accent);
+}
+
+.equidia-board-status[data-state="error"] {
+  color: var(--danger);
+}
+
+.equidia-board-loading,
+.equidia-board-error {
+  align-items: center;
+  background: var(--panel-2);
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-top: 18px;
+  min-height: 112px;
+  padding: 18px;
+}
+
+.equidia-board-loading > span {
+  color: var(--brand-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 2.4rem;
+  font-weight: 900;
+}
+
+.equidia-board-loading p,
+.equidia-board-error p {
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.55;
+  margin: 4px 0 0;
+}
+
+.equidia-board-error strong {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1.1rem;
+}
+
+.equidia-secondary-action {
+  background: transparent;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.equidia-board-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.equidia-board-metrics > div {
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  display: grid;
+  gap: 4px;
+  padding: 18px;
+}
+
+.equidia-board-metrics > div:last-child {
+  border-right: 0;
+}
+
+.equidia-board-metrics span,
+.equidia-variant-name span {
+  color: var(--muted);
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.equidia-board-metrics strong {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1.2rem;
+}
+
+.equidia-variant-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.equidia-variant-list li {
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 38px minmax(105px, 0.28fr) minmax(90px, 1fr) 82px;
+  min-height: 76px;
+  padding: 10px 0;
+}
+
+.equidia-variant-index {
+  color: var(--brand-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.equidia-variant-name {
+  display: grid;
+  gap: 3px;
+}
+
+.equidia-variant-name strong {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1.25rem;
+}
+
+.equidia-variant-meter {
+  background: var(--panel-2);
+  height: 5px;
+  overflow: hidden;
+}
+
+.equidia-variant-meter i {
+  background: linear-gradient(90deg, var(--brand), var(--brand-strong));
+  display: block;
+  height: 100%;
+}
+
+.equidia-variant-rate {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.61rem;
+  text-align: right;
+}
+
+.equidia-board-foot {
+  align-items: center;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  padding-top: 16px;
+}
+
+.equidia-board-foot p,
+.equidia-board-foot span {
+  color: var(--muted);
+  font-size: 0.6rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.equidia-board-foot span {
+  text-align: right;
+}
+
+.equidia-boundary {
+  align-items: center;
+  background: color-mix(in srgb, var(--brand-soft) 64%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--brand) 40%, var(--border));
+  display: grid;
+  gap: 22px;
+  grid-template-columns: auto minmax(180px, 0.5fr) minmax(260px, 1fr) auto;
+  margin-bottom: 8px;
+  padding: clamp(20px, 4vw, 30px);
+}
+
+.equidia-boundary-number {
+  color: var(--brand-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.equidia-boundary h2 {
+  font-size: clamp(1.3rem, 2.8vw, 1.85rem);
+}
+
+.equidia-boundary > p {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.equidia-boundary > a {
+  white-space: nowrap;
+}
+
+@media (max-width: 840px) {
+  .equidia-hero {
+    gap: 28px;
+    grid-template-columns: minmax(0, 1fr) minmax(210px, 0.42fr);
+    padding-left: 26px;
+    padding-right: 26px;
+  }
+
+  .equidia-boundary {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .equidia-boundary > p {
+    grid-column: 2 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .equidia-hero {
+    background:
+      linear-gradient(155deg, color-mix(in srgb, var(--brand-soft) 88%, var(--panel)) 0 53%, transparent 53%),
+      var(--panel);
+    grid-template-columns: 1fr;
+    min-height: 0;
+    padding: 28px 18px 60px;
+  }
+
+  .equidia-hero h1 {
+    font-size: clamp(3.6rem, 19vw, 5.5rem);
+  }
+
+  .equidia-hero h1 em {
+    display: block;
+    margin-left: 0;
+    margin-top: 0.6em;
+    transform: rotate(-3deg);
+  }
+
+  .equidia-tote {
+    grid-template-columns: auto 1fr;
+  }
+
+  .equidia-tote > p {
+    grid-column: 1 / -1;
+  }
+
+  .equidia-board-head,
+  .equidia-board-foot {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .equidia-board-foot span {
+    text-align: left;
+  }
+
+  .equidia-board-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .equidia-board-metrics > div {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+    padding: 13px 0;
+  }
+
+  .equidia-board-metrics > div,
+  .equidia-board-metrics > div:last-child {
+    border-right: 0;
+  }
+
+  .equidia-variant-list li {
+    gap: 10px;
+    grid-template-columns: 28px 1fr auto;
+    padding: 12px 0;
+  }
+
+  .equidia-variant-meter {
+    grid-column: 2 / -1;
+    grid-row: 2;
+  }
+
+  .equidia-variant-rate {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .equidia-boundary {
+    align-items: start;
+    grid-template-columns: auto 1fr;
+  }
+
+  .equidia-boundary > p,
+  .equidia-boundary > a {
+    grid-column: 1 / -1;
+  }
+
+  .equidia-boundary > a {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .equidia-page {
+    gap: 16px;
+  }
+
+  .equidia-hero-actions,
+  .equidia-hero-actions a {
+    width: 100%;
+  }
+
+  .equidia-tote {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+
+  .equidia-tote > p {
+    grid-column: auto;
+  }
+
+  .equidia-signal-board {
+    padding: 18px 14px;
+  }
+
+  .equidia-board-error,
+  .equidia-board-loading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .equidia-secondary-action {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .equidia-hero h1 em {
+    transform: none;
+  }
+
+  .equidia-variant-meter i {
+    transition: none;
+  }
+}

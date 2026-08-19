@@ -18,7 +18,7 @@ export default function ProgramHeader({ header }: ProgramHeaderProps) {
         </div>
       )}
       {header.extraLinks.length > 0 && (
-        <div style={{ marginTop: "4px" }}>
+        <div className="extra-links">
           <strong>Extra Links:</strong>{" "}
           {header.extraLinks.map((x) => (
             <a
@@ -27,7 +27,6 @@ export default function ProgramHeader({ header }: ProgramHeaderProps) {
               target="_blank"
               rel="noreferrer"
               className="link-open"
-              style={{ marginRight: "12px" }}
             >
               {x.label}
             </a>

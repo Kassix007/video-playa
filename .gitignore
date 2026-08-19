@@ -22,8 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env.development
+.env*
+!.env.example
 
 # Local Netlify folder
 .netlify
 .claude/settings.local.json
+.gstack/

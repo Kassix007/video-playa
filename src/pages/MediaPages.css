@@ -1,0 +1,547 @@
+.media-workbench,
+.iptv-directory {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px 18px 2px 18px;
+  box-shadow: var(--shadow);
+  margin: 0 0 22px;
+  padding: clamp(18px, 4vw, 30px);
+}
+
+.media-workbench-heading,
+.directory-heading {
+  align-items: end;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.media-workbench-heading span,
+.directory-heading > div > span {
+  color: var(--brand-strong);
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 850;
+  letter-spacing: 0.16em;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.media-workbench-heading h2,
+.directory-heading h2 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: clamp(1.5rem, 4vw, 2.15rem);
+  letter-spacing: -0.045em;
+  margin: 0;
+}
+
+.media-workbench-heading p,
+.directory-heading > p {
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 380px;
+  text-align: right;
+}
+
+.source-form {
+  align-items: end;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 0.24fr) auto;
+}
+
+.source-url-field,
+.source-mode-field,
+.directory-controls label {
+  display: grid;
+  gap: 7px;
+}
+
+.source-url-field > span,
+.source-mode-field > span,
+.directory-controls label > span {
+  color: var(--muted);
+  font-size: 0.59rem;
+  font-weight: 820;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.source-form input,
+.source-form select,
+.directory-controls input,
+.directory-controls select {
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: 2px 9px 2px 9px;
+  color: var(--text);
+  min-height: 48px;
+  min-width: 0;
+  padding: 0 13px;
+  width: 100%;
+}
+
+.source-form input::placeholder,
+.directory-controls input::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.source-form input:focus,
+.source-form select:focus,
+.directory-controls input:focus,
+.directory-controls select:focus {
+  border-color: var(--brand);
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.source-submit {
+  min-height: 48px;
+  white-space: nowrap;
+}
+
+.source-form-meta {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.source-form-meta p {
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 620px;
+}
+
+.format-chips,
+.channel-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.format-chips span,
+.channel-tags span {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.56rem;
+  padding: 4px 7px;
+  text-transform: uppercase;
+}
+
+.source-validation {
+  color: var(--danger);
+  font-size: 0.72rem;
+  margin: 12px 0 0;
+}
+
+.media-boundary-note,
+.catalog-credit {
+  align-items: flex-start;
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  display: flex;
+  gap: 12px;
+  margin: 20px 0 0;
+  padding: 13px 15px;
+}
+
+.media-boundary-note {
+  display: block;
+}
+
+.media-boundary-note strong,
+.catalog-credit strong {
+  font-size: 0.75rem;
+}
+
+.media-boundary-note p,
+.catalog-credit p {
+  color: var(--muted);
+  font-size: 0.69rem;
+  line-height: 1.55;
+  margin: 3px 0 0;
+}
+
+.player-anchor {
+  scroll-margin-top: 90px;
+}
+
+.iptv-tune-session {
+  align-items: center;
+  background: color-mix(in srgb, var(--brand-soft) 58%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--brand) 42%, var(--border));
+  border-left: 3px solid var(--brand);
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(140px, 0.4fr) minmax(220px, 1fr) auto;
+  margin-top: 12px;
+  min-width: 0;
+  padding: 13px 16px;
+}
+
+.iptv-tune-session > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.iptv-tune-session > div > span {
+  color: var(--brand-strong);
+  font-size: 0.55rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.iptv-tune-session strong {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.iptv-tune-session p {
+  color: var(--muted);
+  font-size: 0.67rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.iptv-attempt-count {
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 8px 10px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.iptv-directory {
+  margin-top: 22px;
+}
+
+.directory-controls {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(165px, 0.26fr) minmax(165px, 0.26fr);
+  margin-bottom: 22px;
+}
+
+.directory-controls input:disabled,
+.directory-controls select:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.directory-state {
+  align-items: center;
+  background: var(--panel-2);
+  border: 1px dashed var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 220px;
+  padding: 24px;
+  text-align: center;
+}
+
+.directory-state strong {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1.35rem;
+}
+
+.directory-state p {
+  color: var(--muted);
+  font-size: 0.74rem;
+  margin: 7px 0 0;
+}
+
+.directory-state .btn {
+  margin-top: 16px;
+}
+
+.directory-loader {
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  border-top-color: var(--brand);
+  height: 32px;
+  margin-bottom: 14px;
+  width: 32px;
+  animation: directory-spin 800ms linear infinite;
+}
+
+@keyframes directory-spin {
+  to { transform: rotate(360deg); }
+}
+
+.channel-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.channel-grid > li {
+  min-width: 0;
+}
+
+.channel-card {
+  align-items: center;
+  background: linear-gradient(120deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border);
+  border-radius: 2px 13px 2px 13px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  min-height: 132px;
+  padding: 14px;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.channel-card:hover,
+.channel-grid > li.selected .channel-card {
+  border-color: var(--brand);
+  transform: translateY(-2px);
+}
+
+.channel-grid > li.selected .channel-card {
+  box-shadow: inset 3px 0 0 var(--brand);
+}
+
+.channel-card-index {
+  align-self: start;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.57rem;
+  padding-top: 3px;
+}
+
+.channel-card-copy {
+  min-width: 0;
+}
+
+.channel-country {
+  color: var(--brand-strong);
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.channel-card h3 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1.02rem;
+  letter-spacing: -0.02em;
+  margin: 5px 0 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.channel-card-copy > p {
+  color: var(--muted);
+  font-size: 0.61rem;
+  margin: 0 0 9px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.channel-tags span.warning {
+  border-color: var(--brand);
+  color: var(--brand-strong);
+}
+
+.channel-tags span.session-outcome.working {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.channel-tags span.session-outcome.failed {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.channel-tune {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 2px 9px 2px 9px;
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.65rem;
+  font-weight: 780;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.channel-tune i {
+  color: var(--brand-strong);
+  font-size: 0.55rem;
+  font-style: normal;
+}
+
+.channel-tune:hover,
+.channel-tune:focus-visible {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--button-text);
+}
+
+.channel-tune:hover i,
+.channel-tune:focus-visible i {
+  color: inherit;
+}
+
+.channel-tune:focus-visible,
+.load-more:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.load-more {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 2px 10px 2px 10px;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  font-weight: 750;
+  gap: 9px;
+  justify-content: center;
+  margin: 18px auto 0;
+  min-height: 46px;
+  padding: 0 18px;
+}
+
+.load-more span {
+  color: var(--brand-strong);
+}
+
+.load-more:hover {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+}
+
+.catalog-credit {
+  margin-top: 24px;
+}
+
+.catalog-credit > span {
+  align-items: center;
+  background: var(--accent);
+  border-radius: 50%;
+  color: var(--bg);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 0.8rem;
+  font-weight: 800;
+  height: 24px;
+  justify-content: center;
+  width: 24px;
+}
+
+@media (max-width: 760px) {
+  .media-workbench-heading,
+  .directory-heading,
+  .source-form-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .media-workbench-heading p,
+  .directory-heading > p {
+    text-align: left;
+  }
+
+  .source-form,
+  .directory-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .source-submit {
+    width: 100%;
+  }
+
+  .iptv-tune-session {
+    align-items: start;
+    grid-template-columns: 1fr auto;
+  }
+
+  .iptv-tune-session p {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .channel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .media-workbench,
+  .iptv-directory {
+    padding: 16px;
+  }
+
+  .channel-card {
+    align-items: start;
+    grid-template-columns: 22px minmax(0, 1fr);
+  }
+
+  .iptv-tune-session {
+    grid-template-columns: 1fr;
+  }
+
+  .iptv-tune-session p,
+  .iptv-attempt-count {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .iptv-attempt-count {
+    text-align: center;
+  }
+
+  .channel-tune {
+    grid-column: 2;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .directory-loader {
+    animation: none;
+  }
+
+  .channel-card {
+    transition: none;
+  }
+}
