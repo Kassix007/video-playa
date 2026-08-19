@@ -131,7 +131,25 @@ describe("HORSEE MCP tool discovery", () => {
         type: "oauth2",
         scopes: ["horsee:council:write"],
       }]);
-      assert.match(client.getInstructions() ?? "", /call save_council_result/i);
+      const instructions = client.getInstructions() ?? "";
+      const mandatorySequence = [
+        "Complete discovery and FACT LOCK",
+        "Analyse all runners blind to market",
+        "Perform the market audit",
+        "Produce the COMPLETE mandatory Council verdict",
+        "Construct a schema-valid CouncilResult",
+        "CALL save_council_result BEFORE ending the response",
+        "Do not end the response after preliminary or blind analysis",
+        "If save_council_result fails, explicitly report the tool error",
+        "If publishing succeeds, say exactly: \"HORSEE dashboard updated.\"",
+      ];
+      let previousStepIndex = -1;
+      for (const step of mandatorySequence) {
+        const stepIndex = instructions.indexOf(step);
+        assert.ok(stepIndex > previousStepIndex, `${step} must appear in mandatory order.`);
+        previousStepIndex = stepIndex;
+      }
+      assert.match(instructions, /response is incomplete until save_council_result returns success or its tool error has been explicitly reported/i);
     });
   });
 });
