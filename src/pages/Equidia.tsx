@@ -16,6 +16,33 @@ type ManifestState =
 
 type CouncilSubmissionState = "idle" | "submitting" | "sent" | "error";
 
+type CouncilHorse = {
+  number: number;
+  name: string;
+  probability: number;
+};
+
+type CouncilResult = {
+  race_id: string;
+  racecourse: string;
+  race_number: number;
+  off_time: string;
+  distance: string;
+  surface: string;
+  going: string;
+  race_type: string;
+  field_size: number;
+  most_likely_winner: CouncilHorse;
+  principal_danger: CouncilHorse;
+  best_value: CouncilHorse;
+  ranking: CouncilHorse[];
+  confidence: "low" | "medium" | "high";
+  strongest_loss_reason: string;
+  final_selection: string;
+  council_status: string;
+  analysed_at: string;
+};
+
 type ChatGPTAppBridge = {
   sendFollowUpMessage?: (message: {
     prompt: string;
@@ -29,16 +56,35 @@ declare global {
   }
 }
 
-const COUNCIL_RESULT_FIELDS = [
-  "Most likely winner",
-  "Principal danger",
-  "Best value horse",
-  "Final ranking",
-  "Win probabilities",
-  "Confidence",
-  "Strongest reason selection could lose",
-  "Final selection",
-] as const;
+function formatCouncilHorse(horse: CouncilHorse): string {
+  return `#${horse.number} ${horse.name} — ${horse.probability}%`;
+}
+
+const COUNCIL_RESULT_FIELDS: Array<{
+  label: string;
+  value: (result: CouncilResult) => string;
+  prominent?: boolean;
+}> = [
+  { label: "Race", value: (result) => `${result.racecourse} R${result.race_number} · ${result.off_time}` },
+  { label: "Most likely winner", value: (result) => formatCouncilHorse(result.most_likely_winner), prominent: true },
+  { label: "Principal danger", value: (result) => formatCouncilHorse(result.principal_danger) },
+  { label: "Best value", value: (result) => formatCouncilHorse(result.best_value) },
+  { label: "Confidence", value: (result) => result.confidence },
+  { label: "Final ranking", value: (result) => result.ranking.map(formatCouncilHorse).join(" › ") },
+  { label: "Strongest loss reason", value: (result) => result.strongest_loss_reason },
+  { label: "Final selection", value: (result) => result.final_selection, prominent: true },
+];
+
+function isCouncilResult(value: unknown): value is CouncilResult {
+  if (!value || typeof value !== "object") return false;
+  const result = value as Partial<CouncilResult>;
+  return typeof result.race_id === "string"
+    && typeof result.racecourse === "string"
+    && typeof result.race_number === "number"
+    && typeof result.most_likely_winner?.probability === "number"
+    && Array.isArray(result.ranking)
+    && typeof result.analysed_at === "string";
+}
 
 function hasCouncilBridge(): boolean {
   return typeof window !== "undefined"
@@ -63,6 +109,7 @@ export default function Equidia() {
   const [councilCommand, setCouncilCommand] = useState("");
   const [councilBridgeAvailable, setCouncilBridgeAvailable] = useState(hasCouncilBridge);
   const [councilSubmissionState, setCouncilSubmissionState] = useState<CouncilSubmissionState>("idle");
+  const [councilResult, setCouncilResult] = useState<CouncilResult | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -94,6 +141,42 @@ export default function Equidia() {
     };
   }, []);
 
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadLatestCouncilResult = async () => {
+      try {
+        const response = await fetch("/api/council/latest", {
+          cache: "no-store",
+          headers: { Accept: "application/json" },
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+
+        const payload = await response.json() as { result?: unknown };
+        if (isCouncilResult(payload.result)) setCouncilResult(payload.result);
+      } catch {
+        // The static Vite site has no local API unless it is run through Netlify Dev.
+      }
+    };
+
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") void loadLatestCouncilResult();
+    };
+
+    void loadLatestCouncilResult();
+    const interval = window.setInterval(() => void loadLatestCouncilResult(), 15_000);
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
+    return () => {
+      controller.abort();
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, []);
+
   const maxBandwidth = useMemo(
     () => manifestState.status === "ready"
       ? Math.max(...manifestState.manifest.variants.map((variant) => variant.bandwidth || 0), 1)
@@ -110,10 +193,10 @@ export default function Equidia() {
   const runCouncil = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const prompt = councilCommand.trim();
+    const prompt = councilCommand;
     const bridge = window.openai;
 
-    if (!prompt || typeof bridge?.sendFollowUpMessage !== "function") {
+    if (!prompt.trim() || typeof bridge?.sendFollowUpMessage !== "function") {
       setCouncilBridgeAvailable(false);
       return;
     }
@@ -258,14 +341,17 @@ export default function Equidia() {
 
         <div className="equidia-council-results" aria-labelledby="equidia-council-results-heading">
           <div className="equidia-council-results-head">
-            <span className="equidia-section-mark">Council return / prepared fields</span>
+            <span className="equidia-section-mark">Council return / live fields</span>
             <h3 id="equidia-council-results-heading">Selection board</h3>
+            {councilResult && (
+              <p>{councilResult.distance} · {councilResult.surface} · {councilResult.going} · {councilResult.field_size} runners</p>
+            )}
           </div>
           <dl>
             {COUNCIL_RESULT_FIELDS.map((field) => (
-              <div key={field}>
-                <dt>{field}</dt>
-                <dd>Awaiting Council result</dd>
+              <div key={field.label} data-prominent={field.prominent || undefined}>
+                <dt>{field.label}</dt>
+                <dd>{councilResult ? field.value(councilResult) : "Awaiting Council result"}</dd>
               </div>
             ))}
           </dl>
