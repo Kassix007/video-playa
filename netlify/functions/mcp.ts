@@ -1,4 +1,5 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import type { Config, Context } from "@netlify/functions";
 import { randomUUID } from "node:crypto";
 import {
   authenticateCouncilRequest,
@@ -12,10 +13,9 @@ import { guardCouncilMcpRequest } from "../../server/council-request-security.js
 import { createCouncilResultStore } from "../../server/council-store.js";
 import { createHorseeMcpServer } from "../../server/horsee-mcp.js";
 import { addHorseeToolSecuritySchemes } from "../../server/horsee-tool-security.js";
+import { createCouncilRuntimeEnvironment } from "../../server/netlify-runtime.js";
 
-const store = createCouncilResultStore();
-
-export const config = {
+export const config: Config = {
   path: "/mcp",
   rateLimit: {
     windowLimit: 120,
@@ -24,16 +24,13 @@ export const config = {
   },
 };
 
-interface NetlifyFunctionContext {
-  requestId?: string;
-}
-
 export default async function handler(
   incomingRequest: Request,
-  context: NetlifyFunctionContext = {},
+  context: Context,
 ): Promise<Response> {
-  const requestId = context.requestId ?? randomUUID();
-  const guardedRequest = await guardCouncilMcpRequest(incomingRequest);
+  const requestId = context.requestId || randomUUID();
+  const runtimeEnvironment = createCouncilRuntimeEnvironment(context);
+  const guardedRequest = await guardCouncilMcpRequest(incomingRequest, runtimeEnvironment);
   if (!guardedRequest.allowed) {
     logCouncilSecurityEvent("mcp_request_denied", {
       request_id: requestId,
@@ -44,7 +41,7 @@ export default async function handler(
   }
 
   const request = guardedRequest.request;
-  const authConfig = resolveCouncilAuthConfig(request.url);
+  const authConfig = resolveCouncilAuthConfig(request.url, runtimeEnvironment);
   let authInfo;
 
   try {
@@ -64,6 +61,7 @@ export default async function handler(
   }
 
   const writePolicy = getCouncilWritePolicy(authConfig);
+  const store = createCouncilResultStore(runtimeEnvironment);
   const server = createHorseeMcpServer(store, writePolicy, { requestId });
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,

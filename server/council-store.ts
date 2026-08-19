@@ -248,9 +248,11 @@ class LocalFileCouncilResultStore implements CouncilResultStore {
   }
 }
 
-export function createCouncilResultStore(): CouncilResultStore {
-  if (process.env.NETLIFY === "true" && process.env.CONTEXT !== "dev") {
-    return new NetlifyCouncilResultStore(resolveCouncilStoreName());
+export function createCouncilResultStore(
+  environment: NetlifyDeployEnvironment = process.env,
+): CouncilResultStore {
+  if (environment.NETLIFY === "true" && environment.CONTEXT !== "dev") {
+    return new NetlifyCouncilResultStore(resolveCouncilStoreName(environment));
   }
 
   return new LocalFileCouncilResultStore();

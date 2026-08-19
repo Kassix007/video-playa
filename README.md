@@ -32,11 +32,11 @@ Open `http://localhost:8888/#/equidia` for the Equidia page. Use Netlify Dev, ra
 Local Council results are stored in `.netlify/horsee-council-results.json`, which is gitignored. Netlify storage is isolated by deploy context:
 
 - Production always uses `horsee-council-results-production`, so history persists across normal production deployments.
-- Deploy Previews use `horsee-council-results-deploy-preview-<REVIEW_ID>`.
-- Branch deploys use `horsee-council-results-branch-<BRANCH>`.
+- Deploy Previews use `horsee-council-results-deploy-preview-<REVIEW_ID-or-DEPLOY_ID>`.
+- Branch deploys use `horsee-council-results-branch-<BRANCH-or-DEPLOY_ID>`.
 - An unrecognized Netlify context fails safe into a non-production namespace containing `DEPLOY_ID`.
 
-This prevents a PR preview or branch deploy from changing the production selection board. Every store retains up to 50 results. Result history is ordered and pruned by the server's receipt time, not the caller-provided `analysed_at` display field. Both storage implementations sit behind `CouncilResultStore`, so the backend can be replaced without changing tool schemas.
+This prevents a PR preview or branch deploy from changing the production selection board. Netlify's per-invocation `Context` supplies the authoritative deploy context, deploy ID, and site identity; environment variables are fallbacks for local tests and explicitly configured values. Every store retains up to 50 results. Result history is ordered and pruned by the server's receipt time, not the caller-provided `analysed_at` display field. Both storage implementations sit behind `CouncilResultStore`, so the backend can be replaced without changing tool schemas.
 
 Build the site, MCP widget, and both TypeScript targets with:
 
