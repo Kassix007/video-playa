@@ -1,12 +1,15 @@
 import { getStore, type Store } from "@netlify/blobs";
+import { createHash } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { CouncilResultSchema, type CouncilResult } from "./council-schema.js";
 
-const STORE_NAME = "horsee-council-results";
+export const PRODUCTION_STORE_NAME = "horsee-council-results-production";
 const LATEST_KEY = "latest.json";
 const HISTORY_PREFIX = "results/";
 const HISTORY_LIMIT = 50;
+
+type NetlifyDeployEnvironment = Readonly<Record<string, string | undefined>>;
 
 export interface CouncilResultStore {
   readonly kind: "netlify-blobs" | "local-file";
@@ -20,18 +23,70 @@ function parseStoredResult(value: unknown): CouncilResult | null {
   return parsed.success ? parsed.data : null;
 }
 
+function safeNamespacePart(
+  value: string | undefined,
+  fallback: string,
+  maxLength: number,
+): string {
+  const safeValue = value
+    ?.toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  if (!safeValue) return fallback;
+  if (safeValue.length <= maxLength) return safeValue;
+
+  const hash = createHash("sha256").update(value ?? safeValue).digest("hex").slice(0, 8);
+  return `${safeValue.slice(0, maxLength - hash.length - 1)}-${hash}`;
+}
+
+export function resolveCouncilStoreName(
+  environment: NetlifyDeployEnvironment = process.env,
+): string {
+  if (environment.CONTEXT === "production") {
+    return PRODUCTION_STORE_NAME;
+  }
+
+  if (environment.CONTEXT === "deploy-preview") {
+    const previewId = safeNamespacePart(
+      environment.REVIEW_ID ?? environment.DEPLOY_ID,
+      "unknown",
+      24,
+    );
+    return `horsee-council-results-deploy-preview-${previewId}`;
+  }
+
+  if (environment.CONTEXT === "branch-deploy") {
+    const branch = safeNamespacePart(
+      environment.BRANCH ?? environment.DEPLOY_ID,
+      "unknown",
+      30,
+    );
+    return `horsee-council-results-branch-${branch}`;
+  }
+
+  const context = safeNamespacePart(environment.CONTEXT, "nonproduction", 12);
+  const deployId = safeNamespacePart(environment.DEPLOY_ID, "unknown", 24);
+  return `horsee-council-results-${context}-${deployId}`;
+}
+
 class NetlifyCouncilResultStore implements CouncilResultStore {
   readonly kind = "netlify-blobs" as const;
 
-  constructor(private readonly store: Store = getStore({ name: STORE_NAME, consistency: "strong" })) {}
+  constructor(storeName: string) {
+    this.store = getStore({ name: storeName, consistency: "strong" });
+  }
+
+  private readonly store: Store;
 
   async save(result: CouncilResult): Promise<void> {
-    const timestamp = String(Date.parse(result.analysed_at)).padStart(13, "0");
+    const validatedResult = CouncilResultSchema.parse(result);
+    const timestamp = String(Date.parse(validatedResult.analysed_at)).padStart(13, "0");
     const historyKey = `${HISTORY_PREFIX}${timestamp}-${crypto.randomUUID()}.json`;
 
     await Promise.all([
-      this.store.setJSON(historyKey, result),
-      this.store.setJSON(LATEST_KEY, result),
+      this.store.setJSON(historyKey, validatedResult),
+      this.store.setJSON(LATEST_KEY, validatedResult),
     ]);
 
     const listing = await this.store.list({ prefix: HISTORY_PREFIX });
@@ -93,8 +148,9 @@ class LocalFileCouncilResultStore implements CouncilResultStore {
   }
 
   async save(result: CouncilResult): Promise<void> {
+    const validatedResult = CouncilResultSchema.parse(result);
     const results = await this.readResults();
-    results.unshift(result);
+    results.unshift(validatedResult);
     await this.writeResults(results.slice(0, HISTORY_LIMIT));
   }
 
@@ -108,8 +164,8 @@ class LocalFileCouncilResultStore implements CouncilResultStore {
 }
 
 export function createCouncilResultStore(): CouncilResultStore {
-  if (process.env.NETLIFY === "true") {
-    return new NetlifyCouncilResultStore();
+  if (process.env.NETLIFY === "true" && process.env.CONTEXT !== "dev") {
+    return new NetlifyCouncilResultStore(resolveCouncilStoreName());
   }
 
   return new LocalFileCouncilResultStore();

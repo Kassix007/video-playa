@@ -12,6 +12,18 @@
   force = true
 
 [[redirects]]
+  from = "/.well-known/oauth-protected-resource"
+  to = "/.netlify/functions/oauth-protected-resource"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/.well-known/oauth-protected-resource/mcp"
+  to = "/.netlify/functions/oauth-protected-resource"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/council/latest"
   to = "/.netlify/functions/council-latest"
   status = 200

@@ -29,40 +29,69 @@ npx netlify dev
 
 Open `http://localhost:8888/#/equidia` for the Equidia page. Use Netlify Dev, rather than only `npm run dev`, when testing the MCP function or latest-result endpoint.
 
-Local Council results are stored in `.netlify/horsee-council-results.json`, which is gitignored. Production uses the site-wide `horsee-council-results` Netlify Blobs store and retains up to 50 results. Both implementations sit behind `CouncilResultStore`, so the backend can be replaced without changing tool schemas.
+Local Council results are stored in `.netlify/horsee-council-results.json`, which is gitignored. Netlify storage is isolated by deploy context:
+
+- Production always uses `horsee-council-results-production`, so history persists across normal production deployments.
+- Deploy Previews use `horsee-council-results-deploy-preview-<REVIEW_ID>`.
+- Branch deploys use `horsee-council-results-branch-<BRANCH>`.
+- An unrecognized Netlify context fails safe into a non-production namespace containing `DEPLOY_ID`.
+
+This prevents a PR preview or branch deploy from changing the production selection board. Every store retains up to 50 results. Both storage implementations sit behind `CouncilResultStore`, so the backend can be replaced without changing tool schemas.
 
 Build the site, MCP widget, and both TypeScript targets with:
 
 ```bash
 npm run build
+npm run test:mcp
 ```
 
 ## Endpoints
 
 - Streamable HTTP MCP: `http://localhost:8888/mcp`
 - Latest structured result for the Equidia dashboard: `http://localhost:8888/api/council/latest`
+- OAuth protected-resource metadata: `http://localhost:8888/.well-known/oauth-protected-resource`
 - Production MCP: `https://<your-netlify-domain>/mcp`
 
 The MCP server identity is `horsee-council` version `1.0.0`.
 
 ## MCP tools
 
-- `open_horsee_council` — read-only; returns the latest result and renders `ui://horsee-council/v1.html`
-- `save_council_result` — write, non-destructive; accepts the strict final verdict
-- `get_latest_council_result` — read-only; returns the latest saved verdict
-- `get_council_history` — read-only; returns a newest-first history (maximum 50)
+- `open_horsee_council` — public read-only (`noauth`); returns the latest result and renders `ui://horsee-council/v1.html`
+- `save_council_result` — OAuth-protected write; requires `horsee:council:write` and accepts the strict final verdict
+- `get_latest_council_result` — public read-only (`noauth`); returns the latest saved verdict
+- `get_council_history` — public read-only (`noauth`); returns a newest-first history (maximum 50)
 
-Horse probabilities are numeric percentages from 0 through 100. Confidence is strictly `low`, `medium`, or `high`. Unknown fields are rejected at every object level.
+The result schema rejects unknown fields and inconsistent verdicts. Ranking must contain exactly `field_size` unique runners; `most_likely_winner` must exactly match `ranking[0]`; the winner, principal danger, and best value horse must match ranked runners; every probability must be numeric from 0 through 100; and ranking probabilities must total 99.5–100.5%. Confidence is strictly `low`, `medium`, or `high`.
+
+## Council write authorization
+
+Read tools remain public, but `save_council_result` is never an anonymous production writer. It advertises an OAuth 2.0 `securitySchemes` entry and enforces the same scope at the server. Bearer tokens are verified with the configured identity provider's JWKS for signature, exact issuer, expiry/not-before, HORSEE resource audience, and `horsee:council:write` scope. Invalid bearer tokens receive HTTP `401` with `WWW-Authenticate`; a tool call without authorization receives the MCP `mcp/www_authenticate` challenge and cannot reach storage.
+
+Configure these server-side Netlify environment variables for the relevant deploy context:
+
+```text
+HORSEE_MCP_RESOURCE=https://your-domain.example/mcp
+HORSEE_OAUTH_ISSUER=https://your-oauth-issuer.example/
+HORSEE_OAUTH_JWKS_URI=https://your-oauth-issuer.example/.well-known/jwks.json
+HORSEE_OAUTH_WRITE_SCOPE=horsee:council:write  # optional override
+```
+
+The authorization server must implement the OAuth 2.1 MCP flow and publish its own OAuth or OIDC discovery metadata. The resource value must be carried into the token's `aud` or `resource` claim. If the three required variables are absent, partial, or invalid on Netlify, writes are deliberately disabled while public reads continue to work. No OpenAI API key is involved, and no shared write secret is placed in model instructions or tool arguments.
+
+For local Inspector testing only, set `HORSEE_COUNCIL_DEV_WRITE_TOKEN` before starting Netlify Dev. This development bearer token is ignored in every non-`dev` Netlify deployment and is never a production authorization mode.
 
 ## Test with MCP Inspector
 
-Start `npx netlify dev`, then launch the current Inspector:
+Start Netlify Dev with an uncommitted local test token, then launch the current Inspector:
 
-```bash
-npx @modelcontextprotocol/inspector@latest
+```powershell
+$env:HORSEE_COUNCIL_DEV_WRITE_TOKEN = "replace-with-a-local-test-token"
+npx netlify dev
 ```
 
-Choose Streamable HTTP and connect to `http://localhost:8888/mcp`. Verify initialization, `tools/list`, and calls to all four tools. Call `open_horsee_council` first to inspect the MCP Apps resource and its `text/html;profile=mcp-app` response. Use a complete structured verdict when testing `save_council_result`, then confirm it is returned by both read tools.
+In another terminal, run `npx @modelcontextprotocol/inspector@latest`. Choose Streamable HTTP, connect to `http://localhost:8888/mcp`, and add `Authorization: Bearer replace-with-a-local-test-token` in the Inspector authentication/header settings. Verify initialization, `tools/list`, and calls to all four tools. Call `open_horsee_council` first to inspect the MCP Apps resource and its `text/html;profile=mcp-app` response. Use a complete structured verdict when testing `save_council_result`, then confirm it is returned by both read tools.
+
+Repeat `save_council_result` without the Authorization header and verify that it returns `isError: true`, includes `mcp/www_authenticate`, and does not alter latest/history. Repeat with a malformed verdict to verify schema rejection before storage.
 
 The Inspector CLI can check discovery directly:
 
@@ -89,8 +118,9 @@ ChatGPT requires a publicly reachable HTTPS endpoint or an approved secure/devel
 ## Implementation notes
 
 - The app resource uses the stable MCP Apps bridge (`ui/initialize`, tool input/result notifications, `tools/call`, and `ui/message`).
+- OAuth is a resource-server boundary only; use an established OAuth 2.1 identity provider rather than implementing an authorization server in this repository.
 - `server/generated/horsee-widget.ts` is rebuilt from `mcp-app/horsee-widget.ts` by `npm run build:mcp-widget`; do not edit the generated module directly.
 - The full Council analysis belongs in the ChatGPT conversation. Only the strict final verdict is stored.
 - No API keys, ChatGPT credentials, or conversation tokens are stored.
 
-Current references: [OpenAI MCP server guide](https://developers.openai.com/plugins/build/mcp-server), [OpenAI MCP Apps UI guide](https://developers.openai.com/plugins/build/chatgpt-ui), [OpenAI connection/testing guide](https://developers.openai.com/plugins/deploy/connect-chatgpt), and [MCP Apps specification](https://modelcontextprotocol.io/extensions/apps/overview).
+Current references: [OpenAI plugin authentication guide](https://developers.openai.com/plugins/build/auth), [OpenAI MCP server guide](https://developers.openai.com/plugins/build/mcp-server), [OpenAI MCP Apps UI guide](https://developers.openai.com/plugins/build/ui), [Netlify build environment variables](https://docs.netlify.com/build/configure-builds/environment-variables/), and [MCP Apps specification](https://modelcontextprotocol.io/extensions/apps/overview).
