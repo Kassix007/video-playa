@@ -7,7 +7,7 @@ The Equidia player remains a normal browser player. HORSEE adds this separate fl
 ```text
 HORSEE MCP App → exact race command as a ChatGPT message
                → Council analysis in the ChatGPT conversation
-               → save_council_result
+               → save_council_result when OAuth publishing is configured
                → structured verdict in the MCP App and Equidia dashboard
 ```
 
@@ -56,16 +56,23 @@ The MCP server identity is `horsee-council` version `1.0.0`.
 
 ## MCP tools
 
-- `open_horsee_council` — public read-only (`noauth`); returns the latest result and renders `ui://horsee-council/v1.html`
+The public bootstrap catalog is available before an OAuth provider is configured. It contains exactly these three read-only tools, each explicitly advertised as `noauth`:
+
+- `open_horsee_council` — returns the latest result and renders `ui://horsee-council/v1.html`
+- `get_latest_council_result` — returns the latest saved verdict
+- `get_council_history` — returns a newest-first history (maximum 50)
+
+Only when the complete Council OAuth/write configuration resolves successfully does the server also register:
+
 - `save_council_result` — OAuth-protected write; requires `horsee:council:write` and accepts the strict final verdict
-- `get_latest_council_result` — public read-only (`noauth`); returns the latest saved verdict
-- `get_council_history` — public read-only (`noauth`); returns a newest-first history (maximum 50)
+
+`save_council_result` is never registered as `noauth`. In bootstrap mode, ChatGPT can create a No Auth connection without resolving OAuth metadata, open the widget, and receive commands through `ui/message`. ChatGPT performs the full Council analysis in the conversation but does not attempt to publish a result; the selection board can therefore remain on the latest previously stored result or await its first result.
 
 The result schema rejects unknown fields, inconsistent verdicts, and unbounded inputs. Ranking must contain exactly `field_size` unique runners; `most_likely_winner` must exactly match `ranking[0]`; the winner, principal danger, and best value horse must match ranked runners; every probability must be numeric from 0 through 100; and ranking probabilities must total 99.5–100.5%. Confidence is strictly `low`, `medium`, or `high`. A race is limited to 40 runners, horse names to 120 characters, the strongest loss reason to 2,000 characters, and the remaining text fields to documented schema-specific limits.
 
 ## Council write authorization
 
-Read tools remain public, but `save_council_result` is never an anonymous production writer. It advertises an OAuth 2.0 `securitySchemes` entry and enforces the same scope at the server. Bearer tokens are verified with the configured identity provider's JWKS for signature, exact issuer, expiry/not-before, HORSEE resource audience, and `horsee:council:write` scope. Invalid bearer tokens receive HTTP `401` with `WWW-Authenticate`; authenticated tokens missing the write scope receive `403`; and a tool call without authorization receives the MCP `mcp/www_authenticate` challenge and cannot reach storage.
+Read tools remain public, but `save_council_result` is never an anonymous production writer. When and only when OAuth/write policy is enabled, it is added to the tool catalog with an OAuth 2.0 `securitySchemes` entry and the server enforces the same scope. Bearer tokens are verified with the configured identity provider's JWKS for signature, exact issuer, expiry/not-before, HORSEE resource audience, and `horsee:council:write` scope. Invalid bearer tokens receive HTTP `401` with `WWW-Authenticate`; authenticated tokens missing the write scope receive `403`; and a tool call without authorization receives the MCP `mcp/www_authenticate` challenge and cannot reach storage.
 
 Before MCP parsing or authentication, the `/mcp` boundary also enforces the configured request host, rejects a supplied browser `Origin` unless it is allowed, and reads no more than 256 KiB of request body. Server-to-server clients may omit `Origin`. Allowed origins are derived from `HORSEE_MCP_RESOURCE`, Netlify's `URL`, `DEPLOY_PRIME_URL`, and `DEPLOY_URL`. Deploy Preview and branch hosts are additionally matched to the current deploy context and the production Netlify site slug; set `HORSEE_NETLIFY_SITE_NAME` when `URL` uses a custom domain. Add exceptional trusted origins with a comma-separated `HORSEE_ALLOWED_ORIGINS` value. Local development permits only loopback hosts unless one of those values is configured. The function is exposed only at `/mcp` (not the default `/.netlify/functions/mcp` URL), and Netlify applies a platform-level limit of 120 requests per 60 seconds for each IP/domain pair.
 
@@ -80,7 +87,7 @@ HORSEE_ALLOWED_ORIGINS=https://trusted-inspector.example  # optional, comma-sepa
 HORSEE_NETLIFY_SITE_NAME=your-netlify-site-name  # needed for previews when URL is custom
 ```
 
-The authorization server must implement the OAuth 2.1 MCP flow and publish its own OAuth or OIDC discovery metadata. The resource value must be carried into the token's `aud` or `resource` claim. Grant `horsee:council:write` only to approved ChatGPT principals/clients; do not issue it as a general public scope. If the three required variables are absent, partial, or invalid on Netlify, writes are deliberately disabled while public reads continue to work. No OpenAI API key is involved, and no shared write secret is placed in model instructions or tool arguments.
+The authorization server must implement the OAuth 2.1 MCP flow and publish its own OAuth or OIDC discovery metadata. The resource value must be carried into the token's `aud` or `resource` claim. Grant `horsee:council:write` only to approved ChatGPT principals/clients; do not issue it as a general public scope. If the three required variables are absent, partial, or invalid on Netlify, writes are deliberately disabled, the save tool is absent from `tools/list`, and the three `noauth` tools continue to work without OAuth discovery. No OpenAI API key is involved, and no shared write secret is placed in model instructions or tool arguments.
 
 Each successful write creates a server-only audit record alongside the result store. The record contains server receipt time, OAuth client ID, a one-way hash of the subject when present, race ID, and a result hash; it never contains the bearer token or the full verdict. Netlify retains the newest 500 audit records per deployment namespace. Local development writes the equivalent private records to `.netlify/horsee-council-write-audit.json`. Denied request-source and authentication events, plus successful/denied tool writes, are emitted as structured Netlify Function logs for monitoring.
 
@@ -88,14 +95,16 @@ For local Inspector testing only, set `HORSEE_COUNCIL_DEV_WRITE_TOKEN` before st
 
 ## Test with MCP Inspector
 
-Start Netlify Dev with an uncommitted local test token, then launch the current Inspector:
+For bootstrap-mode discovery, start Netlify Dev without OAuth variables or a development write token. Inspector initialization and `tools/list` must succeed with No Auth and return exactly the three public tools.
+
+For write-path testing, start Netlify Dev with an uncommitted local test token, then launch the current Inspector:
 
 ```powershell
 $env:HORSEE_COUNCIL_DEV_WRITE_TOKEN = "replace-with-a-local-test-token"
 npx netlify dev
 ```
 
-In another terminal, run `npx @modelcontextprotocol/inspector@latest`. Choose Streamable HTTP, connect to `http://localhost:8888/mcp`, and add `Authorization: Bearer replace-with-a-local-test-token` in the Inspector authentication/header settings. Verify initialization, `tools/list`, and calls to all four tools. Call `open_horsee_council` first to inspect the MCP Apps resource and its `text/html;profile=mcp-app` response. Use a complete structured verdict when testing `save_council_result`, then confirm it is returned by both read tools.
+In another terminal, run `npx @modelcontextprotocol/inspector@latest`. Choose Streamable HTTP, connect to `http://localhost:8888/mcp`, and add `Authorization: Bearer replace-with-a-local-test-token` in the Inspector authentication/header settings. Verify initialization, `tools/list`, and calls to all four tools. Call `open_horsee_council` first to inspect the MCP Apps resource and its `text/html;profile=mcp-app` response. Use a complete structured verdict when testing `save_council_result`, then confirm it is returned by both read tools. Local development-token mode exists only for Inspector testing and, like OAuth mode, registers the save tool with its OAuth-required scheme; it never downgrades the tool to `noauth`.
 
 Repeat `save_council_result` without the Authorization header and verify that it returns `isError: true`, includes `mcp/www_authenticate`, and does not alter latest/history. Repeat with a malformed verdict to verify schema rejection before storage.
 
@@ -116,7 +125,7 @@ ChatGPT requires a publicly reachable HTTPS endpoint or an approved secure/devel
 2. In ChatGPT, open **Settings → Security and login** and enable **Developer mode**. Availability can depend on account or workspace policy.
 3. Open **ChatGPT Plugins**, select the plus button, and enter a name and description.
 4. Choose the public endpoint connection method and enter the complete URL, including `/mcp` (for example, `https://example.netlify.app/mcp`).
-5. Create the connection and review the four discovered tools and their annotations.
+5. Create the connection. In No Auth bootstrap mode, review the three public tools and their `noauth` declarations. After OAuth is completely configured, refresh the connection and review all four tools, including the OAuth-only save tool.
 6. Add HORSEE to a conversation and ask it to open the Council. Enter a command such as `R1C1 hard` in the rendered panel.
 
 `RUN COUNCIL` sends the exact command as a standard MCP Apps `ui/message`. The `window.openai.sendFollowUpMessage` bridge is only a ChatGPT compatibility fallback. Outside a supported host, the button stays disabled and the page states that the Council bridge is offline; stored results may still be viewed.
