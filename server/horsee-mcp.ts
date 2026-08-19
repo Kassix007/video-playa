@@ -14,13 +14,26 @@ export const HORSEE_SERVER_NAME = "horsee-council";
 export const HORSEE_SERVER_VERSION = "1.0.0";
 export const HORSEE_WIDGET_URI = "ui://horsee-council/v1.html";
 
-const WRITE_ENABLED_SERVER_INSTRUCTIONS = `When the user submits a race command from HORSEE, perform the complete Horse Racing Council analysis in the conversation. After the final Council verdict is complete, call save_council_result with the structured verdict.
+const WRITE_ENABLED_SERVER_INSTRUCTIONS = `For every HORSEE race command, complete this mandatory workflow in order and do not stop early:
+1. Complete discovery and FACT LOCK.
+2. Analyse all runners blind to market.
+3. Perform the market audit.
+4. Produce the COMPLETE mandatory Council verdict.
+5. Construct a schema-valid CouncilResult.
+6. CALL save_council_result BEFORE ending the response.
+7. Do not end the response after preliminary or blind analysis.
+8. If save_council_result fails, explicitly report the tool error and do not claim that publishing succeeded.
+9. If publishing succeeds, say exactly: "HORSEE dashboard updated."
 
-Use the current ChatGPT conversation context, any available racecard or browsing tools, and the user's requested mode. Do not call an OpenAI API from this MCP server. Keep the full analysis in the conversation and save only the structured final result. Ranking must include every declared runner exactly once, most_likely_winner must exactly match ranking[0], ranking probabilities must total approximately 100%, analysed_at must be an ISO 8601 timestamp, and confidence must be low, medium, or high. After saving, present the final result and tell the user the Council panel has been updated.`;
+Use the current ChatGPT conversation context, any available racecard or browsing tools, and the user's requested mode. Do not call an OpenAI API from this MCP server. Keep the full analysis in the conversation and save only the structured final result. The complete verdict must include the most likely winner, principal danger, best value horse, final ranking, win probabilities, confidence, strongest reason the selection could lose, and final selection.
 
-const WRITE_DISABLED_SERVER_INSTRUCTIONS = `When the user submits a race command from HORSEE, perform the complete Horse Racing Council analysis in the ChatGPT conversation. HORSEE Council result publishing is not currently configured. Do not attempt to call save_council_result.
+Ranking must include every declared runner exactly once, most_likely_winner must exactly match ranking[0], ranking probabilities must total approximately 100%, analysed_at must be an ISO 8601 timestamp, and confidence must be low, medium, or high. The response is incomplete until save_council_result returns success or its tool error has been explicitly reported.`;
 
-Use the current ChatGPT conversation context, any available racecard or browsing tools, and the user's requested mode. Do not call an OpenAI API from this MCP server. Keep the full analysis and final Council verdict in the conversation. The HORSEE panel may continue to show the latest previously published result or await its first stored result.`;
+const WRITE_DISABLED_SERVER_INSTRUCTIONS = `For every HORSEE race command, complete discovery and FACT LOCK, analyse all runners blind to market, perform the market audit, and produce the COMPLETE mandatory Council verdict. Do not stop after preliminary or blind analysis.
+
+HORSEE Council result publishing is not currently configured, so save_council_result is not available. Do not attempt to call save_council_result or claim that the dashboard was updated. Keep the full analysis and final verdict in the ChatGPT conversation, including the most likely winner, principal danger, best value horse, final ranking, win probabilities, confidence, strongest reason the selection could lose, and final selection.
+
+Use the current ChatGPT conversation context, any available racecard or browsing tools, and the user's requested mode. Do not call an OpenAI API from this MCP server. The HORSEE panel may continue to show the latest previously published result or await its first stored result.`;
 
 export function getHorseeServerInstructions(writePolicy: CouncilWritePolicy): string {
   return writePolicy.enabled

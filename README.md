@@ -68,6 +68,8 @@ Only when the complete Council OAuth/write configuration resolves successfully d
 
 `save_council_result` is never registered as `noauth`. In bootstrap mode, ChatGPT can create a No Auth connection without resolving OAuth metadata, open the widget, and receive commands through `ui/message`. ChatGPT performs the full Council analysis in the conversation but does not attempt to publish a result; the selection board can therefore remain on the latest previously stored result or await its first result.
 
+When publishing is enabled, the server instructions require every race command to progress through discovery and FACT LOCK, blind-to-market analysis of every runner, market audit, the complete Council verdict, and construction of a schema-valid result. ChatGPT must call `save_council_result` before ending its response, explicitly report any tool error, and say `HORSEE dashboard updated.` only after a successful publish. Bootstrap instructions retain the full analytical sequence but explicitly prohibit the unavailable save call.
+
 The result schema rejects unknown fields, inconsistent verdicts, and unbounded inputs. Ranking must contain exactly `field_size` unique runners; `most_likely_winner` must exactly match `ranking[0]`; the winner, principal danger, and best value horse must match ranked runners; every probability must be numeric from 0 through 100; and ranking probabilities must total 99.5–100.5%. Confidence is strictly `low`, `medium`, or `high`. A race is limited to 40 runners, horse names to 120 characters, the strongest loss reason to 2,000 characters, and the remaining text fields to documented schema-specific limits.
 
 ## Council write authorization
