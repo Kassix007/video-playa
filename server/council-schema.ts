@@ -1,32 +1,34 @@
 import { z } from "zod";
 
+export const MAX_COUNCIL_FIELD_SIZE = 40;
+
 export const CouncilConfidenceSchema = z.enum(["low", "medium", "high"]);
 
 export const CouncilHorseSchema = z.object({
-  number: z.number().int().positive(),
-  name: z.string().min(1),
+  number: z.number().int().positive().max(999),
+  name: z.string().trim().min(1).max(120),
   probability: z.number().min(0).max(100),
 }).strict();
 
 const CouncilResultShapeSchema = z.object({
-  race_id: z.string().min(1),
-  racecourse: z.string().min(1),
-  race_number: z.number().int().positive(),
-  off_time: z.string().min(1),
-  distance: z.string().min(1),
-  surface: z.string().min(1),
-  going: z.string().min(1),
-  race_type: z.string().min(1),
-  field_size: z.number().int().positive(),
+  race_id: z.string().trim().min(1).max(160),
+  racecourse: z.string().trim().min(1).max(120),
+  race_number: z.number().int().positive().max(999),
+  off_time: z.string().trim().min(1).max(40),
+  distance: z.string().trim().min(1).max(80),
+  surface: z.string().trim().min(1).max(80),
+  going: z.string().trim().min(1).max(80),
+  race_type: z.string().trim().min(1).max(80),
+  field_size: z.number().int().positive().max(MAX_COUNCIL_FIELD_SIZE),
   most_likely_winner: CouncilHorseSchema,
   principal_danger: CouncilHorseSchema,
   best_value: CouncilHorseSchema,
-  ranking: z.array(CouncilHorseSchema).min(1),
+  ranking: z.array(CouncilHorseSchema).min(1).max(MAX_COUNCIL_FIELD_SIZE),
   confidence: CouncilConfidenceSchema,
-  strongest_loss_reason: z.string().min(1),
-  final_selection: z.string().min(1),
-  council_status: z.string().min(1),
-  analysed_at: z.iso.datetime(),
+  strongest_loss_reason: z.string().trim().min(1).max(2_000),
+  final_selection: z.string().trim().min(1).max(240),
+  council_status: z.string().trim().min(1).max(64),
+  analysed_at: z.iso.datetime().max(40),
 }).strict();
 
 function isSameHorse(

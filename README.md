@@ -36,7 +36,7 @@ Local Council results are stored in `.netlify/horsee-council-results.json`, whic
 - Branch deploys use `horsee-council-results-branch-<BRANCH>`.
 - An unrecognized Netlify context fails safe into a non-production namespace containing `DEPLOY_ID`.
 
-This prevents a PR preview or branch deploy from changing the production selection board. Every store retains up to 50 results. Both storage implementations sit behind `CouncilResultStore`, so the backend can be replaced without changing tool schemas.
+This prevents a PR preview or branch deploy from changing the production selection board. Every store retains up to 50 results. Result history is ordered and pruned by the server's receipt time, not the caller-provided `analysed_at` display field. Both storage implementations sit behind `CouncilResultStore`, so the backend can be replaced without changing tool schemas.
 
 Build the site, MCP widget, and both TypeScript targets with:
 
@@ -61,11 +61,13 @@ The MCP server identity is `horsee-council` version `1.0.0`.
 - `get_latest_council_result` — public read-only (`noauth`); returns the latest saved verdict
 - `get_council_history` — public read-only (`noauth`); returns a newest-first history (maximum 50)
 
-The result schema rejects unknown fields and inconsistent verdicts. Ranking must contain exactly `field_size` unique runners; `most_likely_winner` must exactly match `ranking[0]`; the winner, principal danger, and best value horse must match ranked runners; every probability must be numeric from 0 through 100; and ranking probabilities must total 99.5–100.5%. Confidence is strictly `low`, `medium`, or `high`.
+The result schema rejects unknown fields, inconsistent verdicts, and unbounded inputs. Ranking must contain exactly `field_size` unique runners; `most_likely_winner` must exactly match `ranking[0]`; the winner, principal danger, and best value horse must match ranked runners; every probability must be numeric from 0 through 100; and ranking probabilities must total 99.5–100.5%. Confidence is strictly `low`, `medium`, or `high`. A race is limited to 40 runners, horse names to 120 characters, the strongest loss reason to 2,000 characters, and the remaining text fields to documented schema-specific limits.
 
 ## Council write authorization
 
-Read tools remain public, but `save_council_result` is never an anonymous production writer. It advertises an OAuth 2.0 `securitySchemes` entry and enforces the same scope at the server. Bearer tokens are verified with the configured identity provider's JWKS for signature, exact issuer, expiry/not-before, HORSEE resource audience, and `horsee:council:write` scope. Invalid bearer tokens receive HTTP `401` with `WWW-Authenticate`; a tool call without authorization receives the MCP `mcp/www_authenticate` challenge and cannot reach storage.
+Read tools remain public, but `save_council_result` is never an anonymous production writer. It advertises an OAuth 2.0 `securitySchemes` entry and enforces the same scope at the server. Bearer tokens are verified with the configured identity provider's JWKS for signature, exact issuer, expiry/not-before, HORSEE resource audience, and `horsee:council:write` scope. Invalid bearer tokens receive HTTP `401` with `WWW-Authenticate`; authenticated tokens missing the write scope receive `403`; and a tool call without authorization receives the MCP `mcp/www_authenticate` challenge and cannot reach storage.
+
+Before MCP parsing or authentication, the `/mcp` boundary also enforces the configured request host, rejects a supplied browser `Origin` unless it is allowed, and reads no more than 256 KiB of request body. Server-to-server clients may omit `Origin`. Allowed origins are derived from `HORSEE_MCP_RESOURCE`, Netlify's `URL`, `DEPLOY_PRIME_URL`, and `DEPLOY_URL`; add exceptional trusted origins with a comma-separated `HORSEE_ALLOWED_ORIGINS` value. Local development permits only loopback hosts unless one of those values is configured. The function is exposed only at `/mcp` (not the default `/.netlify/functions/mcp` URL), and Netlify applies a platform-level limit of 120 requests per 60 seconds for each IP/domain pair.
 
 Configure these server-side Netlify environment variables for the relevant deploy context:
 
@@ -74,9 +76,12 @@ HORSEE_MCP_RESOURCE=https://your-domain.example/mcp
 HORSEE_OAUTH_ISSUER=https://your-oauth-issuer.example/
 HORSEE_OAUTH_JWKS_URI=https://your-oauth-issuer.example/.well-known/jwks.json
 HORSEE_OAUTH_WRITE_SCOPE=horsee:council:write  # optional override
+HORSEE_ALLOWED_ORIGINS=https://trusted-inspector.example  # optional, comma-separated
 ```
 
-The authorization server must implement the OAuth 2.1 MCP flow and publish its own OAuth or OIDC discovery metadata. The resource value must be carried into the token's `aud` or `resource` claim. If the three required variables are absent, partial, or invalid on Netlify, writes are deliberately disabled while public reads continue to work. No OpenAI API key is involved, and no shared write secret is placed in model instructions or tool arguments.
+The authorization server must implement the OAuth 2.1 MCP flow and publish its own OAuth or OIDC discovery metadata. The resource value must be carried into the token's `aud` or `resource` claim. Grant `horsee:council:write` only to approved ChatGPT principals/clients; do not issue it as a general public scope. If the three required variables are absent, partial, or invalid on Netlify, writes are deliberately disabled while public reads continue to work. No OpenAI API key is involved, and no shared write secret is placed in model instructions or tool arguments.
+
+Each successful write creates a server-only audit record alongside the result store. The record contains server receipt time, OAuth client ID, a one-way hash of the subject when present, race ID, and a result hash; it never contains the bearer token or the full verdict. Netlify retains the newest 500 audit records per deployment namespace. Local development writes the equivalent private records to `.netlify/horsee-council-write-audit.json`. Denied request-source and authentication events, plus successful/denied tool writes, are emitted as structured Netlify Function logs for monitoring.
 
 For local Inspector testing only, set `HORSEE_COUNCIL_DEV_WRITE_TOKEN` before starting Netlify Dev. This development bearer token is ignored in every non-`dev` Netlify deployment and is never a production authorization mode.
 
@@ -123,4 +128,4 @@ ChatGPT requires a publicly reachable HTTPS endpoint or an approved secure/devel
 - The full Council analysis belongs in the ChatGPT conversation. Only the strict final verdict is stored.
 - No API keys, ChatGPT credentials, or conversation tokens are stored.
 
-Current references: [OpenAI plugin authentication guide](https://developers.openai.com/plugins/build/auth), [OpenAI MCP server guide](https://developers.openai.com/plugins/build/mcp-server), [OpenAI MCP Apps UI guide](https://developers.openai.com/plugins/build/ui), [Netlify build environment variables](https://docs.netlify.com/build/configure-builds/environment-variables/), and [MCP Apps specification](https://modelcontextprotocol.io/extensions/apps/overview).
+Current references: [OpenAI plugin authentication guide](https://developers.openai.com/plugins/build/auth), [OpenAI MCP server guide](https://developers.openai.com/plugins/build/mcp-server), [OpenAI MCP Apps UI guide](https://developers.openai.com/plugins/build/ui), [Netlify build environment variables](https://docs.netlify.com/build/configure-builds/environment-variables/), [Netlify rate limiting](https://www.netlify.com/blog/how-to-rate-limit-ai-features-and-avoid-surprise-costs/), and [MCP Apps specification](https://modelcontextprotocol.io/extensions/apps/overview).

@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   authenticateCouncilRequest,
   createCouncilAuthChallenge,
+  createCouncilUnauthorizedResponse,
   getCouncilProtectedResourceMetadata,
   getCouncilWritePolicy,
   resolveCouncilAuthConfig,
@@ -72,5 +73,24 @@ describe("Council write authorization", () => {
       ),
       "Bearer resource_metadata=\"https://horsee.example/.well-known/oauth-protected-resource\", scope=\"horsee:council:write\", error=\"insufficient_scope\", error_description=\"Council write access is required.\"",
     );
+  });
+
+  it("uses 401 for invalid tokens and 403 for insufficient scope", () => {
+    const config = resolveCouncilAuthConfig("http://localhost:8888/mcp", {
+      CONTEXT: "dev",
+      HORSEE_COUNCIL_DEV_WRITE_TOKEN: "inspector-test-token",
+    });
+
+    assert.equal(
+      createCouncilUnauthorizedResponse(config, "Invalid token.", "invalid_token").status,
+      401,
+    );
+    const insufficientScope = createCouncilUnauthorizedResponse(
+      config,
+      "Council write access is required.",
+      "insufficient_scope",
+    );
+    assert.equal(insufficientScope.status, 403);
+    assert.match(insufficientScope.headers.get("www-authenticate") ?? "", /insufficient_scope/);
   });
 });

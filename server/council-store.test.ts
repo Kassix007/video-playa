@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { PRODUCTION_STORE_NAME, resolveCouncilStoreName } from "./council-store.js";
+import {
+  createCouncilHistoryKey,
+  PRODUCTION_STORE_NAME,
+  resolveCouncilStoreName,
+} from "./council-store.js";
 
 describe("Netlify Council store namespaces", () => {
   it("keeps one stable namespace across production deployments", () => {
@@ -47,5 +51,12 @@ describe("Netlify Council store namespaces", () => {
 
     assert.equal(branchStore, "horsee-council-results-branch-feature-horsee-auth");
     assert.notEqual(branchStore, PRODUCTION_STORE_NAME);
+  });
+
+  it("creates history keys from server receipt time", () => {
+    assert.equal(
+      createCouncilHistoryKey(1_776_672_000_000, "event-id"),
+      "results/1776672000000-event-id.json",
+    );
   });
 });
