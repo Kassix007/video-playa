@@ -23,6 +23,43 @@ function isLocalOrigin(origin: string): boolean {
   return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
 }
 
+function netlifySiteSlug(environment: CouncilRequestEnvironment): string | null {
+  const configuredSlug = environment.HORSEE_NETLIFY_SITE_NAME?.trim().toLowerCase();
+  if (configuredSlug && /^[a-z0-9-]+$/.test(configuredSlug)) return configuredSlug;
+
+  const productionOrigin = parseOrigin(environment.URL);
+  if (!productionOrigin) return null;
+  const hostname = new URL(productionOrigin).hostname.toLowerCase();
+  const suffix = ".netlify.app";
+  if (!hostname.endsWith(suffix)) return null;
+  return hostname.slice(0, -suffix.length) || null;
+}
+
+function isExpectedNetlifyDeployOrigin(
+  origin: string,
+  environment: CouncilRequestEnvironment,
+): boolean {
+  if (environment.NETLIFY !== "true") return false;
+  const url = new URL(origin);
+  if (url.protocol !== "https:") return false;
+
+  const siteSlug = netlifySiteSlug(environment);
+  if (!siteSlug) return false;
+  const deploySuffix = `--${siteSlug}.netlify.app`;
+  if (!url.hostname.endsWith(deploySuffix)) return false;
+  const deployPrefix = url.hostname.slice(0, -deploySuffix.length);
+
+  if (environment.CONTEXT === "deploy-preview") {
+    const reviewId = environment.REVIEW_ID?.trim();
+    return reviewId && /^\d+$/.test(reviewId)
+      ? deployPrefix === `deploy-preview-${reviewId}`
+      : /^deploy-preview-\d+$/.test(deployPrefix);
+  }
+
+  return environment.CONTEXT === "branch-deploy"
+    && /^[a-z0-9][a-z0-9-]{0,62}$/.test(deployPrefix);
+}
+
 export function resolveAllowedCouncilOrigins(
   environment: CouncilRequestEnvironment = process.env,
 ): Set<string> {
@@ -59,6 +96,9 @@ function validateRequestSource(
   const allowedOrigins = resolveAllowedCouncilOrigins(environment);
   const isLocalDevelopment = environment.NETLIFY !== "true" || environment.CONTEXT === "dev";
   if (isLocalDevelopment && isLocalOrigin(requestUrl.origin)) {
+    allowedOrigins.add(requestUrl.origin);
+  }
+  if (isExpectedNetlifyDeployOrigin(requestUrl.origin, environment)) {
     allowedOrigins.add(requestUrl.origin);
   }
 

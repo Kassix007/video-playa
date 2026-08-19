@@ -66,6 +66,41 @@ describe("HORSEE MCP request boundary", () => {
     assert.equal(result.allowed, true);
   });
 
+  it("accepts only the current site's context-bound Deploy Preview host", async () => {
+    const previewEnvironment = {
+      NETLIFY: "true",
+      CONTEXT: "deploy-preview",
+      REVIEW_ID: "3",
+      URL: "https://horsee.example",
+      HORSEE_NETLIFY_SITE_NAME: "video-playa",
+    };
+    const allowed = await guardCouncilMcpRequest(
+      new Request("https://deploy-preview-3--video-playa.netlify.app/mcp", {
+        method: "POST",
+        body: "{}",
+      }),
+      previewEnvironment,
+    );
+    const wrongReview = await guardCouncilMcpRequest(
+      new Request("https://deploy-preview-4--video-playa.netlify.app/mcp", {
+        method: "POST",
+        body: "{}",
+      }),
+      previewEnvironment,
+    );
+    const wrongSite = await guardCouncilMcpRequest(
+      new Request("https://deploy-preview-3--attacker.netlify.app/mcp", {
+        method: "POST",
+        body: "{}",
+      }),
+      previewEnvironment,
+    );
+
+    assert.equal(allowed.allowed, true);
+    assert.equal(wrongReview.allowed, false);
+    assert.equal(wrongSite.allowed, false);
+  });
+
   it("rejects an MCP body above 256 KiB without trusting Content-Length", async () => {
     const result = await guardCouncilMcpRequest(
       new Request("https://horsee.example/mcp", {
