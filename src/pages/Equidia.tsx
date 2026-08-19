@@ -14,6 +14,37 @@ type ManifestState =
   | { status: "ready"; manifest: EquidiaManifest }
   | { status: "error"; message: string };
 
+type CouncilSubmissionState = "idle" | "submitting" | "sent" | "error";
+
+type ChatGPTAppBridge = {
+  sendFollowUpMessage?: (message: {
+    prompt: string;
+    scrollToBottom?: boolean;
+  }) => Promise<void> | void;
+};
+
+declare global {
+  interface Window {
+    openai?: ChatGPTAppBridge;
+  }
+}
+
+const COUNCIL_RESULT_FIELDS = [
+  "Most likely winner",
+  "Principal danger",
+  "Best value horse",
+  "Final ranking",
+  "Win probabilities",
+  "Confidence",
+  "Strongest reason selection could lose",
+  "Final selection",
+] as const;
+
+function hasCouncilBridge(): boolean {
+  return typeof window !== "undefined"
+    && typeof window.openai?.sendFollowUpMessage === "function";
+}
+
 function formatBandwidth(bandwidth: number | null): string {
   if (!bandwidth) return "Rate n/a";
   if (bandwidth >= 1_000_000) return `${(bandwidth / 1_000_000).toFixed(2)} Mb/s`;
@@ -29,6 +60,9 @@ function languageName(code: string | null): string {
 export default function Equidia() {
   const [manifestState, setManifestState] = useState<ManifestState>({ status: "loading" });
   const [refreshKey, setRefreshKey] = useState(0);
+  const [councilCommand, setCouncilCommand] = useState("");
+  const [councilBridgeAvailable, setCouncilBridgeAvailable] = useState(hasCouncilBridge);
+  const [councilSubmissionState, setCouncilSubmissionState] = useState<CouncilSubmissionState>("idle");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -47,6 +81,19 @@ export default function Equidia() {
     return () => controller.abort();
   }, [refreshKey]);
 
+  useEffect(() => {
+    const detectCouncilBridge = () => setCouncilBridgeAvailable(hasCouncilBridge());
+
+    detectCouncilBridge();
+    window.addEventListener("focus", detectCouncilBridge);
+    document.addEventListener("visibilitychange", detectCouncilBridge);
+
+    return () => {
+      window.removeEventListener("focus", detectCouncilBridge);
+      document.removeEventListener("visibilitychange", detectCouncilBridge);
+    };
+  }, []);
+
   const maxBandwidth = useMemo(
     () => manifestState.status === "ready"
       ? Math.max(...manifestState.manifest.variants.map((variant) => variant.bandwidth || 0), 1)
@@ -57,6 +104,29 @@ export default function Equidia() {
   const audioLabel = manifestState.status === "ready"
     ? languageName(manifestState.manifest.audio?.language || null)
     : "Checking";
+
+  const councilCommandReady = councilCommand.trim().length > 0;
+
+  const runCouncil = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const prompt = councilCommand.trim();
+    const bridge = window.openai;
+
+    if (!prompt || typeof bridge?.sendFollowUpMessage !== "function") {
+      setCouncilBridgeAvailable(false);
+      return;
+    }
+
+    setCouncilSubmissionState("submitting");
+
+    try {
+      await bridge.sendFollowUpMessage({ prompt, scrollToBottom: true });
+      setCouncilSubmissionState("sent");
+    } catch {
+      setCouncilSubmissionState("error");
+    }
+  };
 
   return (
     <div className="equidia-page">
@@ -102,6 +172,105 @@ export default function Equidia() {
       <div id="equidia-player" className="equidia-player-anchor">
         <StreamPlayer autoPlay source={EQUIDIA_SOURCE} />
       </div>
+
+      <section className="equidia-council" aria-labelledby="equidia-council-heading">
+        <header className="equidia-council-head">
+          <div>
+            <span className="equidia-section-mark">HORSEE / race command desk</span>
+            <h2 id="equidia-council-heading">Horse Racing Council</h2>
+          </div>
+          <p
+            className="equidia-council-bridge"
+            data-state={councilBridgeAvailable ? "online" : "offline"}
+            aria-live="polite"
+          >
+            <i aria-hidden="true" />
+            {councilBridgeAvailable ? "Council bridge online" : "Council bridge offline"}
+          </p>
+        </header>
+
+        <div className="equidia-council-console">
+          <form className="equidia-council-form" onSubmit={runCouncil}>
+            <label htmlFor="equidia-council-command">
+              Council command
+              <span>Race + horse, with optional mode</span>
+            </label>
+            <div className="equidia-council-controls">
+              <input
+                id="equidia-council-command"
+                type="text"
+                value={councilCommand}
+                onChange={(event) => {
+                  setCouncilCommand(event.target.value);
+                  if (councilSubmissionState !== "submitting") setCouncilSubmissionState("idle");
+                }}
+                placeholder="R1C1 hard"
+                autoComplete="off"
+                spellCheck={false}
+                aria-describedby="equidia-council-help equidia-council-feedback"
+              />
+              <button
+                className="equidia-council-run"
+                type="submit"
+                disabled={!councilBridgeAvailable || !councilCommandReady || councilSubmissionState === "submitting"}
+              >
+                {councilSubmissionState === "submitting" ? "Sending…" : "Run Council"}
+              </button>
+            </div>
+            <p id="equidia-council-help" className="equidia-council-help">
+              Try <code>R1C1 hard</code>, <code>R2C7 hard</code>, or <code>R1C4</code>.
+            </p>
+          </form>
+
+          <div id="equidia-council-feedback" className="equidia-council-feedback" aria-live="polite">
+            {!councilBridgeAvailable && (
+              <>
+                <strong>Council bridge offline</strong>
+                <span>Open HORSEE through ChatGPT to run the Council.</span>
+              </>
+            )}
+            {councilBridgeAvailable && councilSubmissionState === "idle" && (
+              <>
+                <strong>ChatGPT is ready</strong>
+                <span>Your command will be sent as a follow-up message.</span>
+              </>
+            )}
+            {councilBridgeAvailable && councilSubmissionState === "submitting" && (
+              <>
+                <strong>Sending to ChatGPT</strong>
+                <span>Handing the command to the active conversation.</span>
+              </>
+            )}
+            {councilBridgeAvailable && councilSubmissionState === "sent" && (
+              <>
+                <strong>Command submitted</strong>
+                <span>The Council is continuing in your ChatGPT conversation.</span>
+              </>
+            )}
+            {councilBridgeAvailable && councilSubmissionState === "error" && (
+              <>
+                <strong>Command not submitted</strong>
+                <span>ChatGPT did not accept the follow-up. Please try again.</span>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="equidia-council-results" aria-labelledby="equidia-council-results-heading">
+          <div className="equidia-council-results-head">
+            <span className="equidia-section-mark">Council return / prepared fields</span>
+            <h3 id="equidia-council-results-heading">Selection board</h3>
+          </div>
+          <dl>
+            {COUNCIL_RESULT_FIELDS.map((field) => (
+              <div key={field}>
+                <dt>{field}</dt>
+                <dd>Awaiting Council result</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
 
       <section className="equidia-signal-board" aria-labelledby="equidia-signal-heading">
         <header className="equidia-board-head">
