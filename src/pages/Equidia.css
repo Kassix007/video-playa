@@ -234,6 +234,226 @@
   scroll-margin-top: 92px;
 }
 
+.equidia-council {
+  background:
+    linear-gradient(128deg, color-mix(in srgb, var(--brand-soft) 58%, transparent), transparent 42%),
+    var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.equidia-council-head {
+  align-items: end;
+  border-bottom: 1px solid var(--border-strong);
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin: 0 clamp(20px, 4vw, 34px);
+  padding: clamp(20px, 4vw, 30px) 0 18px;
+}
+
+.equidia-council-head h2 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: clamp(1.65rem, 4vw, 2.45rem);
+  letter-spacing: -0.05em;
+  margin: 0;
+}
+
+.equidia-council-bridge {
+  align-items: center;
+  color: var(--danger);
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 0.6rem;
+  font-weight: 850;
+  gap: 8px;
+  letter-spacing: 0.09em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.equidia-council-bridge i {
+  background: currentColor;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 16%, transparent);
+  height: 7px;
+  width: 7px;
+}
+
+.equidia-council-bridge[data-state="online"] {
+  color: var(--accent);
+}
+
+.equidia-council-console {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.38fr);
+  padding: clamp(20px, 4vw, 34px);
+}
+
+.equidia-council-form {
+  min-width: 0;
+}
+
+.equidia-council-form > label {
+  align-items: baseline;
+  display: flex;
+  font-size: 0.65rem;
+  font-weight: 900;
+  gap: 10px;
+  letter-spacing: 0.09em;
+  margin-bottom: 9px;
+  text-transform: uppercase;
+}
+
+.equidia-council-form > label span {
+  color: var(--muted);
+  font-size: 0.53rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+}
+
+.equidia-council-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.equidia-council-controls input {
+  background: color-mix(in srgb, var(--bg) 76%, var(--panel));
+  border: 1px solid var(--border-strong);
+  border-right: 0;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(0.82rem, 1.8vw, 0.96rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  min-height: 52px;
+  min-width: 0;
+  padding: 0 16px;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.equidia-council-controls input::placeholder {
+  color: color-mix(in srgb, var(--muted) 68%, transparent);
+}
+
+.equidia-council-controls input:focus-visible,
+.equidia-council-run:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+  position: relative;
+  z-index: 1;
+}
+
+.equidia-council-run {
+  background: var(--brand);
+  border: 1px solid var(--brand);
+  color: var(--button-text);
+  cursor: pointer;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  min-height: 52px;
+  min-width: 142px;
+  padding: 0 18px;
+  text-transform: uppercase;
+}
+
+.equidia-council-run:hover:not(:disabled) {
+  background: var(--brand-strong);
+  border-color: var(--brand-strong);
+}
+
+.equidia-council-run:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.equidia-council-help {
+  color: var(--muted);
+  font-size: 0.6rem;
+  line-height: 1.5;
+  margin: 9px 0 0;
+}
+
+.equidia-council-help code {
+  color: var(--text);
+  font-size: 0.96em;
+}
+
+.equidia-council-feedback {
+  align-content: center;
+  background: color-mix(in srgb, var(--panel-2) 84%, transparent);
+  border-left: 3px solid var(--border-strong);
+  display: grid;
+  gap: 5px;
+  min-height: 84px;
+  padding: 15px 17px;
+}
+
+.equidia-council-feedback strong {
+  font-size: 0.63rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.equidia-council-feedback span {
+  color: var(--muted);
+  font-size: 0.65rem;
+  line-height: 1.5;
+}
+
+.equidia-council-results {
+  background: color-mix(in srgb, var(--panel-2) 72%, var(--panel));
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 22px;
+  grid-template-columns: minmax(170px, 0.26fr) minmax(0, 1fr);
+  padding: clamp(20px, 4vw, 34px);
+}
+
+.equidia-council-results-head h3 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1.35rem;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.equidia-council-results dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+.equidia-council-results dl > div {
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px 14px;
+}
+
+.equidia-council-results dl > div:nth-child(odd) {
+  border-right: 1px solid var(--border);
+}
+
+.equidia-council-results dt {
+  color: var(--muted);
+  font-size: 0.55rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.equidia-council-results dd {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
 .equidia-signal-board {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -487,6 +707,14 @@
   .equidia-boundary > p {
     grid-column: 2 / -1;
   }
+
+  .equidia-council-console {
+    grid-template-columns: minmax(0, 1fr) minmax(210px, 0.42fr);
+  }
+
+  .equidia-council-results {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 680px) {
@@ -519,9 +747,26 @@
   }
 
   .equidia-board-head,
-  .equidia-board-foot {
+  .equidia-board-foot,
+  .equidia-council-head {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .equidia-council-console {
+    grid-template-columns: 1fr;
+  }
+
+  .equidia-council-feedback {
+    min-height: 0;
+  }
+
+  .equidia-council-results dl {
+    grid-template-columns: 1fr;
+  }
+
+  .equidia-council-results dl > div:nth-child(odd) {
+    border-right: 0;
   }
 
   .equidia-board-foot span {
@@ -596,6 +841,36 @@
 
   .equidia-signal-board {
     padding: 18px 14px;
+  }
+
+  .equidia-council-head {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+
+  .equidia-council-console,
+  .equidia-council-results {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .equidia-council-form > label {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .equidia-council-controls {
+    gap: 8px;
+    grid-template-columns: 1fr;
+  }
+
+  .equidia-council-controls input {
+    border-right: 1px solid var(--border-strong);
+  }
+
+  .equidia-council-run {
+    width: 100%;
   }
 
   .equidia-board-error,
