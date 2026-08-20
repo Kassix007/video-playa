@@ -467,6 +467,398 @@
   font-weight: 800;
 }
 
+.equidia-council-archive {
+  border-top: 1px solid var(--border-strong);
+  padding: clamp(20px, 4vw, 34px);
+}
+
+.equidia-archive-head,
+.equidia-archive-title,
+.equidia-calendar-toolbar {
+  align-items: center;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+}
+
+.equidia-archive-head {
+  border-bottom: 1px solid var(--border-strong);
+  padding-bottom: 18px;
+}
+
+.equidia-archive-head h3,
+.equidia-archive-title h4,
+.equidia-calendar-toolbar h4 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.equidia-archive-head h3 {
+  font-size: clamp(1.45rem, 3vw, 2rem);
+}
+
+.equidia-archive-head nav,
+.equidia-history-sort {
+  display: flex;
+}
+
+.equidia-archive-head button,
+.equidia-history-sort button,
+.equidia-calendar-toolbar button {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  min-height: 38px;
+  padding: 0 14px;
+  text-transform: uppercase;
+}
+
+.equidia-archive-head button + button,
+.equidia-history-sort button + button {
+  border-left: 0;
+}
+
+.equidia-archive-head button[data-active="true"],
+.equidia-history-sort button[data-active="true"] {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--button-text);
+}
+
+.equidia-archive-head button:focus-visible,
+.equidia-history-sort button:focus-visible,
+.equidia-calendar-toolbar button:focus-visible,
+.equidia-calendar button:focus-visible,
+.equidia-council-card summary:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+  position: relative;
+  z-index: 2;
+}
+
+.equidia-archive-view {
+  padding-top: 22px;
+}
+
+.equidia-archive-title {
+  margin-bottom: 14px;
+}
+
+.equidia-archive-title h4,
+.equidia-calendar-toolbar h4 {
+  font-size: clamp(1.15rem, 2.6vw, 1.55rem);
+}
+
+.equidia-archive-title p {
+  color: var(--muted);
+  font-size: 0.59rem;
+  margin: 5px 0 0;
+}
+
+.equidia-archive-title > strong {
+  color: var(--brand-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.equidia-archive-message,
+.equidia-archive-empty {
+  background: color-mix(in srgb, var(--panel-2) 80%, transparent);
+  border-left: 3px solid var(--border-strong);
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.6;
+  margin: 0;
+  padding: 16px 18px;
+}
+
+.equidia-archive-message[data-state="error"] {
+  border-left-color: var(--danger);
+  color: var(--danger);
+}
+
+.equidia-council-card-list {
+  display: grid;
+  gap: 9px;
+}
+
+.equidia-council-card {
+  background: color-mix(in srgb, var(--panel-2) 76%, var(--panel));
+  border: 1px solid var(--border);
+}
+
+.equidia-council-card[open] {
+  border-color: color-mix(in srgb, var(--brand) 46%, var(--border));
+}
+
+.equidia-council-card summary {
+  align-items: center;
+  cursor: pointer;
+  display: grid;
+  gap: 15px;
+  grid-template-columns: 64px minmax(170px, 0.8fr) minmax(210px, 1fr) auto;
+  list-style: none;
+  min-width: 0;
+  padding: 15px 16px;
+}
+
+.equidia-council-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.equidia-council-card-time {
+  color: var(--brand-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.equidia-council-card-race,
+.equidia-council-card-pick {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.equidia-council-card-race b,
+.equidia-council-card-pick small {
+  color: var(--muted);
+  font-size: 0.52rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.equidia-council-card-race strong,
+.equidia-council-card-pick strong {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  overflow-wrap: anywhere;
+}
+
+.equidia-council-card-race small,
+.equidia-council-card-pick span,
+.equidia-council-card-pick time {
+  color: var(--muted);
+  font-size: 0.58rem;
+}
+
+.equidia-council-card-pick time {
+  font-size: 0.52rem;
+  font-style: normal;
+  margin-top: 2px;
+}
+
+.equidia-confidence {
+  border: 1px solid currentColor;
+  color: var(--muted);
+  font-size: 0.52rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 5px 7px;
+  text-transform: uppercase;
+}
+
+.equidia-confidence[data-confidence="high"] {
+  color: var(--accent);
+}
+
+.equidia-confidence[data-confidence="low"] {
+  color: var(--danger);
+}
+
+.equidia-council-card-body {
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(250px, 0.75fr);
+  padding: 18px;
+}
+
+.equidia-council-card-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+.equidia-council-card-facts > div {
+  border-bottom: 1px solid var(--border);
+  min-width: 0;
+  padding: 10px 12px;
+}
+
+.equidia-council-card-facts > div:nth-child(odd) {
+  border-right: 1px solid var(--border);
+}
+
+.equidia-council-card-facts dt {
+  color: var(--muted);
+  font-size: 0.52rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.equidia-council-card-facts dd {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.equidia-runner-ranking h4 {
+  font-size: 0.61rem;
+  letter-spacing: 0.09em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.equidia-runner-ranking ol {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.equidia-runner-ranking li {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 22px minmax(80px, 1fr) minmax(45px, 0.7fr) 42px;
+}
+
+.equidia-runner-ranking li > span,
+.equidia-runner-ranking li > em {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.55rem;
+  font-style: normal;
+}
+
+.equidia-runner-ranking li > strong {
+  font-size: 0.62rem;
+  overflow-wrap: anywhere;
+}
+
+.equidia-runner-ranking li > i {
+  background: var(--panel);
+  display: block;
+  height: 4px;
+  overflow: hidden;
+}
+
+.equidia-runner-ranking li > i b {
+  background: var(--brand);
+  display: block;
+  height: 100%;
+}
+
+.equidia-calendar-toolbar {
+  justify-content: flex-start;
+  margin-bottom: 14px;
+}
+
+.equidia-calendar-toolbar h4 {
+  min-width: min(42vw, 260px);
+  text-align: center;
+}
+
+.equidia-calendar-toolbar button:not(.equidia-calendar-today) {
+  font-size: 1rem;
+  min-width: 40px;
+  padding: 0;
+}
+
+.equidia-calendar-toolbar .equidia-calendar-today {
+  margin-left: auto;
+}
+
+.equidia-calendar {
+  background: color-mix(in srgb, var(--panel-2) 76%, var(--panel));
+  border: 1px solid var(--border);
+  padding: 12px;
+}
+
+.equidia-calendar-weekdays,
+.equidia-calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.equidia-calendar-weekdays span {
+  color: var(--muted);
+  font-size: 0.52rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 8px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.equidia-calendar-days > button,
+.equidia-calendar-days > span {
+  aspect-ratio: 1.35;
+  min-height: 48px;
+}
+
+.equidia-calendar-days > button {
+  align-content: center;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  gap: 5px;
+  margin: -1px 0 0 -1px;
+  padding: 6px;
+}
+
+.equidia-calendar-days > button:disabled {
+  color: var(--muted);
+  cursor: default;
+  opacity: 0.45;
+}
+
+.equidia-calendar-days > button:not(:disabled) {
+  background: color-mix(in srgb, var(--brand-soft) 52%, transparent);
+}
+
+.equidia-calendar-days > button[data-selected="true"] {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--button-text);
+  opacity: 1;
+}
+
+.equidia-calendar-days > button[data-today="true"] {
+  box-shadow: inset 0 0 0 2px var(--brand-strong);
+}
+
+.equidia-calendar-days button span {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.equidia-calendar-days button b {
+  font-size: 0.53rem;
+  letter-spacing: 0.04em;
+}
+
+.equidia-history-day {
+  border-top: 1px solid var(--border-strong);
+  margin-top: 22px;
+  padding-top: 20px;
+}
+
 .equidia-signal-board {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -728,6 +1120,14 @@
   .equidia-council-results {
     grid-template-columns: 1fr;
   }
+
+  .equidia-council-card summary {
+    grid-template-columns: 58px minmax(150px, 0.8fr) minmax(190px, 1fr) auto;
+  }
+
+  .equidia-council-card-body {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 680px) {
@@ -780,6 +1180,43 @@
 
   .equidia-council-results dl > div:nth-child(odd) {
     border-right: 0;
+  }
+
+  .equidia-archive-head,
+  .equidia-archive-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .equidia-council-card summary {
+    align-items: start;
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+  }
+
+  .equidia-council-card-pick {
+    grid-column: 2 / -1;
+  }
+
+  .equidia-council-card-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .equidia-council-card-facts > div:nth-child(odd) {
+    border-right: 0;
+  }
+
+  .equidia-calendar-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .equidia-calendar-toolbar h4 {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .equidia-calendar-toolbar .equidia-calendar-today {
+    margin-left: 0;
+    width: 100%;
   }
 
   .equidia-board-foot span {
@@ -862,9 +1299,59 @@
   }
 
   .equidia-council-console,
-  .equidia-council-results {
+  .equidia-council-results,
+  .equidia-council-archive {
     padding-left: 14px;
     padding-right: 14px;
+  }
+
+  .equidia-archive-head nav,
+  .equidia-archive-head nav button,
+  .equidia-history-sort,
+  .equidia-history-sort button {
+    width: 100%;
+  }
+
+  .equidia-council-card summary {
+    grid-template-columns: 1fr auto;
+    padding: 13px 12px;
+  }
+
+  .equidia-council-card-time {
+    grid-column: 1;
+  }
+
+  .equidia-council-card-race,
+  .equidia-council-card-pick {
+    grid-column: 1 / -1;
+  }
+
+  .equidia-confidence {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .equidia-council-card-body {
+    padding: 12px;
+  }
+
+  .equidia-calendar {
+    padding: 7px;
+  }
+
+  .equidia-calendar-days > button,
+  .equidia-calendar-days > span {
+    aspect-ratio: 1;
+    min-height: 39px;
+  }
+
+  .equidia-calendar-days > button {
+    gap: 2px;
+    padding: 3px;
+  }
+
+  .equidia-calendar-days button b {
+    font-size: 0.46rem;
   }
 
   .equidia-council-form > label {

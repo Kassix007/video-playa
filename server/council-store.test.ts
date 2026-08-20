@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  createCouncilDatedHistoryKey,
   createCouncilHistoryKey,
   PRODUCTION_STORE_NAME,
   resolveCouncilStoreName,
@@ -57,6 +58,13 @@ describe("Netlify Council store namespaces", () => {
     assert.equal(
       createCouncilHistoryKey(1_776_672_000_000, "event-id"),
       "results/1776672000000-event-id.json",
+    );
+  });
+
+  it("creates date-partitioned history keys for efficient archive queries", () => {
+    assert.equal(
+      createCouncilDatedHistoryKey("2026-08-21", 1_776_672_000_000, "event-id"),
+      "results/2026-08-21/1776672000000-event-id.json",
     );
   });
 });

@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import CouncilArchive from "../components/council/CouncilArchive";
 import StreamPlayer from "../components/player/StreamPlayer";
+import {
+  isCouncilResult,
+  type CouncilHorse,
+  type CouncilResult,
+} from "../services/council";
 import {
   EQUIDIA_MASTER_URL,
   EQUIDIA_SOURCE,
@@ -15,33 +21,6 @@ type ManifestState =
   | { status: "error"; message: string };
 
 type CouncilSubmissionState = "idle" | "submitting" | "sent" | "error";
-
-type CouncilHorse = {
-  number: number;
-  name: string;
-  probability: number;
-};
-
-type CouncilResult = {
-  race_id: string;
-  racecourse: string;
-  race_number: number;
-  off_time: string;
-  distance: string;
-  surface: string;
-  going: string;
-  race_type: string;
-  field_size: number;
-  most_likely_winner: CouncilHorse;
-  principal_danger: CouncilHorse;
-  best_value: CouncilHorse;
-  ranking: CouncilHorse[];
-  confidence: "low" | "medium" | "high";
-  strongest_loss_reason: string;
-  final_selection: string;
-  council_status: string;
-  analysed_at: string;
-};
 
 type ChatGPTAppBridge = {
   sendFollowUpMessage?: (message: {
@@ -74,17 +53,6 @@ const COUNCIL_RESULT_FIELDS: Array<{
   { label: "Strongest loss reason", value: (result) => result.strongest_loss_reason },
   { label: "Final selection", value: (result) => result.final_selection, prominent: true },
 ];
-
-function isCouncilResult(value: unknown): value is CouncilResult {
-  if (!value || typeof value !== "object") return false;
-  const result = value as Partial<CouncilResult>;
-  return typeof result.race_id === "string"
-    && typeof result.racecourse === "string"
-    && typeof result.race_number === "number"
-    && typeof result.most_likely_winner?.probability === "number"
-    && Array.isArray(result.ranking)
-    && typeof result.analysed_at === "string";
-}
 
 function hasCouncilBridge(): boolean {
   return typeof window !== "undefined"
@@ -356,6 +324,8 @@ export default function Equidia() {
             ))}
           </dl>
         </div>
+
+        <CouncilArchive />
       </section>
 
       <section className="equidia-signal-board" aria-labelledby="equidia-signal-heading">

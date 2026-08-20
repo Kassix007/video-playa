@@ -24,6 +24,24 @@
   force = true
 
 [[redirects]]
+  from = "/api/council/today"
+  to = "/.netlify/functions/council-today"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/council/history/dates"
+  to = "/.netlify/functions/council-history-dates"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/council/history"
+  to = "/.netlify/functions/council-history"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/prog.txt"
   to = "/.netlify/functions/proxy"
   status = 200
