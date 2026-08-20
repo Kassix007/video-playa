@@ -24,7 +24,7 @@ Add one deterministic read-only HORSEE discovery tool that directly retrieves an
 
 **Performance Goals**: One normal source fetch plus at most one bounded retry; reject documents over 20 MiB; apply a 25-second timeout per fetch; serve date-filtered archive responses without sending the full history to the browser
 
-**Constraints**: Direct official SMSPariaz source only; no application racecard cache; Mauritius date authority; no partial parse success; PDF parsing must be lazy so native/browser-compatible globals cannot break MCP startup; no new secrets or client-side storage credentials; preserve existing MCP and Council response contracts
+**Constraints**: Direct official SMSPariaz source only; no application racecard cache; Mauritius date authority; no partial parse success; PDF parsing must be lazy so native/browser-compatible globals cannot break MCP startup; the function artifact must explicitly include the dynamically imported PDF.js worker; no new secrets or client-side storage credentials; preserve existing MCP and Council response contracts
 
 **Scale/Scope**: One daily multi-page racecard, all retained Council analyses, three new read APIs, one Equidia route, and the existing MCP/store implementation
 
@@ -54,7 +54,7 @@ save_council_result
     -> Equidia archive service and UI
 ```
 
-The parser separates transport/date validation from deterministic text parsing so tests can stub both the HTTP response and extracted PDF text. PDF.js and its native canvas globals load only inside the real extraction path, while the Netlify MCP bundle preserves the native dependency explicitly. Shared Mauritius date utilities are used by racecard validation, storage partitioning, archive filtering, APIs, and client day selection. Archive reads stay behind the store interface so both Netlify Blobs and local-file development implement identical behavior.
+The parser separates transport/date validation from deterministic text parsing so tests can stub both the HTTP response and extracted PDF text. PDF.js and its native canvas globals load only inside the real extraction path, while the Netlify MCP bundle preserves both the native dependency and PDF.js's dynamically imported worker explicitly. Shared Mauritius date utilities are used by racecard validation, storage partitioning, archive filtering, APIs, and client day selection. Archive reads stay behind the store interface so both Netlify Blobs and local-file development implement identical behavior.
 
 ## Project Structure
 
@@ -119,6 +119,7 @@ package-lock.json
 5. Add the Today/date/month APIs and client response validation.
 6. Integrate Today cards, historical calendar, daily detail, responsive styling, and accessible interaction into Equidia.
 7. Run automated regression, production build, live source smoke, and responsive browser verification.
+8. Verify the production-equivalent MCP ZIP contains the dynamically imported PDF.js worker before deployment, then smoke-test the deployed racecard call.
 
 ## Complexity Tracking
 

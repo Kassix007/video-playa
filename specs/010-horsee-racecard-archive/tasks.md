@@ -147,6 +147,17 @@
 
 ---
 
+## Phase 9: PDF.js Worker Packaging Recovery
+
+**Purpose**: Ensure a racecard call can parse the downloaded programme inside the isolated deployed function artifact.
+
+- [X] T044 Add a failing configuration regression test proving the MCP function declares the PDF.js worker in `server/netlify-bundle-config.test.ts` (FR-025, FR-027; SC-007, SC-011)
+- [X] T045 Include `node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs` in the MCP function through `netlify.toml` (FR-027; SC-011)
+- [X] T046 Build the production-equivalent MCP ZIP and verify the exact worker module path is present using `specs/010-horsee-racecard-archive/quickstart.md` (SC-011)
+- [ ] T047 Run all backend tests, ESLint, and the production build, then verify the deployed racecard tool returns a current non-empty card (SC-006, SC-009, SC-011)
+
+---
+
 ## Dependencies and Execution Order
 
 ### Phase Dependencies

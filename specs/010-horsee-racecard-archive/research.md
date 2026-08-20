@@ -103,3 +103,15 @@
 - Keep the top-level parser import and rely on transitive dependency discovery: rejected because this produced the observed production 502.
 - Add a partial handwritten `DOMMatrix` shim: rejected because it would not provide the complete runtime PDF.js expects and could fail on future documents.
 - Load the native canvas module at MCP startup: rejected because the racecard parser should not become a startup dependency for unrelated tools.
+
+## Decision 10: Include the dynamically imported PDF.js worker as a function file
+
+**Decision**: Configure the Netlify `mcp` function with `included_files` for `node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs`, and verify the path inside the production-equivalent ZIP before deployment.
+
+**Rationale**: `pdf-parse` loads the worker with a runtime dynamic import. The function bundler includes the parser module but cannot infer that worker file, producing a deployed `ERR_MODULE_NOT_FOUND` only when the racecard tool parses a PDF. Including the exact file keeps the artifact small and preserves the dependency's expected module path.
+
+**Alternatives considered**:
+
+- Externalize the complete `pdfjs-dist` package: rejected because it copies tens of megabytes when only the worker module is missing.
+- Embed the worker as a data URL: rejected because the dependency's worker entry still performs its own dynamic import and would duplicate a large generated module in the bundle.
+- Rely on the workspace `node_modules`: rejected because serverless functions execute from isolated deployment artifacts.
