@@ -119,6 +119,7 @@ As an existing HORSEE client, I want authentication, result saving, latest-resul
 - **FR-023**: Calendar and analysis interactions MUST use labeled, keyboard-operable controls with visible focus and meaningful expanded-state information.
 - **FR-024**: The Today collection, calendar, and analysis detail MUST remain readable and operable without page-level horizontal scrolling at 375, 768, and 1280 pixel widths.
 - **FR-025**: Automated racecard and archive tests MUST use controlled fixtures or stubs and MUST NOT depend on the live SMSPariaz site or current production storage.
+- **FR-026**: Loading the HORSEE MCP MUST NOT require browser-only PDF globals; parser dependencies MUST load only when the racecard operation runs, and a parser failure MUST remain isolated to that operation.
 
 ### Key Entities
 
@@ -142,6 +143,7 @@ As an existing HORSEE client, I want authentication, result saving, latest-resul
 - **SC-007**: Racecard and archive automated tests complete without a network connection to SMSPariaz and without production storage access.
 - **SC-008**: At 375, 768, and 1280 pixel widths, the Equidia Today and calendar flows have zero page-level horizontal overflow and their primary controls remain keyboard operable.
 - **SC-009**: The production build completes successfully and the affected Equidia flows show no application runtime errors during desktop, tablet, and mobile browser checks.
+- **SC-010**: A production-equivalent Node function bundle initializes the MCP and advertises its existing tools without a `DOMMatrix`, `ImageData`, or `Path2D` startup failure.
 
 ## Assumptions
 
@@ -157,3 +159,4 @@ As an existing HORSEE client, I want authentication, result saving, latest-resul
 - The racecard parser, stale refresh, structured error, date-history, legacy-read, authorization, discovery, save, and compatibility suites passed 59 automated tests.
 - The production build and lint checks completed successfully.
 - Desktop, tablet, and 360-pixel browser checks exercised Today, month navigation, populated-date selection, analysis expansion, and empty states with no page-level horizontal overflow.
+- The production MCP startup failure caused by a missing native PDF.js canvas dependency was reproduced, the parser was made lazy and Node-compatible, and the Netlify MCP artifact was verified to contain the canvas runtime; 60 backend tests, ESLint, and the production build passed.

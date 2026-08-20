@@ -60,4 +60,13 @@ For a release smoke check only, allow the real source call and record the return
 
 ## 6. Deployment and migration
 
-Deploy through the existing Netlify pipeline. No destructive data migration is required: new saves use date-partitioned history keys, while existing flat history keys remain readable. `pdf-parse` is the only new runtime dependency. Existing Auth0 variables, write scope, MCP endpoint, Council store, and latest-result key remain unchanged.
+Deploy through the existing Netlify pipeline. No destructive data migration is required: new saves use date-partitioned history keys, while existing flat history keys remain readable. PDF extraction uses `pdf-parse` plus its explicit Node canvas runtime. Existing Auth0 variables, write scope, MCP endpoint, Council store, and latest-result key remain unchanged.
+
+Before deployment, build the Netlify function artifacts and confirm the MCP archive includes `@napi-rs/canvas` and the platform-native canvas package:
+
+```powershell
+netlify functions:build --src netlify/functions --functions .netlify/functions-runtime-check
+tar -tf .netlify/functions-runtime-check/mcp.zip | Select-String '@napi-rs/canvas'
+```
+
+After deployment, POST an MCP `initialize` request to `/mcp`, then use its session ID for `tools/list`. Both requests must succeed and the tool list must contain `get_smspariaz_daily_racecard`; a `DOMMatrix is not defined` response fails the deployment gate.

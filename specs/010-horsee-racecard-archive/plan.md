@@ -12,7 +12,7 @@ Add one deterministic read-only HORSEE discovery tool that directly retrieves an
 
 **Language/Version**: TypeScript 5.8, React TSX, CSS, Node.js 22 deployment runtime
 
-**Primary Dependencies**: Model Context Protocol SDK 1.30, Zod 4.4, `pdf-parse` 2.4, Netlify Functions 6, Netlify Blobs 11, React 18.3, Vite 7.1
+**Primary Dependencies**: Model Context Protocol SDK 1.30, Zod 4.4, `pdf-parse` 2.4, `@napi-rs/canvas` 0.1.80, Netlify Functions 6, Netlify Blobs 11, React 18.3, Vite 7.1
 
 **Storage**: Existing strongly consistent Netlify Blob store in deployed environments; existing atomic local JSON file store during development
 
@@ -24,7 +24,7 @@ Add one deterministic read-only HORSEE discovery tool that directly retrieves an
 
 **Performance Goals**: One normal source fetch plus at most one bounded retry; reject documents over 20 MiB; apply a 25-second timeout per fetch; serve date-filtered archive responses without sending the full history to the browser
 
-**Constraints**: Direct official SMSPariaz source only; no application racecard cache; Mauritius date authority; no partial parse success; no new secrets or client-side storage credentials; preserve existing MCP and Council response contracts
+**Constraints**: Direct official SMSPariaz source only; no application racecard cache; Mauritius date authority; no partial parse success; PDF parsing must be lazy so native/browser-compatible globals cannot break MCP startup; no new secrets or client-side storage credentials; preserve existing MCP and Council response contracts
 
 **Scale/Scope**: One daily multi-page racecard, all retained Council analyses, three new read APIs, one Equidia route, and the existing MCP/store implementation
 
@@ -54,7 +54,7 @@ save_council_result
     -> Equidia archive service and UI
 ```
 
-The parser separates transport/date validation from deterministic text parsing so tests can stub both the HTTP response and extracted PDF text. Shared Mauritius date utilities are used by racecard validation, storage partitioning, archive filtering, APIs, and client day selection. Archive reads stay behind the store interface so both Netlify Blobs and local-file development implement identical behavior.
+The parser separates transport/date validation from deterministic text parsing so tests can stub both the HTTP response and extracted PDF text. PDF.js and its native canvas globals load only inside the real extraction path, while the Netlify MCP bundle preserves the native dependency explicitly. Shared Mauritius date utilities are used by racecard validation, storage partitioning, archive filtering, APIs, and client day selection. Archive reads stay behind the store interface so both Netlify Blobs and local-file development implement identical behavior.
 
 ## Project Structure
 

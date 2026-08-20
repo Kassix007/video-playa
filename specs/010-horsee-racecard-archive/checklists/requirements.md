@@ -27,8 +27,10 @@
 - [x] Today and calendar collections define ordering, counts, repeated analyses, and empty states
 - [x] Existing authorization, save, latest-result, and history contracts are protected
 - [x] Verification requirements cover isolated automated tests, build, and responsive browser checks
+- [x] Production MCP startup is isolated from lazy PDF parser and native canvas initialization failures
 
 ## Notes
 
 - Validation passed on the first review iteration with no unresolved clarification.
 - This is a backfilled specification for implementation completed on 2026-08-21; delivered evidence is recorded in `spec.md` and will be mapped to tasks and verification steps during planning.
+- The production `DOMMatrix` startup regression is covered by FR-026, SC-010, and Tasks T039-T043.

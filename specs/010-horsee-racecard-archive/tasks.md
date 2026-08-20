@@ -135,6 +135,18 @@
 
 ---
 
+## Phase 8: Production MCP Runtime Recovery
+
+**Purpose**: Prevent PDF.js native runtime discovery from crashing the deployed MCP before any tool can be called.
+
+- [ ] T039 Load Node canvas globals and `pdf-parse` only inside real extraction in `server/smspariaz-racecard.ts` (FR-026; SC-010)
+- [ ] T040 Declare `@napi-rs/canvas` directly and preserve it in the MCP function artifact through `package.json`, `package-lock.json`, and `netlify.toml` (FR-026; SC-010)
+- [ ] T041 Add real-PDF extraction coverage with browser globals removed in `server/smspariaz-racecard.test.ts` (FR-025, FR-026; SC-007, SC-010)
+- [ ] T042 Build the production-equivalent function archive and verify its MCP package contains the native canvas runtime using `specs/010-horsee-racecard-archive/quickstart.md` (SC-010)
+- [ ] T043 Run all backend tests, ESLint, and the production build using `package.json` (SC-006, SC-009, SC-010)
+
+---
+
 ## Dependencies and Execution Order
 
 ### Phase Dependencies
