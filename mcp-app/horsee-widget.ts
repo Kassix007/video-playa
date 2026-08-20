@@ -1,4 +1,9 @@
 import { App } from "@modelcontextprotocol/ext-apps/app-with-deps";
+import {
+  councilRunStatusFrom,
+  formatCouncilRunStage,
+  type WidgetCouncilRunStatus,
+} from "./council-run-status-view.js";
 
 type CouncilResult = {
   race_id: string;
@@ -57,9 +62,17 @@ const runButton = document.querySelector<HTMLButtonElement>("#run")!;
 const bridgeLabel = document.querySelector<HTMLElement>("#bridge")!;
 const feedbackTitle = document.querySelector<HTMLElement>("#feedback-title")!;
 const feedbackDetail = document.querySelector<HTMLElement>("#feedback-detail")!;
+const runStatus = document.querySelector<HTMLElement>("#run-status")!;
+const runStatusTitle = document.querySelector<HTMLElement>("#run-status-title")!;
+const runStatusCommand = document.querySelector<HTMLElement>("#run-status-command")!;
+const runStatusStage = document.querySelector<HTMLElement>("#run-status-stage")!;
+const runStatusUpdated = document.querySelector<HTMLTimeElement>("#run-status-updated")!;
+const runStatusMessage = document.querySelector<HTMLElement>("#run-status-message")!;
 const resultList = document.querySelector<HTMLDListElement>("#result-list")!;
 
-const app = new App({ name: "HORSEE Horse Racing Council", version: "1.1.0" }, {}, { autoResize: true });
+const app = new App({ name: "HORSEE Horse Racing Council", version: "1.2.0" }, {}, { autoResize: true });
+const RUN_POLL_INTERVAL_MS = 3_000;
+const RUN_POLL_TIMEOUT_MS = 30 * 60_000;
 let standardBridge = false;
 let latestAnalysedAt: string | null = null;
 
@@ -92,48 +105,109 @@ function setFeedback(title: string, detail: string): void {
   feedbackDetail.textContent = detail;
 }
 
+function renderRunStatus(status: WidgetCouncilRunStatus | null): void {
+  if (!status) {
+    runStatus.dataset.state = "idle";
+    runStatusTitle.textContent = "HORSEE IDLE";
+    runStatusCommand.textContent = "No active Council run";
+    runStatusStage.textContent = "Stage: awaiting command";
+    runStatusUpdated.textContent = "Updated: —";
+    runStatusUpdated.removeAttribute("datetime");
+    runStatusMessage.textContent = "Run stages are separate from the saved Selection Board.";
+    return;
+  }
+
+  runStatus.dataset.state = status.stage.toLowerCase();
+  runStatusTitle.textContent = status.stage === "SAVED"
+    ? "HORSEE SAVED"
+    : status.stage === "FAILED"
+      ? "HORSEE FAILED"
+      : "HORSEE RUNNING";
+  runStatusCommand.textContent = status.command;
+  runStatusStage.textContent = `Stage: ${formatCouncilRunStage(status.stage)}`;
+  runStatusUpdated.dateTime = status.updated_at;
+  runStatusUpdated.textContent = `Updated: ${new Date(status.updated_at).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  })}`;
+  runStatusMessage.textContent = status.message ?? "Council progress update received.";
+}
+
 function extractStructuredContent(value: unknown): unknown {
   if (!value || typeof value !== "object") return null;
   const record = value as Record<string, unknown>;
   return record.structuredContent ?? record;
 }
 
-async function getLatestResult(): Promise<CouncilResult | null> {
+async function getLatestState(): Promise<{
+  result: CouncilResult | null;
+  status: WidgetCouncilRunStatus | null;
+}> {
+  let structuredContent: unknown;
   if (standardBridge) {
     const response = await app.callServerTool({ name: "get_latest_council_result", arguments: {} });
-    return resultFrom(response.structuredContent);
-  }
-
-  if (typeof window.openai?.callTool === "function") {
+    structuredContent = response.structuredContent;
+  } else if (typeof window.openai?.callTool === "function") {
     const response = await window.openai.callTool("get_latest_council_result", {});
-    return resultFrom(extractStructuredContent(response));
+    structuredContent = extractStructuredContent(response);
+  } else {
+    structuredContent = extractStructuredContent(window.openai?.toolOutput);
   }
 
-  return resultFrom(extractStructuredContent(window.openai?.toolOutput));
+  return {
+    result: resultFrom(structuredContent),
+    status: councilRunStatusFrom(structuredContent),
+  };
 }
 
-async function refreshResult(): Promise<CouncilResult | null> {
+async function refreshCouncilState(expectedCommand?: string): Promise<{
+  result: CouncilResult | null;
+  status: WidgetCouncilRunStatus | null;
+}> {
   try {
-    const result = await getLatestResult();
-    if (result) renderResult(result);
-    return result;
+    const state = await getLatestState();
+    if (state.result) renderResult(state.result);
+    if (
+      state.status
+      && (!expectedCommand || state.status.command.trim() === expectedCommand.trim())
+    ) {
+      renderRunStatus(state.status);
+    }
+    return state;
   } catch {
-    return null;
+    return { result: null, status: null };
   }
 }
 
-async function pollForNewResult(previousAnalysedAt: string | null): Promise<void> {
-  const deadline = Date.now() + 120_000;
+async function pollForCouncilRun(
+  command: string,
+  previousAnalysedAt: string | null,
+): Promise<void> {
+  const deadline = Date.now() + RUN_POLL_TIMEOUT_MS;
   while (Date.now() < deadline) {
-    await new Promise((resolve) => window.setTimeout(resolve, 3_000));
-    const result = await refreshResult();
-    if (result && result.analysed_at !== previousAnalysedAt) {
-      setFeedback("Council result received", "The selection board has been updated.");
+    await new Promise((resolve) => window.setTimeout(resolve, RUN_POLL_INTERVAL_MS));
+    const state = await refreshCouncilState(command);
+    const status = state.status?.command.trim() === command.trim() ? state.status : null;
+
+    if (status?.stage === "FAILED") {
+      setFeedback("Council run failed", status.message ?? "ChatGPT reported a terminal error.");
+      runButton.disabled = input.value.trim().length === 0;
+      return;
+    }
+    if (status?.stage === "SAVED") {
+      const resultWasUpdated = state.result?.analysed_at !== previousAnalysedAt;
+      setFeedback(
+        "Council result received",
+        resultWasUpdated
+          ? "The Selection Board and run status are updated."
+          : "The run was saved; reopen the Council if the Selection Board has not refreshed.",
+      );
       runButton.disabled = input.value.trim().length === 0;
       return;
     }
   }
-  setFeedback("Analysis still running", "The conversation may still update this panel; reopen it to refresh.");
+  setFeedback("Run status timed out", "The last reported stage remains visible; check the conversation before retrying.");
   runButton.disabled = input.value.trim().length === 0;
 }
 
@@ -146,10 +220,13 @@ function setBridgeOnline(): void {
 
 app.ontoolresult = (params) => {
   const result = resultFrom(params.structuredContent);
+  const status = councilRunStatusFrom(params.structuredContent);
   if (result) renderResult(result);
+  if (status) renderRunStatus(status);
 };
 
 renderResult(null);
+renderRunStatus(null);
 
 void (async () => {
   try {
@@ -159,12 +236,12 @@ void (async () => {
     ]);
     standardBridge = true;
     setBridgeOnline();
-    await refreshResult();
+    await refreshCouncilState();
   } catch {
     const legacyAvailable = typeof window.openai?.sendFollowUpMessage === "function";
     if (legacyAvailable) {
       setBridgeOnline();
-      await refreshResult();
+      await refreshCouncilState();
     } else {
       bridgeLabel.dataset.state = "offline";
       bridgeLabel.textContent = "Council bridge offline";
@@ -186,6 +263,12 @@ form.addEventListener("submit", (event) => {
   const previousAnalysedAt = latestAnalysedAt;
   runButton.disabled = true;
   setFeedback("Sending to ChatGPT", "Handing the command to the active conversation.");
+  renderRunStatus({
+    command: command.trim(),
+    stage: "RECEIVED",
+    message: "Waiting for ChatGPT to confirm the persisted run stage.",
+    updated_at: new Date().toISOString(),
+  });
 
   void (async () => {
     try {
@@ -199,9 +282,15 @@ form.addEventListener("submit", (event) => {
       }
 
       setFeedback("Command submitted", "ChatGPT is running the Council analysis.");
-      await pollForNewResult(previousAnalysedAt);
+      await pollForCouncilRun(command, previousAnalysedAt);
     } catch {
       setFeedback("Command not submitted", "ChatGPT did not accept the follow-up. Please try again.");
+      renderRunStatus({
+        command: command.trim(),
+        stage: "FAILED",
+        message: "The command was not accepted by the ChatGPT bridge.",
+        updated_at: new Date().toISOString(),
+      });
       runButton.disabled = input.value.trim().length === 0;
     }
   })();

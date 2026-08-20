@@ -10,6 +10,10 @@ import {
 import type { CouncilWriteActor } from "./council-audit.js";
 import type { CouncilResult } from "./council-schema.js";
 import type { CouncilResultStore } from "./council-store.js";
+import type {
+  CouncilRunStatus,
+  CouncilRunStatusStore,
+} from "./council-run-status.js";
 import {
   createHorseeMcpServer,
   getHorseeServerInstructions,
@@ -38,11 +42,25 @@ class ReadOnlyStore implements CouncilResultStore {
   }
 }
 
+class ReadOnlyRunStatusStore implements CouncilRunStatusStore {
+  async set(_status: CouncilRunStatus): Promise<void> {
+    throw new Error("Discovery tests must not update Council run status.");
+  }
+
+  async get(): Promise<CouncilRunStatus | null> {
+    return null;
+  }
+}
+
 async function withClient(
   writePolicy: CouncilWritePolicy,
   run: (client: Client) => Promise<void>,
 ): Promise<void> {
-  const server = createHorseeMcpServer(new ReadOnlyStore(), writePolicy);
+  const server = createHorseeMcpServer(
+    new ReadOnlyStore(),
+    new ReadOnlyRunStatusStore(),
+    writePolicy,
+  );
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   const client = new Client({ name: "horsee-discovery-test", version: "1.0.0" });
 
@@ -123,12 +141,14 @@ describe("HORSEE MCP tool discovery", () => {
         assert.deepEqual(tool._meta?.securitySchemes, [{ type: "noauth" }]);
       }
       assert.equal(listed.tools.some((tool) => tool.name === "save_council_result"), false);
+      assert.equal(listed.tools.some((tool) => tool.name === "check_council_write_access"), false);
+      assert.equal(listed.tools.some((tool) => tool.name === "update_council_run_status"), false);
       assert.match(client.getInstructions() ?? "", /publishing is not currently configured/i);
       assert.match(client.getInstructions() ?? "", /do not attempt to call save_council_result/i);
     });
   });
 
-  it("advertises the OAuth write tool only when OAuth is completely configured", async () => {
+  it("advertises privileged OAuth tools only when OAuth is completely configured", async () => {
     const authConfig = resolveCouncilAuthConfig("https://horsee.example/mcp", {
       NETLIFY: "true",
       CONTEXT: "production",
@@ -147,27 +167,54 @@ describe("HORSEE MCP tool discovery", () => {
 
       assert.deepEqual(listed.tools.map((tool) => tool.name), [
         "open_horsee_council",
+        "check_council_write_access",
+        "update_council_run_status",
         "save_council_result",
         "get_latest_council_result",
         "get_council_history",
       ]);
-      assert.equal(listed.tools.length, 4);
+      assert.equal(listed.tools.length, 6);
 
       for (const publicToolName of publicToolNames) {
         const publicTool = listed.tools.find((tool) => tool.name === publicToolName);
         assert.deepEqual(securitySchemes(publicTool), [{ type: "noauth" }]);
       }
 
-      const saveTool = listed.tools.find((tool) => tool.name === "save_council_result");
-      assert.deepEqual(securitySchemes(saveTool), [{
-        type: "oauth2",
-        scopes: ["horsee:council:write"],
-      }]);
-      assert.deepEqual(saveTool?._meta?.securitySchemes, [{
-        type: "oauth2",
-        scopes: ["horsee:council:write"],
-      }]);
+      for (const protectedToolName of [
+        "check_council_write_access",
+        "update_council_run_status",
+        "save_council_result",
+      ]) {
+        const protectedTool = listed.tools.find((tool) => tool.name === protectedToolName);
+        assert.deepEqual(securitySchemes(protectedTool), [{
+          type: "oauth2",
+          scopes: ["horsee:council:write"],
+        }]);
+        assert.deepEqual(protectedTool?._meta?.securitySchemes, [{
+          type: "oauth2",
+          scopes: ["horsee:council:write"],
+        }]);
+      }
       const instructions = client.getInstructions() ?? "";
+      const statusSequence = [
+        "call check_council_write_access",
+        "stage RECEIVED",
+        "Set RESOLVING_RACE",
+        "Set FACT_LOCK",
+        "Set ANALYSING_RUNNERS",
+        "Set MARKET_AUDIT",
+        "Set VERDICT_READY",
+        "Set SAVING",
+        "Set SAVED",
+        "Set FAILED",
+      ];
+      let previousStatusIndex = -1;
+      for (const step of statusSequence) {
+        const stepIndex = instructions.indexOf(step);
+        assert.ok(stepIndex > previousStatusIndex, `${step} must appear in status order.`);
+        previousStatusIndex = stepIndex;
+      }
+      assert.match(instructions, /Do not silently run for minutes without updating the stage/i);
       const mandatorySequence = [
         "Analyse EVERY runner blind to odds",
         "Run the Form Analyst",

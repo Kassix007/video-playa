@@ -6,6 +6,10 @@ import {
   type CouncilWritePolicy,
 } from "./council-auth.js";
 import { logCouncilSecurityEvent } from "./council-audit.js";
+import {
+  CouncilRunStatusSchema,
+  type CouncilRunStatusStore,
+} from "./council-run-status.js";
 import { CouncilResultSchema } from "./council-schema.js";
 import type { CouncilResultStore } from "./council-store.js";
 import { createHorseeWidgetHtml } from "./widget-html.js";
@@ -13,6 +17,24 @@ import { createHorseeWidgetHtml } from "./widget-html.js";
 export const HORSEE_SERVER_NAME = "horsee-council";
 export const HORSEE_SERVER_VERSION = "1.0.0";
 export const HORSEE_WIDGET_URI = "ui://horsee-council/v1.html";
+export const HORSEE_PRODUCTION_MCP_RESOURCE = "https://videoplaya.kassinathdoss.dev/mcp";
+
+const WRITE_ENABLED_RUN_OBSERVABILITY_INSTRUCTIONS = `RUN OBSERVABILITY — REQUIRED BEFORE AND DURING EVERY FULL RACE COMMAND:
+Before beginning full-race research in a connected session, call check_council_write_access. If it returns an OAuth challenge or error, stop before the long analysis and report that actual error. After access succeeds, immediately call update_council_run_status with the user's exact command, stage RECEIVED, and a current ISO timestamp before doing research.
+
+Keep the same exact command and update the status throughout the run:
+1. Set RESOLVING_RACE immediately before race resolution and discovery.
+2. Set FACT_LOCK as soon as the facts are locked.
+3. Set ANALYSING_RUNNERS immediately before the Council analysts begin.
+4. Set MARKET_AUDIT immediately before inspecting odds or market data.
+5. Set VERDICT_READY when the complete final verdict and schema-valid CouncilResult are ready.
+6. Set SAVING immediately before calling save_council_result.
+7. Set SAVED only after save_council_result succeeds.
+8. Set FAILED only when an actual terminal error ends the run; include a concise non-sensitive reason in message.
+
+Every status update must include a fresh ISO timestamp. Use message only for a concise progress note, never for a selection or full verdict. Do not silently run for minutes without updating the stage. Status updates are ephemeral observability only and never replace save_council_result.`;
+
+const WRITE_DISABLED_RUN_OBSERVABILITY_INSTRUCTIONS = `HORSEE OAuth diagnostics, run-status updates, and result publishing are not currently configured. check_council_write_access, update_council_run_status, and save_council_result are unavailable; do not attempt to call them or claim that the dashboard or run status was updated. Keep the analysis and final verdict in the ChatGPT conversation.`;
 
 const RACE_RESOLUTION_AND_RESEARCH_INSTRUCTIONS = `For every HORSEE race command, including a short command such as "R2C1 20/08/26 hard", independently resolve the requested date, meeting, and race from current daily racing programmes, then obtain and cross-check the complete racecard before FACT LOCK. The user supplies only the short command; never ask them for the track, runners, race payload, weights, jockeys, or conditions unless exhaustive web research genuinely fails. A fixture calendar proves that a racecourse is scheduled to race; it does not by itself establish the PMU meeting number.
 
@@ -65,10 +87,13 @@ HORSEE Council result publishing is not currently configured, so save_council_re
 Use the current ChatGPT conversation context, available web/search and racecard tools, and the user's requested mode. Do not call an OpenAI API from this MCP server. The HORSEE panel may continue to show the latest previously published result or await its first stored result.`;
 
 export function getHorseeServerInstructions(writePolicy: CouncilWritePolicy): string {
+  const observabilityInstructions = writePolicy.enabled
+    ? WRITE_ENABLED_RUN_OBSERVABILITY_INSTRUCTIONS
+    : WRITE_DISABLED_RUN_OBSERVABILITY_INSTRUCTIONS;
   const publishingInstructions = writePolicy.enabled
     ? WRITE_ENABLED_SERVER_INSTRUCTIONS
     : WRITE_DISABLED_SERVER_INSTRUCTIONS;
-  return `${RACE_RESOLUTION_AND_RESEARCH_INSTRUCTIONS}\n\n${publishingInstructions}`;
+  return `${observabilityInstructions}\n\n${RACE_RESOLUTION_AND_RESEARCH_INSTRUCTIONS}\n\n${publishingInstructions}`;
 }
 
 const toolAnnotations = {
@@ -85,6 +110,20 @@ export const SAVE_COUNCIL_RESULT_ANNOTATIONS = {
   openWorldHint: true,
 } as const;
 
+export const CHECK_COUNCIL_WRITE_ACCESS_ANNOTATIONS = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+} as const;
+
+export const UPDATE_COUNCIL_RUN_STATUS_ANNOTATIONS = {
+  readOnlyHint: false,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: true,
+} as const;
+
 export type HorseeSecurityScheme =
   | { type: "noauth" }
   | { type: "oauth2"; scopes: string[] };
@@ -93,7 +132,11 @@ export function getHorseeToolSecuritySchemes(
   toolName: string,
   writeScope: string,
 ): HorseeSecurityScheme[] {
-  return toolName === "save_council_result"
+  return [
+    "check_council_write_access",
+    "update_council_run_status",
+    "save_council_result",
+  ].includes(toolName)
     ? [{ type: "oauth2", scopes: [writeScope] }]
     : [{ type: "noauth" }];
 }
@@ -131,6 +174,7 @@ function authorizationFailure(
 
 export function createHorseeMcpServer(
   store: CouncilResultStore,
+  statusStore: CouncilRunStatusStore,
   writePolicy: CouncilWritePolicy,
   securityContext: { requestId?: string } = {},
 ): McpServer {
@@ -148,6 +192,7 @@ export function createHorseeMcpServer(
       inputSchema: z.object({}).strict(),
       outputSchema: z.object({
         result: CouncilResultSchema.nullable(),
+        status: CouncilRunStatusSchema.nullable(),
         storage: z.enum(["netlify-blobs", "local-file"]),
       }).strict(),
       annotations: toolAnnotations,
@@ -162,7 +207,11 @@ export function createHorseeMcpServer(
       },
     },
     async () => {
-      const output = { result: await store.getLatest(), storage: store.kind };
+      const [result, status] = await Promise.all([
+        store.getLatest(),
+        statusStore.get(),
+      ]);
+      const output = { result, status, storage: store.kind };
       return {
         content: [{ type: "text", text: output.result ? "HORSEE Council is open with the latest saved result." : "HORSEE Council is open and awaiting its first result." }],
         structuredContent: output,
@@ -171,6 +220,86 @@ export function createHorseeMcpServer(
   );
 
   if (writePolicy.enabled) {
+    server.registerTool(
+      "check_council_write_access",
+      {
+        title: "Check HORSEE Council write access",
+        description: "Verify the connected ChatGPT client's HORSEE OAuth write access without publishing a result or changing any storage.",
+        inputSchema: z.object({}).strict(),
+        outputSchema: z.object({
+          authenticated: z.literal(true),
+          write_scope: z.literal("horsee:council:write"),
+          resource: z.literal(HORSEE_PRODUCTION_MCP_RESOURCE),
+        }).strict(),
+        annotations: CHECK_COUNCIL_WRITE_ACCESS_ANNOTATIONS,
+        _meta: {
+          securitySchemes: getHorseeToolSecuritySchemes(
+            "check_council_write_access",
+            writePolicy.writeScope,
+          ),
+        },
+      },
+      async (_input, extra) => {
+        const failure = authorizationFailure(writePolicy, extra.authInfo);
+        if (failure) {
+          return {
+            content: [{ type: "text", text: failure.message }],
+            _meta: {
+              "mcp/www_authenticate": [
+                createCouncilAuthChallenge(writePolicy, failure.error, failure.message),
+              ],
+            },
+            isError: true,
+          };
+        }
+
+        const output = {
+          authenticated: true as const,
+          write_scope: "horsee:council:write" as const,
+          resource: HORSEE_PRODUCTION_MCP_RESOURCE,
+        };
+        return { content: [], structuredContent: output };
+      },
+    );
+
+    server.registerTool(
+      "update_council_run_status",
+      {
+        title: "Update HORSEE Council run status",
+        description: "Update the current ephemeral HORSEE run stage for progress visibility. This never publishes a selection or changes Council result history.",
+        inputSchema: CouncilRunStatusSchema,
+        outputSchema: z.object({ status: CouncilRunStatusSchema }).strict(),
+        annotations: UPDATE_COUNCIL_RUN_STATUS_ANNOTATIONS,
+        _meta: {
+          securitySchemes: getHorseeToolSecuritySchemes(
+            "update_council_run_status",
+            writePolicy.writeScope,
+          ),
+        },
+      },
+      async (status, extra) => {
+        const failure = authorizationFailure(writePolicy, extra.authInfo);
+        if (failure) {
+          return {
+            content: [{ type: "text", text: failure.message }],
+            _meta: {
+              "mcp/www_authenticate": [
+                createCouncilAuthChallenge(writePolicy, failure.error, failure.message),
+              ],
+            },
+            isError: true,
+          };
+        }
+
+        await statusStore.set(status);
+        const output = { status };
+        return {
+          content: [{ type: "text", text: `HORSEE run stage updated to ${status.stage}.` }],
+          structuredContent: output,
+        };
+      },
+    );
+
     server.registerTool(
       "save_council_result",
       {
@@ -233,7 +362,10 @@ export function createHorseeMcpServer(
       title: "Get latest HORSEE Council result",
       description: "Return the latest saved HORSEE Council result, or null when no analysis has been saved.",
       inputSchema: z.object({}).strict(),
-      outputSchema: z.object({ result: CouncilResultSchema.nullable() }).strict(),
+      outputSchema: z.object({
+        result: CouncilResultSchema.nullable(),
+        status: CouncilRunStatusSchema.nullable(),
+      }).strict(),
       annotations: toolAnnotations,
       _meta: {
         securitySchemes: getHorseeToolSecuritySchemes(
@@ -243,7 +375,11 @@ export function createHorseeMcpServer(
       },
     },
     async () => {
-      const output = { result: await store.getLatest() };
+      const [result, status] = await Promise.all([
+        store.getLatest(),
+        statusStore.get(),
+      ]);
+      const output = { result, status };
       return {
         content: [{ type: "text", text: output.result ? "Latest HORSEE Council result returned." : "No HORSEE Council result has been saved yet." }],
         structuredContent: output,
