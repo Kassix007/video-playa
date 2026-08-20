@@ -6,16 +6,21 @@ import {
   type CouncilWritePolicy,
 } from "./council-auth.js";
 import { logCouncilSecurityEvent } from "./council-audit.js";
+import { isCouncilHistoryDate } from "./council-history.js";
 import {
   CouncilRunStatusSchema,
   type CouncilRunStatusStore,
 } from "./council-run-status.js";
 import { CouncilResultSchema } from "./council-schema.js";
 import type { CouncilResultStore } from "./council-store.js";
+import {
+  getSmspariazDailyRacecard,
+  SmspariazRacecardResponseSchema,
+} from "./smspariaz-racecard.js";
 import { createHorseeWidgetHtml } from "./widget-html.js";
 
 export const HORSEE_SERVER_NAME = "horsee-council";
-export const HORSEE_SERVER_VERSION = "1.0.0";
+export const HORSEE_SERVER_VERSION = "1.1.0";
 export const HORSEE_WIDGET_URI = "ui://horsee-council/v1.html";
 export const HORSEE_PRODUCTION_MCP_RESOURCE = "https://videoplaya.kassinathdoss.dev/mcp";
 
@@ -37,6 +42,9 @@ Every status update must include a fresh ISO timestamp. Use message only for a c
 const WRITE_DISABLED_RUN_OBSERVABILITY_INSTRUCTIONS = `HORSEE OAuth diagnostics, run-status updates, and result publishing are not currently configured. check_council_write_access, update_council_run_status, and save_council_result are unavailable; do not attempt to call them or claim that the dashboard or run status was updated. Keep the analysis and final verdict in the ChatGPT conversation.`;
 
 const RACE_RESOLUTION_AND_RESEARCH_INSTRUCTIONS = `For every HORSEE race command, including a short command such as "R2C1 20/08/26 hard", independently resolve the requested date, meeting, and race from current daily racing programmes, then obtain and cross-check the complete racecard before FACT LOCK. The user supplies only the short command; never ask them for the track, runners, race payload, weights, jockeys, or conditions unless exhaustive web research genuinely fails. A fixture calendar proves that a racecourse is scheduled to race; it does not by itself establish the PMU meeting number.
+
+SMSPARIAZ PROGRAMME DISCOVERY — AUTHORITATIVE:
+Call get_smspariaz_daily_racecard to decide which races SMSPariaz offers on the current Mauritius day. This server-side tool fetches SMSPariaz directly, rejects stale programmes, and returns every parsed meeting without country filtering. Do not replace its offering list with search results or a third-party racecard. It discovers the programme only; it does not perform Council analysis. Continue to corroborate the selected race's runners and material facts before FACT LOCK as described below.
 
 MANDATORY RACE RESOLUTION — BEFORE FACT LOCK:
 1. Resolve the DATE explicitly from the command. Interpret a short date such as 20/08/26 as 20/08/2026 and state the resolved date.
@@ -119,6 +127,13 @@ export const CHECK_COUNCIL_WRITE_ACCESS_ANNOTATIONS = {
 
 export const UPDATE_COUNCIL_RUN_STATUS_ANNOTATIONS = {
   readOnlyHint: false,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: true,
+} as const;
+
+export const SMSPARIAZ_RACECARD_ANNOTATIONS = {
+  readOnlyHint: true,
   destructiveHint: false,
   idempotentHint: true,
   openWorldHint: true,
@@ -357,6 +372,36 @@ export function createHorseeMcpServer(
   }
 
   server.registerTool(
+    "get_smspariaz_daily_racecard",
+    {
+      title: "Get current SMSPariaz daily racecard",
+      description: "Fetch SMSPariaz directly from the HORSEE server, reject stale documents, and return the complete current Mauritius-day race programme in chronological order. This is programme discovery only and performs no Council analysis.",
+      inputSchema: z.object({}).strict(),
+      outputSchema: SmspariazRacecardResponseSchema,
+      annotations: SMSPARIAZ_RACECARD_ANNOTATIONS,
+      _meta: {
+        securitySchemes: getHorseeToolSecuritySchemes(
+          "get_smspariaz_daily_racecard",
+          writePolicy.writeScope,
+        ),
+      },
+    },
+    async () => {
+      const output = await getSmspariazDailyRacecard();
+      return {
+        content: [{
+          type: "text",
+          text: output.success
+            ? `${output.race_count} current SMSPariaz race${output.race_count === 1 ? "" : "s"} returned across ${output.meeting_count} meeting${output.meeting_count === 1 ? "" : "s"}.`
+            : `${output.error_code}: ${output.error}`,
+        }],
+        structuredContent: output,
+        ...(output.success ? {} : { isError: true }),
+      };
+    },
+  );
+
+  server.registerTool(
     "get_latest_council_result",
     {
       title: "Get latest HORSEE Council result",
@@ -391,8 +436,11 @@ export function createHorseeMcpServer(
     "get_council_history",
     {
       title: "Get HORSEE Council history",
-      description: "Return a small newest-first history of saved HORSEE Council results.",
-      inputSchema: z.object({ limit: z.number().int().min(1).max(50).default(10) }).strict(),
+      description: "Return newest-first saved HORSEE Council results, optionally restricted to one Mauritius calendar date. Existing calls with only limit remain supported.",
+      inputSchema: z.object({
+        limit: z.number().int().min(1).max(100).default(10),
+        date: z.string().refine(isCouncilHistoryDate, "Date must be a valid YYYY-MM-DD value.").optional(),
+      }).strict(),
       outputSchema: z.object({ results: z.array(CouncilResultSchema) }).strict(),
       annotations: toolAnnotations,
       _meta: {
@@ -402,8 +450,11 @@ export function createHorseeMcpServer(
         ),
       },
     },
-    async ({ limit }) => {
-      const output = { results: await store.getHistory(limit) };
+    async ({ limit, date }) => {
+      const results = date
+        ? (await store.getByDate(date)).slice(0, limit)
+        : await store.getHistory(limit);
+      const output = { results };
       return {
         content: [{ type: "text", text: `${output.results.length} HORSEE Council result${output.results.length === 1 ? "" : "s"} returned.` }],
         structuredContent: output,

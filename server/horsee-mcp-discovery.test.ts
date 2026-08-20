@@ -7,7 +7,6 @@ import {
   resolveCouncilAuthConfig,
   type CouncilWritePolicy,
 } from "./council-auth.js";
-import type { CouncilWriteActor } from "./council-audit.js";
 import type { CouncilResult } from "./council-schema.js";
 import type { CouncilResultStore } from "./council-store.js";
 import type {
@@ -22,6 +21,7 @@ import { decorateHorseeToolSecuritySchemes } from "./horsee-tool-security.js";
 
 const publicToolNames = [
   "open_horsee_council",
+  "get_smspariaz_daily_racecard",
   "get_latest_council_result",
   "get_council_history",
 ] as const;
@@ -29,7 +29,7 @@ const publicToolNames = [
 class ReadOnlyStore implements CouncilResultStore {
   readonly kind = "local-file" as const;
 
-  async save(_result: CouncilResult, _actor: CouncilWriteActor): Promise<void> {
+  async save(): Promise<void> {
     throw new Error("Discovery tests must not write Council results.");
   }
 
@@ -37,13 +37,21 @@ class ReadOnlyStore implements CouncilResultStore {
     return null;
   }
 
-  async getHistory(_limit: number): Promise<CouncilResult[]> {
+  async getHistory(): Promise<CouncilResult[]> {
+    return [];
+  }
+
+  async getByDate(): Promise<CouncilResult[]> {
+    return [];
+  }
+
+  async getDateCounts(): Promise<Array<{ date: string; count: number }>> {
     return [];
   }
 }
 
 class ReadOnlyRunStatusStore implements CouncilRunStatusStore {
-  async set(_status: CouncilRunStatus): Promise<void> {
+  async set(): Promise<void> {
     throw new Error("Discovery tests must not update Council run status.");
   }
 
@@ -119,7 +127,7 @@ describe("HORSEE MCP tool discovery", () => {
     assert.match(instructions, /never ask the user to supply the racecard unless that web research has genuinely been exhausted/i);
   });
 
-  it("advertises exactly three noauth tools when OAuth/write policy is disabled", async () => {
+  it("advertises exactly four noauth tools when OAuth/write policy is disabled", async () => {
     const authConfig = resolveCouncilAuthConfig("https://horsee.example/mcp", {
       NETLIFY: "true",
       CONTEXT: "production",
@@ -135,7 +143,7 @@ describe("HORSEE MCP tool discovery", () => {
       advertiseTopLevelSecuritySchemes(listed, writePolicy.writeScope);
 
       assert.deepEqual(listed.tools.map((tool) => tool.name), publicToolNames);
-      assert.equal(listed.tools.length, 3);
+      assert.equal(listed.tools.length, 4);
       for (const tool of listed.tools) {
         assert.deepEqual(securitySchemes(tool), [{ type: "noauth" }]);
         assert.deepEqual(tool._meta?.securitySchemes, [{ type: "noauth" }]);
@@ -170,10 +178,11 @@ describe("HORSEE MCP tool discovery", () => {
         "check_council_write_access",
         "update_council_run_status",
         "save_council_result",
+        "get_smspariaz_daily_racecard",
         "get_latest_council_result",
         "get_council_history",
       ]);
-      assert.equal(listed.tools.length, 6);
+      assert.equal(listed.tools.length, 7);
 
       for (const publicToolName of publicToolNames) {
         const publicTool = listed.tools.find((tool) => tool.name === publicToolName);

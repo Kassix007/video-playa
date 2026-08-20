@@ -69,6 +69,14 @@ class RecordingStore implements CouncilResultStore {
   async getHistory(limit: number): Promise<CouncilResult[]> {
     return this.writes.slice(-limit).map((write) => write.result).reverse();
   }
+
+  async getByDate(): Promise<CouncilResult[]> {
+    return this.writes.map((write) => write.result).reverse();
+  }
+
+  async getDateCounts(): Promise<Array<{ date: string; count: number }>> {
+    return [];
+  }
 }
 
 class RecordingRunStatusStore implements CouncilRunStatusStore {

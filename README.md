@@ -37,7 +37,7 @@ Local Council results are stored in `.netlify/horsee-council-results.json`, whic
 - Branch deploys use `horsee-council-results-branch-<BRANCH-or-DEPLOY_ID>`.
 - An unrecognized Netlify context fails safe into a non-production namespace containing `DEPLOY_ID`.
 
-This prevents a PR preview or branch deploy from changing the production selection board. Netlify's per-invocation `Context` supplies the authoritative deploy context, deploy ID, and site identity; environment variables are fallbacks for local tests and explicitly configured values. Every store retains up to 50 results. Result history is ordered and pruned by the server's receipt time, not the caller-provided `analysed_at` display field. Both storage implementations sit behind `CouncilResultStore`, so the backend can be replaced without changing tool schemas.
+This prevents a PR preview or branch deploy from changing the production selection board. Netlify's per-invocation `Context` supplies the authoritative deploy context, deploy ID, and site identity; environment variables are fallbacks for local tests and explicitly configured values. Council results are retained without a history cap. New Netlify Blob keys are partitioned by Mauritius analysis date (`results/YYYY-MM-DD/...`) for efficient archive reads; legacy flat history keys remain readable and need no migration. Both storage implementations sit behind `CouncilResultStore`, so the backend can be replaced without changing existing tool responses.
 
 Current run progress is stored separately from verdicts. Netlify uses a single current-status key in `horsee-council-run-status-production`, with the same isolated Deploy Preview and branch suffixes as result storage. Local development uses `.netlify/horsee-council-run-status.json`. This status has no history and can never overwrite, populate, or count as a Council result; only `save_council_result` writes the Selection Board.
 
@@ -52,18 +52,22 @@ npm run test:mcp
 
 - Streamable HTTP MCP: `http://localhost:8888/mcp`
 - Latest structured result for the Equidia dashboard: `http://localhost:8888/api/council/latest`
+- Current Mauritius-day analyses: `http://localhost:8888/api/council/today`
+- Analyses for a date: `http://localhost:8888/api/council/history?date=2026-08-20`
+- Archive date counts: `http://localhost:8888/api/council/history/dates?month=2026-08`
 - OAuth protected-resource metadata: `http://localhost:8888/.well-known/oauth-protected-resource`
 - Production MCP: `https://<your-netlify-domain>/mcp`
 
-The MCP server identity is `horsee-council` version `1.0.0`.
+The MCP server identity is `horsee-council` version `1.1.0`.
 
 ## MCP tools
 
-The public bootstrap catalog is available before an OAuth provider is configured. It contains exactly these three read-only tools, each explicitly advertised as `noauth`:
+The public bootstrap catalog is available before an OAuth provider is configured. It contains exactly these four read-only tools, each explicitly advertised as `noauth`:
 
 - `open_horsee_council` — returns the latest result and current run status, then renders `ui://horsee-council/v1.html`
+- `get_smspariaz_daily_racecard` — fetches SMSPariaz directly, validates the current Mauritius date, retries stale responses with cache bypass, and parses every meeting/race from the complete PDF
 - `get_latest_council_result` — returns the latest saved verdict and separately stored current run status
-- `get_council_history` — returns a newest-first history (maximum 50)
+- `get_council_history` — returns up to 100 newest-first results and optionally filters by a Mauritius date while preserving the existing output shape
 
 Only when the complete Council OAuth/write configuration resolves successfully does the server also register:
 
@@ -73,7 +77,7 @@ Only when the complete Council OAuth/write configuration resolves successfully d
 
 None of these three privileged tools is ever registered as `noauth`. In bootstrap mode, ChatGPT can create a No Auth connection without resolving OAuth metadata, open the widget, and receive commands through `ui/message`. ChatGPT performs the full Council analysis in the conversation but does not attempt to update status or publish a result; the selection board can therefore remain on the latest previously stored result or await its first result.
 
-Before FACT LOCK, the server instructions require ChatGPT to resolve the command's date and R/C identity from current daily racing programmes, corroborate the racecourse/meeting/race mapping with two compatible current sources, and persist across conflicts, blocked pages, and incomplete racecards. A fixture calendar proves only that a course is scheduled to race; it cannot establish the PMU meeting number by itself. HORSEE must obtain and cross-check the complete racecard through web/search fallbacks, research every runner independently, and may ask the user for a racecard only after genuinely exhaustive research fails. The regression guard records that on 20/08/2026 `R2C1` was Le Lion-d'Angers, Prix Cocktail Vision (Prix E. et L. de Tredern), and must not be inferred as Senonnes from a Senonnes fixture calendar.
+For the current Mauritius day, `get_smspariaz_daily_racecard` is authoritative for deciding which races SMSPariaz offers; search results and third-party racecards cannot replace that offering list. Before FACT LOCK, the server instructions still require ChatGPT to corroborate the selected race's conditions and runner facts with compatible current sources and persist across conflicts, blocked pages, and incomplete runner data. A fixture calendar proves only that a course is scheduled to race; it cannot establish the PMU meeting number by itself. The regression guard records that on 20/08/2026 `R2C1` was Le Lion-d'Angers, Prix Cocktail Vision (Prix E. et L. de Tredern), and must not be inferred as Senonnes from a Senonnes fixture calendar.
 
 When publishing is enabled, ChatGPT first calls `check_council_write_access` so OAuth failures surface before a long race analysis. Each accepted command then progresses through `RECEIVED`, `RESOLVING_RACE`, `FACT_LOCK`, `ANALYSING_RUNNERS`, `MARKET_AUDIT`, `VERDICT_READY`, `SAVING`, and `SAVED`; an actual terminal error uses `FAILED`. The widget polls the current status, shows its command and timestamp separately from the Selection Board, and continues for long-running analyses rather than going silent after two minutes.
 
@@ -106,7 +110,7 @@ For local Inspector testing only, set `HORSEE_COUNCIL_DEV_WRITE_TOKEN` before st
 
 ## Test with MCP Inspector
 
-For bootstrap-mode discovery, start Netlify Dev without OAuth variables or a development write token. Inspector initialization and `tools/list` must succeed with No Auth and return exactly the three public tools.
+For bootstrap-mode discovery, start Netlify Dev without OAuth variables or a development write token. Inspector initialization and `tools/list` must succeed with No Auth and return exactly the four public tools.
 
 For write-path testing, start Netlify Dev with an uncommitted local test token, then launch the current Inspector:
 
@@ -115,7 +119,7 @@ $env:HORSEE_COUNCIL_DEV_WRITE_TOKEN = "replace-with-a-local-test-token"
 npx netlify dev
 ```
 
-In another terminal, run `npx @modelcontextprotocol/inspector@latest`. Choose Streamable HTTP, connect to `http://localhost:8888/mcp`, and add `Authorization: Bearer replace-with-a-local-test-token` in the Inspector authentication/header settings. Verify initialization, `tools/list`, and all six tools. Call `check_council_write_access` first; it should confirm access in seconds without creating a result. Call `open_horsee_council` to inspect the MCP Apps resource and its `text/html;profile=mcp-app` response, then exercise `update_council_run_status` and confirm the widget/open payload exposes status while the latest result remains unchanged. Use a complete structured verdict only when deliberately testing `save_council_result`, then confirm it is returned by both read tools. Local development-token mode exists only for Inspector testing and, like OAuth mode, keeps every privileged tool OAuth-required; it never downgrades one to `noauth`.
+In another terminal, run `npx @modelcontextprotocol/inspector@latest`. Choose Streamable HTTP, connect to `http://localhost:8888/mcp`, and add `Authorization: Bearer replace-with-a-local-test-token` in the Inspector authentication/header settings. Verify initialization, `tools/list`, and all seven tools. Call `get_smspariaz_daily_racecard` to verify current programme discovery, then call `check_council_write_access`; it should confirm access in seconds without creating a result. Call `open_horsee_council` to inspect the MCP Apps resource and its `text/html;profile=mcp-app` response, then exercise `update_council_run_status` and confirm the widget/open payload exposes status while the latest result remains unchanged. Use a complete structured verdict only when deliberately testing `save_council_result`, then confirm it is returned by both result read tools. Local development-token mode exists only for Inspector testing and, like OAuth mode, keeps every privileged tool OAuth-required; it never downgrades one to `noauth`.
 
 Repeat `check_council_write_access` without the Authorization header and verify that it returns `isError: true` with `mcp/www_authenticate`. Repeat `save_council_result` without authorization and confirm latest/history remain unchanged. Repeat with a malformed verdict to verify schema rejection before storage.
 
@@ -136,7 +140,7 @@ ChatGPT requires a publicly reachable HTTPS endpoint or an approved secure/devel
 2. In ChatGPT, open **Settings → Security and login** and enable **Developer mode**. Availability can depend on account or workspace policy.
 3. Open **ChatGPT Plugins**, select the plus button, and enter a name and description.
 4. Choose the public endpoint connection method and enter the complete URL, including `/mcp` (for example, `https://example.netlify.app/mcp`).
-5. Create the connection. In No Auth bootstrap mode, review the three public tools and their `noauth` declarations. After OAuth is completely configured, refresh the connection and review all six tools, including the three OAuth-only diagnostic/status/save tools.
+5. Create the connection. In No Auth bootstrap mode, review the four public tools and their `noauth` declarations. After OAuth is completely configured, refresh the connection and review all seven tools, including the three OAuth-only diagnostic/status/save tools.
 6. Add HORSEE to a conversation and ask it to open the Council. Enter a command such as `R1C1 hard` in the rendered panel.
 
 `RUN COUNCIL` sends the exact command as a standard MCP Apps `ui/message`. The `window.openai.sendFollowUpMessage` bridge is only a ChatGPT compatibility fallback. Outside a supported host, the button stays disabled and the page states that the Council bridge is offline; stored results may still be viewed.

@@ -8,13 +8,20 @@ import {
   type CouncilWriteActor,
   type CouncilWriteAuditEvent,
 } from "./council-audit.js";
+import {
+  aggregateCouncilDateCounts,
+  filterCouncilResultsByDate,
+  getCouncilResultMauritiusDate,
+  isCouncilHistoryDate,
+  sortCouncilResultsNewest,
+  type CouncilDateCount,
+} from "./council-history.js";
 import { CouncilResultSchema, type CouncilResult } from "./council-schema.js";
 
 export const PRODUCTION_STORE_NAME = "horsee-council-results-production";
 const LATEST_KEY = "latest.json";
 const HISTORY_PREFIX = "results/";
 const AUDIT_PREFIX = "private-audit/";
-const HISTORY_LIMIT = 50;
 const AUDIT_LIMIT = 500;
 
 type NetlifyDeployEnvironment = Readonly<Record<string, string | undefined>>;
@@ -24,6 +31,8 @@ export interface CouncilResultStore {
   save(result: CouncilResult, actor: CouncilWriteActor): Promise<void>;
   getLatest(): Promise<CouncilResult | null>;
   getHistory(limit: number): Promise<CouncilResult[]>;
+  getByDate(date: string): Promise<CouncilResult[]>;
+  getDateCounts(month: string): Promise<CouncilDateCount[]>;
 }
 
 export function createCouncilHistoryKey(
@@ -36,6 +45,20 @@ export function createCouncilHistoryKey(
   return `${HISTORY_PREFIX}${String(occurredAt).padStart(13, "0")}-${eventId}.json`;
 }
 
+export function createCouncilDatedHistoryKey(
+  programmeDate: string,
+  occurredAt = Date.now(),
+  eventId: string = randomUUID(),
+): string {
+  if (!isCouncilHistoryDate(programmeDate)) {
+    throw new TypeError("Council programme date must use YYYY-MM-DD.");
+  }
+  if (!Number.isSafeInteger(occurredAt) || occurredAt < 0) {
+    throw new TypeError("Council storage time must be a non-negative safe integer.");
+  }
+  return `${HISTORY_PREFIX}${programmeDate}/${String(occurredAt).padStart(13, "0")}-${eventId}.json`;
+}
+
 function createCouncilAuditKey(event: CouncilWriteAuditEvent): string {
   return `${AUDIT_PREFIX}${String(Date.parse(event.occurred_at)).padStart(13, "0")}-${event.event_id}.json`;
 }
@@ -43,6 +66,15 @@ function createCouncilAuditKey(event: CouncilWriteAuditEvent): string {
 function parseStoredResult(value: unknown): CouncilResult | null {
   const parsed = CouncilResultSchema.safeParse(value);
   return parsed.success ? parsed.data : null;
+}
+
+function isLegacyCouncilHistoryKey(key: string): boolean {
+  return /^results\/\d{13}-[^/]+\.json$/.test(key);
+}
+
+function councilHistoryKeyTimestamp(key: string): number {
+  const match = key.match(/(?:^|\/)(\d{13})-[^/]+\.json$/);
+  return match ? Number(match[1]) : 0;
 }
 
 function safeNamespacePart(
@@ -101,11 +133,31 @@ class NetlifyCouncilResultStore implements CouncilResultStore {
 
   private readonly store: Store;
 
+  private async listKeys(prefix: string): Promise<string[]> {
+    const keys: string[] = [];
+    for await (const page of this.store.list({ prefix, paginate: true })) {
+      keys.push(...page.blobs.map((blob) => blob.key));
+    }
+    return keys;
+  }
+
+  private async readResults(keys: string[]): Promise<CouncilResult[]> {
+    const values = await Promise.all(keys.map((key) => this.store.get(key, { type: "json" })));
+    return values.flatMap((value) => {
+      const result = parseStoredResult(value);
+      return result ? [result] : [];
+    });
+  }
+
   async save(result: CouncilResult, actor: CouncilWriteActor): Promise<void> {
     const validatedResult = CouncilResultSchema.parse(result);
     const occurredAt = Date.now();
     const eventId = randomUUID();
-    const historyKey = createCouncilHistoryKey(occurredAt, eventId);
+    const historyKey = createCouncilDatedHistoryKey(
+      getCouncilResultMauritiusDate(validatedResult),
+      occurredAt,
+      eventId,
+    );
     const auditEvent = createCouncilWriteAuditEvent(
       validatedResult,
       actor,
@@ -134,20 +186,6 @@ class NetlifyCouncilResultStore implements CouncilResultStore {
       });
     }
 
-    try {
-      const historyListing = await this.store.list({ prefix: HISTORY_PREFIX });
-      const staleHistoryKeys = historyListing.blobs
-        .map((blob) => blob.key)
-        .sort()
-        .reverse()
-        .slice(HISTORY_LIMIT);
-      await Promise.all(staleHistoryKeys.map((key) => this.store.delete(key)));
-    } catch {
-      logCouncilSecurityEvent("council_history_pruning_failed", {
-        race_id: validatedResult.race_id,
-        event_id: eventId,
-      });
-    }
   }
 
   async getLatest(): Promise<CouncilResult | null> {
@@ -155,18 +193,45 @@ class NetlifyCouncilResultStore implements CouncilResultStore {
   }
 
   async getHistory(limit: number): Promise<CouncilResult[]> {
-    const listing = await this.store.list({ prefix: HISTORY_PREFIX });
-    const keys = listing.blobs
-      .map((blob) => blob.key)
-      .sort()
-      .reverse()
-      .slice(0, Math.min(limit, HISTORY_LIMIT));
-    const values = await Promise.all(keys.map((key) => this.store.get(key, { type: "json" })));
+    const keys = (await this.listKeys(HISTORY_PREFIX))
+      .sort((left, right) => councilHistoryKeyTimestamp(right) - councilHistoryKeyTimestamp(left))
+      .slice(0, Math.max(0, limit));
+    return this.readResults(keys);
+  }
 
-    return values.flatMap((value) => {
-      const result = parseStoredResult(value);
-      return result ? [result] : [];
-    });
+  async getByDate(date: string): Promise<CouncilResult[]> {
+    const [datedKeys, allKeys] = await Promise.all([
+      this.listKeys(`${HISTORY_PREFIX}${date}/`),
+      this.listKeys(HISTORY_PREFIX),
+    ]);
+    const legacyKeys = allKeys.filter(isLegacyCouncilHistoryKey);
+    const [datedResults, legacyResults] = await Promise.all([
+      this.readResults(datedKeys),
+      this.readResults(legacyKeys),
+    ]);
+    return sortCouncilResultsNewest([
+      ...datedResults,
+      ...filterCouncilResultsByDate(legacyResults, date),
+    ]);
+  }
+
+  async getDateCounts(month: string): Promise<CouncilDateCount[]> {
+    const [monthKeys, allKeys] = await Promise.all([
+      this.listKeys(`${HISTORY_PREFIX}${month}-`),
+      this.listKeys(HISTORY_PREFIX),
+    ]);
+    const counts = new Map<string, number>();
+    for (const key of monthKeys) {
+      const date = key.slice(HISTORY_PREFIX.length, HISTORY_PREFIX.length + 10);
+      if (isCouncilHistoryDate(date)) counts.set(date, (counts.get(date) ?? 0) + 1);
+    }
+    const legacyResults = await this.readResults(allKeys.filter(isLegacyCouncilHistoryKey));
+    for (const item of aggregateCouncilDateCounts(legacyResults, month)) {
+      counts.set(item.date, (counts.get(item.date) ?? 0) + item.count);
+    }
+    return [...counts.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([date, count]) => ({ date, count }));
   }
 }
 
@@ -229,7 +294,7 @@ class LocalFileCouncilResultStore implements CouncilResultStore {
     ]);
     results.unshift(validatedResult);
     auditEvents.unshift(createCouncilWriteAuditEvent(validatedResult, actor, occurredAt));
-    await this.writeResults(results.slice(0, HISTORY_LIMIT));
+    await this.writeResults(results);
     try {
       await this.writeAuditEvents(auditEvents.slice(0, AUDIT_LIMIT));
     } catch {
@@ -244,7 +309,15 @@ class LocalFileCouncilResultStore implements CouncilResultStore {
   }
 
   async getHistory(limit: number): Promise<CouncilResult[]> {
-    return (await this.readResults()).slice(0, Math.min(limit, HISTORY_LIMIT));
+    return (await this.readResults()).slice(0, Math.max(0, limit));
+  }
+
+  async getByDate(date: string): Promise<CouncilResult[]> {
+    return sortCouncilResultsNewest(filterCouncilResultsByDate(await this.readResults(), date));
+  }
+
+  async getDateCounts(month: string): Promise<CouncilDateCount[]> {
+    return aggregateCouncilDateCounts(await this.readResults(), month);
   }
 }
 
