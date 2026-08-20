@@ -14,31 +14,61 @@ export const HORSEE_SERVER_NAME = "horsee-council";
 export const HORSEE_SERVER_VERSION = "1.0.0";
 export const HORSEE_WIDGET_URI = "ui://horsee-council/v1.html";
 
-const WRITE_ENABLED_SERVER_INSTRUCTIONS = `For every HORSEE race command, complete this mandatory workflow in order and do not stop early:
-1. Complete discovery and FACT LOCK.
-2. Analyse all runners blind to market.
-3. Perform the market audit.
-4. Produce the COMPLETE mandatory Council verdict.
-5. Construct a schema-valid CouncilResult.
-6. CALL save_council_result BEFORE ending the response.
-7. Do not end the response after preliminary or blind analysis.
-8. If save_council_result fails, explicitly report the tool error and do not claim that publishing succeeded.
-9. If publishing succeeds, say exactly: "HORSEE dashboard updated."
+const RACE_RESOLUTION_AND_RESEARCH_INSTRUCTIONS = `For every HORSEE race command, including a short command such as "R2C1 20/08/26 hard", independently resolve the requested date, meeting, and race from current daily racing programmes, then obtain and cross-check the complete racecard before FACT LOCK. The user supplies only the short command; never ask them for the track, runners, race payload, weights, jockeys, or conditions unless exhaustive web research genuinely fails. A fixture calendar proves that a racecourse is scheduled to race; it does not by itself establish the PMU meeting number.
 
-Use the current ChatGPT conversation context, any available racecard or browsing tools, and the user's requested mode. Do not call an OpenAI API from this MCP server. Keep the full analysis in the conversation and save only the structured final result. The complete verdict must include the most likely winner, principal danger, best value horse, final ranking, win probabilities, confidence, strongest reason the selection could lose, and final selection.
+MANDATORY RACE RESOLUTION — BEFORE FACT LOCK:
+1. Resolve the DATE explicitly from the command. Interpret a short date such as 20/08/26 as 20/08/2026 and state the resolved date.
+2. Resolve the meeting number (R1, R2, and so on) from a CURRENT DAILY RACING PROGRAMME for that date. Never infer an R-number merely because a racecourse calendar says the track is racing that day.
+3. Use this meeting-number source priority:
+   A. a current PMU/daily programme source;
+   B. a current independent racing programme such as Geny, Zone-Turf, ZEturf, Equidia, OKTurf, OneTurf, Turf-fr, or an equivalent;
+   C. France Galop, LeTROT, or the racecourse's official source to corroborate the fixture and race conditions.
+4. Require TWO compatible current sources before locking the racecourse, meeting number, and race number. At least one source must be a daily programme capable of mapping the R-number; a fixture calendar alone is not sufficient evidence for that mapping.
+5. If sources conflict, continue searching and reconcile the conflict. Do not declare FACT LOCK FAILED after the first conflict, inaccessible page, or poorly indexed result.
+6. Search with multiple formulations, including the exact R/C and date (for example "R2C1 20/08/2026"), meeting and course ("R2 Le Lion d'Angers 20 August 2026"), exact race name plus date, racecourse plus off time plus date, and site-specific searches where useful.
+
+RACE RESOLUTION REGRESSION GUARD — 20/08/2026:
+R2 must not be inferred as Senonnes merely from a Senonnes fixture calendar. The current PMU programme for that date had R2 = Le Lion-d'Angers and C1 = Prix Cocktail Vision (Prix E. et L. de Tredern), off at 11:21: a 1400m left-handed turf Flat maiden for three-year-olds with seven runners.
+
+RESEARCH PERSISTENCE — AFTER R/C RESOLUTION:
+Actively obtain the race name, off time, distance, surface, going, race type/class, restrictions, field size, every declared runner, non-runners, draw, weights, jockey/driver, trainer, official rating or handicap mark when relevant, claims/allowances, shoeing/equipment for trotting, and latest relevant form. Research every runner independently.
+
+If one racecard site is unavailable, do not stop. Try alternative current sources. Make several independent search attempts, including exact race-name/date queries, before treating a material fact as unavailable. When no single page supplies the complete card, assemble it from multiple current sources and cross-check all material facts.
+
+FACT LOCK FAILED is a LAST RESORT. It is allowed only after exhaustive fallback searching when either the meeting/race cannot be reliably identified or a material fact needed to distinguish the runners genuinely remains unresolved. State exactly which sources and search paths were attempted. Never ask the user to supply the racecard unless that web research has genuinely been exhausted.`;
+
+const WRITE_ENABLED_SERVER_INSTRUCTIONS = `COUNCIL WORKFLOW — AFTER SUCCESSFUL FACT LOCK:
+1. Analyse EVERY runner blind to odds.
+2. Run the Form Analyst.
+3. Run the Conditions Analyst.
+4. Run the Handicap Analyst.
+5. Run the Improvement Analyst.
+6. Run the Reliability Analyst.
+7. Apply the contradiction gate to the top three.
+8. Only then inspect the market and perform the market audit.
+9. Produce the COMPLETE mandatory Council verdict.
+10. Construct a schema-valid CouncilResult.
+11. CALL save_council_result BEFORE ending the response.
+12. Do not finish until saving succeeds or an actual save tool error is explicitly reported. Never end after preliminary, discovery, FACT LOCK, or blind analysis.
+
+If save_council_result fails, explicitly report the tool error and do not claim that publishing succeeded. If publishing succeeds, say exactly: "HORSEE dashboard updated."
+
+Use the current ChatGPT conversation context, available web/search and racecard tools, and the user's requested mode. Do not call an OpenAI API from this MCP server. Keep the full analysis in the conversation and save only the structured final result. The complete verdict must include the most likely winner, principal danger, best value horse, final ranking, win probabilities, confidence, strongest reason the selection could lose, and final selection.
 
 Ranking must include every declared runner exactly once, most_likely_winner must exactly match ranking[0], ranking probabilities must total approximately 100%, analysed_at must be an ISO 8601 timestamp, and confidence must be low, medium, or high. The response is incomplete until save_council_result returns success or its tool error has been explicitly reported.`;
 
-const WRITE_DISABLED_SERVER_INSTRUCTIONS = `For every HORSEE race command, complete discovery and FACT LOCK, analyse all runners blind to market, perform the market audit, and produce the COMPLETE mandatory Council verdict. Do not stop after preliminary or blind analysis.
+const WRITE_DISABLED_SERVER_INSTRUCTIONS = `COUNCIL WORKFLOW — AFTER SUCCESSFUL FACT LOCK:
+Analyse EVERY runner blind to odds, then run the Form, Conditions, Handicap, Improvement, and Reliability Analysts. Apply the contradiction gate to the top three. Only then inspect the market, perform the market audit, and produce the COMPLETE mandatory Council verdict. Do not stop after discovery, FACT LOCK, preliminary analysis, or blind analysis.
 
 HORSEE Council result publishing is not currently configured, so save_council_result is not available. Do not attempt to call save_council_result or claim that the dashboard was updated. Keep the full analysis and final verdict in the ChatGPT conversation, including the most likely winner, principal danger, best value horse, final ranking, win probabilities, confidence, strongest reason the selection could lose, and final selection.
 
-Use the current ChatGPT conversation context, any available racecard or browsing tools, and the user's requested mode. Do not call an OpenAI API from this MCP server. The HORSEE panel may continue to show the latest previously published result or await its first stored result.`;
+Use the current ChatGPT conversation context, available web/search and racecard tools, and the user's requested mode. Do not call an OpenAI API from this MCP server. The HORSEE panel may continue to show the latest previously published result or await its first stored result.`;
 
 export function getHorseeServerInstructions(writePolicy: CouncilWritePolicy): string {
-  return writePolicy.enabled
+  const publishingInstructions = writePolicy.enabled
     ? WRITE_ENABLED_SERVER_INSTRUCTIONS
     : WRITE_DISABLED_SERVER_INSTRUCTIONS;
+  return `${RACE_RESOLUTION_AND_RESEARCH_INSTRUCTIONS}\n\n${publishingInstructions}`;
 }
 
 const toolAnnotations = {

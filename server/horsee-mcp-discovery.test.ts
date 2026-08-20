@@ -10,7 +10,10 @@ import {
 import type { CouncilWriteActor } from "./council-audit.js";
 import type { CouncilResult } from "./council-schema.js";
 import type { CouncilResultStore } from "./council-store.js";
-import { createHorseeMcpServer } from "./horsee-mcp.js";
+import {
+  createHorseeMcpServer,
+  getHorseeServerInstructions,
+} from "./horsee-mcp.js";
 import { decorateHorseeToolSecuritySchemes } from "./horsee-tool-security.js";
 
 const publicToolNames = [
@@ -65,6 +68,39 @@ function securitySchemes(tool: unknown): unknown {
 }
 
 describe("HORSEE MCP tool discovery", () => {
+  it("persists through race resolution and guards the R2C1 20/08/2026 regression", () => {
+    const disabledPolicy = getCouncilWritePolicy(resolveCouncilAuthConfig(
+      "https://horsee.example/mcp",
+      { NETLIFY: "true", CONTEXT: "production" },
+    ));
+    const instructions = getHorseeServerInstructions(disabledPolicy);
+
+    assert.match(instructions, /"R2C1 20\/08\/26 hard"/);
+    const raceResolutionSequence = [
+      "Resolve the DATE explicitly from the command",
+      "Resolve the meeting number (R1, R2, and so on) from a CURRENT DAILY RACING PROGRAMME",
+      "A fixture calendar proves that a racecourse is scheduled to race; it does not by itself establish the PMU meeting number",
+      "Require TWO compatible current sources",
+      "If sources conflict, continue searching",
+      "RESEARCH PERSISTENCE — AFTER R/C RESOLUTION",
+      "If one racecard site is unavailable, do not stop",
+      "FACT LOCK FAILED is a LAST RESORT",
+    ];
+    for (const requirement of raceResolutionSequence) {
+      assert.match(instructions, new RegExp(requirement.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
+    }
+
+    assert.match(
+      instructions,
+      /R2 must not be inferred as Senonnes merely from a Senonnes fixture calendar\./,
+    );
+    assert.match(
+      instructions,
+      /R2 = Le Lion-d'Angers and C1 = Prix Cocktail Vision \(Prix E\. et L\. de Tredern\), off at 11:21/,
+    );
+    assert.match(instructions, /never ask the user to supply the racecard unless that web research has genuinely been exhausted/i);
+  });
+
   it("advertises exactly three noauth tools when OAuth/write policy is disabled", async () => {
     const authConfig = resolveCouncilAuthConfig("https://horsee.example/mcp", {
       NETLIFY: "true",
@@ -133,15 +169,18 @@ describe("HORSEE MCP tool discovery", () => {
       }]);
       const instructions = client.getInstructions() ?? "";
       const mandatorySequence = [
-        "Complete discovery and FACT LOCK",
-        "Analyse all runners blind to market",
-        "Perform the market audit",
+        "Analyse EVERY runner blind to odds",
+        "Run the Form Analyst",
+        "Run the Conditions Analyst",
+        "Run the Handicap Analyst",
+        "Run the Improvement Analyst",
+        "Run the Reliability Analyst",
+        "Apply the contradiction gate to the top three",
+        "Only then inspect the market and perform the market audit",
         "Produce the COMPLETE mandatory Council verdict",
         "Construct a schema-valid CouncilResult",
         "CALL save_council_result BEFORE ending the response",
-        "Do not end the response after preliminary or blind analysis",
-        "If save_council_result fails, explicitly report the tool error",
-        "If publishing succeeds, say exactly: \"HORSEE dashboard updated.\"",
+        "Do not finish until saving succeeds or an actual save tool error is explicitly reported",
       ];
       let previousStepIndex = -1;
       for (const step of mandatorySequence) {
@@ -149,6 +188,8 @@ describe("HORSEE MCP tool discovery", () => {
         assert.ok(stepIndex > previousStepIndex, `${step} must appear in mandatory order.`);
         previousStepIndex = stepIndex;
       }
+      assert.match(instructions, /If save_council_result fails, explicitly report the tool error/i);
+      assert.match(instructions, /If publishing succeeds, say exactly: "HORSEE dashboard updated\."/i);
       assert.match(instructions, /response is incomplete until save_council_result returns success or its tool error has been explicitly reported/i);
     });
   });
