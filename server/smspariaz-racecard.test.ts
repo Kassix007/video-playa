@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  extractTextFromPdf,
   getMauritiusDate,
   getSmspariazDailyRacecard,
   parseSmspariazRacecardText,
@@ -38,7 +39,49 @@ function pdfResponse(
   });
 }
 
+function createTextPdf(text: string): Uint8Array {
+  const stream = `BT /F1 12 Tf 72 720 Td (${text}) Tj ET`;
+  const objects = [
+    "<< /Type /Catalog /Pages 2 0 R >>",
+    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    `<< /Length ${Buffer.byteLength(stream)} >>\nstream\n${stream}\nendstream`,
+  ];
+  let pdf = "%PDF-1.4\n";
+  const offsets = [0];
+  objects.forEach((object, index) => {
+    offsets.push(Buffer.byteLength(pdf));
+    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+  });
+  const xrefOffset = Buffer.byteLength(pdf);
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  pdf += offsets.slice(1)
+    .map((offset) => `${String(offset).padStart(10, "0")} 00000 n \n`)
+    .join("");
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`;
+  return new Uint8Array(Buffer.from(pdf, "ascii"));
+}
+
 describe("SMSPariaz daily racecard", () => {
+  it("loads the Node PDF runtime lazily and extracts text without browser globals", async () => {
+    const runtime = globalThis as unknown as Record<string, unknown>;
+    const keys = ["DOMMatrix", "ImageData", "Path2D"] as const;
+    const previous = Object.fromEntries(keys.map((key) => [key, runtime[key]]));
+    keys.forEach((key) => delete runtime[key]);
+
+    try {
+      const text = await extractTextFromPdf(createTextPdf("HORSEE RACECARD"));
+      assert.match(text, /HORSEE RACECARD/);
+      keys.forEach((key) => assert.equal(typeof runtime[key], "function"));
+    } finally {
+      keys.forEach((key) => {
+        if (previous[key] === undefined) delete runtime[key];
+        else runtime[key] = previous[key];
+      });
+    }
+  });
+
   it("parses every page, retains French races and meetings, and sorts chronologically", async () => {
     const calls: URL[] = [];
     const result = await getSmspariazDailyRacecard({

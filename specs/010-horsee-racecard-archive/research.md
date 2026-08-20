@@ -91,3 +91,15 @@
 
 - Live PDF in every test run: rejected because upstream availability and the current date would make the suite flaky.
 - Snapshot only: rejected because freshness, ordering, and error behavior need semantic assertions.
+
+## Decision 9: Load PDF.js lazily and preserve its native Node runtime
+
+**Decision**: Import `@napi-rs/canvas` and `pdf-parse` only inside the real PDF extraction path, initialize missing `DOMMatrix`, `ImageData`, and `Path2D` globals before PDF.js evaluation, and mark the native canvas package as external in the Netlify MCP function bundle.
+
+**Rationale**: Netlify's bundler could not discover PDF.js's dynamic native-module load, which left `DOMMatrix` undefined and crashed the entire MCP during module startup. An explicit lazy dependency keeps unrelated tools available and ensures the Linux deployment artifact contains the required native binary.
+
+**Alternatives considered**:
+
+- Keep the top-level parser import and rely on transitive dependency discovery: rejected because this produced the observed production 502.
+- Add a partial handwritten `DOMMatrix` shim: rejected because it would not provide the complete runtime PDF.js expects and could fail on future documents.
+- Load the native canvas module at MCP startup: rejected because the racecard parser should not become a startup dependency for unrelated tools.

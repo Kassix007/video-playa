@@ -1,4 +1,3 @@
-import { PDFParse } from "pdf-parse";
 import { z } from "zod";
 import {
   formatMauritiusTimestamp,
@@ -303,7 +302,19 @@ export function parseSmspariazRacecardText(text: string): SmspariazRace[] {
     || left.race_number - right.race_number);
 }
 
-async function extractTextFromPdf(data: Uint8Array): Promise<string> {
+async function loadPdfParser(): Promise<typeof import("pdf-parse")> {
+  const runtime = globalThis as unknown as Record<string, unknown>;
+  if (!runtime.DOMMatrix || !runtime.ImageData || !runtime.Path2D) {
+    const canvas = await import("@napi-rs/canvas");
+    runtime.DOMMatrix ??= canvas.DOMMatrix;
+    runtime.ImageData ??= canvas.ImageData;
+    runtime.Path2D ??= canvas.Path2D;
+  }
+  return import("pdf-parse");
+}
+
+export async function extractTextFromPdf(data: Uint8Array): Promise<string> {
+  const { PDFParse } = await loadPdfParser();
   const parser = new PDFParse({ data });
   try {
     const result = await parser.getText();

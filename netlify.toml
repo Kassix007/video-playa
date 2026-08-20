@@ -5,6 +5,12 @@
 [build.environment]
   NODE_VERSION = "22"
 
+[functions]
+  node_bundler = "esbuild"
+
+[functions.mcp]
+  external_node_modules = ["@napi-rs/canvas"]
+
 [[redirects]]
   from = "/.well-known/oauth-protected-resource"
   to = "/.netlify/functions/oauth-protected-resource"
