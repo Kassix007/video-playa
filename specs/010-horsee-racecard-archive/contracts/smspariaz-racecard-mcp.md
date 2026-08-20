@@ -64,6 +64,10 @@ Optional race/meeting fields are omitted when they cannot be extracted reliably.
 
 Failures are returned as structured content and mark the MCP call as an error. A stale or partially parsed card is never returned as success.
 
+## Runtime Packaging
+
+The deployed MCP artifact includes `pdfjs-dist/legacy/build/pdf.worker.mjs` at that exact module path. A valid PDF parse must not depend on a worker file from the build workspace or another function artifact.
+
 ## Compatibility
 
 - The tool is additive to existing HORSEE discovery.

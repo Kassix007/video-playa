@@ -62,11 +62,14 @@ For a release smoke check only, allow the real source call and record the return
 
 Deploy through the existing Netlify pipeline. No destructive data migration is required: new saves use date-partitioned history keys, while existing flat history keys remain readable. PDF extraction uses `pdf-parse` plus its explicit Node canvas runtime. Existing Auth0 variables, write scope, MCP endpoint, Council store, and latest-result key remain unchanged.
 
-Before deployment, build the Netlify function artifacts and confirm the MCP archive includes `@napi-rs/canvas` and the platform-native canvas package:
+Before deployment, build the Netlify function artifacts and confirm the MCP archive includes `@napi-rs/canvas`, the platform-native canvas package, and the PDF.js worker:
 
 ```powershell
-netlify functions:build --src netlify/functions --functions .netlify/functions-runtime-check
-tar -tf .netlify/functions-runtime-check/mcp.zip | Select-String '@napi-rs/canvas'
+netlify build --offline
+tar -tf .netlify/functions/mcp.zip | Select-String '@napi-rs/canvas'
+tar -tf .netlify/functions/mcp.zip | Select-String 'node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs'
 ```
 
-After deployment, POST an MCP `initialize` request to `/mcp`, then use its session ID for `tools/list`. Both requests must succeed and the tool list must contain `get_smspariaz_daily_racecard`; a `DOMMatrix is not defined` response fails the deployment gate.
+Use the full Netlify build for this gate: the lower-level `netlify functions:build` command does not apply the site's `netlify.toml` included-file configuration.
+
+After deployment, POST an MCP `initialize` request to `/mcp`, use its session ID for `tools/list`, and call `get_smspariaz_daily_racecard`. Discovery and the tool call must succeed; `DOMMatrix is not defined`, a missing `pdf.worker.mjs`, or an empty racecard fails the deployment gate.
