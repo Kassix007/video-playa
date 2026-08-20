@@ -33,6 +33,16 @@ export function createHorseeWidgetHtml(): string {
       .feedback { align-content: center; background: #202923; border-left: 3px solid #56635c; display: grid; gap: 5px; min-height: 84px; padding: 14px 16px; }
       .feedback strong { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
       .feedback span { color: #aab4ae; font-size: 11px; line-height: 1.5; }
+      .run-status { align-items: center; background: #17201b; border-top: 1px solid #47534d; display: grid; gap: 14px 22px; grid-template-columns: minmax(150px, .22fr) minmax(150px, 1fr) minmax(175px, .65fr); padding: 18px 22px; }
+      .run-status-label { color: #68d39b; display: block; font-size: 10px; font-weight: 900; letter-spacing: .13em; margin-bottom: 5px; text-transform: uppercase; }
+      .run-status-command { font: 800 14px ui-monospace, monospace; margin: 0; overflow-wrap: anywhere; }
+      .run-status-meta { display: grid; gap: 5px; }
+      .run-status-meta strong, .run-status-meta time { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+      .run-status-meta time { color: #aab4ae; }
+      .run-status-message { color: #aab4ae; font-size: 11px; line-height: 1.5; margin: 0; }
+      .run-status[data-state="idle"] .run-status-label { color: #aab4ae; }
+      .run-status[data-state="saved"] .run-status-label { color: #68d39b; }
+      .run-status[data-state="failed"] .run-status-label { color: #ef766d; }
       .results { background: #1c241f; border-top: 1px solid #47534d; display: grid; gap: 20px; grid-template-columns: minmax(155px, .25fr) minmax(0, 1fr); padding: 22px; }
       dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; }
       dl > div { border-bottom: 1px solid #3a463f; display: grid; gap: 6px; min-width: 0; padding: 11px 13px; }
@@ -42,11 +52,11 @@ export function createHorseeWidgetHtml(): string {
       .waiting { color: #aab4ae; }
       @media (max-width: 620px) {
         .head { align-items: flex-start; flex-direction: column; }
-        .console, .results { grid-template-columns: 1fr; }
+        .console, .results, .run-status { grid-template-columns: 1fr; }
       }
       @media (max-width: 410px) {
         .head { margin: 0 14px; }
-        .console, .results { padding-left: 14px; padding-right: 14px; }
+        .console, .results, .run-status { padding-left: 14px; padding-right: 14px; }
         label { align-items: flex-start; flex-direction: column; gap: 3px; }
         .controls, dl { gap: 8px; grid-template-columns: 1fr; }
         input { border-right: 1px solid #56635c; }
@@ -71,6 +81,17 @@ export function createHorseeWidgetHtml(): string {
           <p class="help">Try <code>R1C1 hard</code>, <code>R2C7 hard</code>, or <code>R1C4</code>.</p>
         </form>
         <div class="feedback" aria-live="polite"><strong id="feedback-title">Connecting to ChatGPT</strong><span id="feedback-detail">Checking the MCP Apps bridge.</span></div>
+      </section>
+      <section id="run-status" class="run-status" data-state="idle" aria-live="polite" aria-labelledby="run-status-title">
+        <div>
+          <strong id="run-status-title" class="run-status-label">HORSEE IDLE</strong>
+          <p id="run-status-command" class="run-status-command">No active Council run</p>
+        </div>
+        <div class="run-status-meta">
+          <strong id="run-status-stage">Stage: awaiting command</strong>
+          <time id="run-status-updated">Updated: —</time>
+        </div>
+        <p id="run-status-message" class="run-status-message">Run stages are separate from the saved Selection Board.</p>
       </section>
       <section class="results" aria-labelledby="results-title">
         <div><span class="mark">Council return / live fields</span><h2 id="results-title">Selection board</h2></div>

@@ -5,9 +5,16 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import type { AuthInfo } from "@modelcontextprotocol/sdk/server/auth/types.js";
 import type { CouncilWriteActor } from "./council-audit.js";
 import type { CouncilWritePolicy } from "./council-auth.js";
+import type {
+  CouncilRunStatus,
+  CouncilRunStatusStore,
+} from "./council-run-status.js";
 import type { CouncilResult } from "./council-schema.js";
 import type { CouncilResultStore } from "./council-store.js";
-import { createHorseeMcpServer } from "./horsee-mcp.js";
+import {
+  createHorseeMcpServer,
+  HORSEE_PRODUCTION_MCP_RESOURCE,
+} from "./horsee-mcp.js";
 
 const result: CouncilResult = {
   race_id: "equidia-r1c1",
@@ -35,9 +42,16 @@ const result: CouncilResult = {
 
 const writePolicy: CouncilWritePolicy = {
   enabled: true,
-  resource: "https://horsee.example/mcp",
-  resourceMetadataUrl: "https://horsee.example/.well-known/oauth-protected-resource",
+  resource: HORSEE_PRODUCTION_MCP_RESOURCE,
+  resourceMetadataUrl: "https://videoplaya.kassinathdoss.dev/.well-known/oauth-protected-resource",
   writeScope: "horsee:council:write",
+};
+
+const receivedStatus: CouncilRunStatus = {
+  command: "R2C5 hard",
+  stage: "RECEIVED",
+  message: "Command accepted.",
+  updated_at: "2026-08-20T15:21:34.000Z",
 };
 
 class RecordingStore implements CouncilResultStore {
@@ -57,12 +71,30 @@ class RecordingStore implements CouncilResultStore {
   }
 }
 
+class RecordingRunStatusStore implements CouncilRunStatusStore {
+  readonly writes: CouncilRunStatus[] = [];
+
+  async set(status: CouncilRunStatus): Promise<void> {
+    this.writes.push(status);
+  }
+
+  async get(): Promise<CouncilRunStatus | null> {
+    return this.writes.at(-1) ?? null;
+  }
+}
+
 async function withClient(
   store: RecordingStore,
   authInfo: AuthInfo | undefined,
   run: (client: Client) => Promise<void>,
+  statusStore = new RecordingRunStatusStore(),
 ): Promise<void> {
-  const server = createHorseeMcpServer(store, writePolicy, { requestId: "test-request" });
+  const server = createHorseeMcpServer(
+    store,
+    statusStore,
+    writePolicy,
+    { requestId: "test-request" },
+  );
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   if (authInfo) {
     const send = clientTransport.send.bind(clientTransport);
@@ -80,6 +112,159 @@ async function withClient(
   }
 }
 
+function validAuthInfo(): AuthInfo {
+  return {
+    token: "not-persisted",
+    clientId: "chatgpt-test-client",
+    scopes: [writePolicy.writeScope],
+    resource: new URL(writePolicy.resource!),
+    extra: { subject: "test-subject" },
+  };
+}
+
+describe("check_council_write_access OAuth diagnostic", () => {
+  it("requires OAuth and returns the existing challenge without a token", async () => {
+    await withClient(new RecordingStore(), undefined, async (client) => {
+      const response = await client.callTool({
+        name: "check_council_write_access",
+        arguments: {},
+      });
+      assert.equal(response.isError, true);
+      const content = response.content as Array<{ text?: string }>;
+      assert.match(content[0]?.text ?? "", /Authentication is required to save a Council result/);
+      assert.match(
+        String(response._meta?.["mcp/www_authenticate"]),
+        /error="invalid_token"/,
+      );
+    });
+  });
+
+  it("returns only the non-sensitive authenticated write-access result", async () => {
+    const resultStore = new RecordingStore();
+    const statusStore = new RecordingRunStatusStore();
+    await withClient(resultStore, validAuthInfo(), async (client) => {
+      const response = await client.callTool({
+        name: "check_council_write_access",
+        arguments: {},
+      });
+      assert.notEqual(response.isError, true);
+      assert.deepEqual(response.content, []);
+      assert.deepEqual(response.structuredContent, {
+        authenticated: true,
+        write_scope: "horsee:council:write",
+        resource: HORSEE_PRODUCTION_MCP_RESOURCE,
+      });
+      const serialized = JSON.stringify(response);
+      assert.equal(serialized.includes("not-persisted"), false);
+      assert.equal(serialized.includes("test-subject"), false);
+    }, statusStore);
+    assert.equal(resultStore.writes.length, 0);
+    assert.equal(statusStore.writes.length, 0);
+  });
+
+  it("rejects auth context without the required scope", async () => {
+    const authInfo = { ...validAuthInfo(), scopes: [] };
+    await withClient(new RecordingStore(), authInfo, async (client) => {
+      const response = await client.callTool({
+        name: "check_council_write_access",
+        arguments: {},
+      });
+      assert.equal(response.isError, true);
+      assert.match(String(response._meta?.["mcp/www_authenticate"]), /insufficient_scope/);
+    });
+  });
+
+  it("rejects auth context issued for another resource", async () => {
+    const authInfo = {
+      ...validAuthInfo(),
+      resource: new URL("https://other.example/mcp"),
+    };
+    await withClient(new RecordingStore(), authInfo, async (client) => {
+      const response = await client.callTool({
+        name: "check_council_write_access",
+        arguments: {},
+      });
+      assert.equal(response.isError, true);
+      assert.match(String(response._meta?.["mcp/www_authenticate"]), /invalid_token/);
+    });
+  });
+});
+
+describe("Council run status isolation", () => {
+  it("does not accept an unauthenticated status update", async () => {
+    const resultStore = new RecordingStore();
+    const statusStore = new RecordingRunStatusStore();
+
+    await withClient(resultStore, undefined, async (client) => {
+      const response = await client.callTool({
+        name: "update_council_run_status",
+        arguments: receivedStatus,
+      });
+      assert.equal(response.isError, true);
+    }, statusStore);
+
+    assert.equal(statusStore.writes.length, 0);
+    assert.equal(resultStore.writes.length, 0);
+  });
+
+  it("stores and reads stage transitions without modifying the latest verdict", async () => {
+    const resultStore = new RecordingStore();
+    const statusStore = new RecordingRunStatusStore();
+    const transitions: CouncilRunStatus[] = [
+      receivedStatus,
+      {
+        ...receivedStatus,
+        stage: "ANALYSING_RUNNERS",
+        message: "Council analysts are evaluating every runner.",
+        updated_at: "2026-08-20T15:24:00.000Z",
+      },
+    ];
+
+    await withClient(resultStore, validAuthInfo(), async (client) => {
+      for (const status of transitions) {
+        const update = await client.callTool({
+          name: "update_council_run_status",
+          arguments: status,
+        });
+        assert.notEqual(update.isError, true);
+      }
+
+      const latest = await client.callTool({
+        name: "get_latest_council_result",
+        arguments: {},
+      });
+      assert.deepEqual(latest.structuredContent, {
+        result: null,
+        status: transitions[1],
+      });
+    }, statusStore);
+
+    assert.deepEqual(statusStore.writes, transitions);
+    assert.equal(resultStore.writes.length, 0);
+  });
+
+  it("keeps save_council_result as the only operation that publishes a verdict", async () => {
+    const resultStore = new RecordingStore();
+    const statusStore = new RecordingRunStatusStore();
+
+    await withClient(resultStore, validAuthInfo(), async (client) => {
+      await client.callTool({ name: "check_council_write_access", arguments: {} });
+      await client.callTool({
+        name: "update_council_run_status",
+        arguments: receivedStatus,
+      });
+      assert.equal(resultStore.writes.length, 0);
+
+      const save = await client.callTool({
+        name: "save_council_result",
+        arguments: result,
+      });
+      assert.notEqual(save.isError, true);
+      assert.equal(resultStore.writes.length, 1);
+    }, statusStore);
+  });
+});
+
 describe("save_council_result authorization boundary", () => {
   it("does not mutate storage for an unauthenticated tool call", async () => {
     const store = new RecordingStore();
@@ -94,13 +279,7 @@ describe("save_council_result authorization boundary", () => {
 
   it("passes the authenticated client identity to storage", async () => {
     const store = new RecordingStore();
-    const authInfo: AuthInfo = {
-      token: "not-persisted",
-      clientId: "chatgpt-test-client",
-      scopes: [writePolicy.writeScope],
-      resource: new URL(writePolicy.resource!),
-      extra: { subject: "test-subject" },
-    };
+    const authInfo = validAuthInfo();
 
     await withClient(store, authInfo, async (client) => {
       const response = await client.callTool({ name: "save_council_result", arguments: result });
@@ -117,12 +296,7 @@ describe("save_council_result authorization boundary", () => {
 
   it("rejects an invalid result before storage", async () => {
     const store = new RecordingStore();
-    const authInfo: AuthInfo = {
-      token: "not-persisted",
-      clientId: "chatgpt-test-client",
-      scopes: [writePolicy.writeScope],
-      resource: new URL(writePolicy.resource!),
-    };
+    const authInfo = validAuthInfo();
 
     await withClient(store, authInfo, async (client) => {
       const response = await client.callTool({

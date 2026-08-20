@@ -10,6 +10,7 @@ import {
 } from "../../server/council-auth.js";
 import { logCouncilSecurityEvent } from "../../server/council-audit.js";
 import { guardCouncilMcpRequest } from "../../server/council-request-security.js";
+import { createCouncilRunStatusStore } from "../../server/council-run-status.js";
 import { createCouncilResultStore } from "../../server/council-store.js";
 import { createHorseeMcpServer } from "../../server/horsee-mcp.js";
 import { addHorseeToolSecuritySchemes } from "../../server/horsee-tool-security.js";
@@ -62,7 +63,8 @@ export default async function handler(
 
   const writePolicy = getCouncilWritePolicy(authConfig);
   const store = createCouncilResultStore(runtimeEnvironment);
-  const server = createHorseeMcpServer(store, writePolicy, { requestId });
+  const statusStore = createCouncilRunStatusStore(runtimeEnvironment);
+  const server = createHorseeMcpServer(store, statusStore, writePolicy, { requestId });
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true,
