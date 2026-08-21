@@ -63,15 +63,42 @@ export const SmspariazRacecardFailureSchema = z.object({
   error: z.string().min(1),
 }).strict();
 
-export const SmspariazRacecardResponseSchema = z.discriminatedUnion("success", [
-  SmspariazRacecardSuccessSchema,
-  SmspariazRacecardFailureSchema,
-]);
+// The MCP SDK's output-schema validator only accepts an object-typed Zod schema
+// as a tool `outputSchema`; a `z.discriminatedUnion` normalizes to `undefined`
+// and then crashes the tools/call path with "Cannot read properties of undefined
+// (reading '_zod')". Expose a single flat object whose success/failure fields are
+// optional and enforce the discriminated shape with a refinement, which the SDK
+// still recognizes as an object schema. The discriminated `SmspariazRacecardResponse`
+// type below preserves exhaustive `output.success` narrowing for callers.
+const SmspariazRacecardResponseFields = z.object({
+  success: z.boolean(),
+  programme_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  timezone: z.literal(MAURITIUS_TIMEZONE),
+  fetched_at: z.string().min(1),
+  source: z.literal(SMSPARIAZ_RACECARD_SOURCE),
+  meeting_count: z.number().int().nonnegative().optional(),
+  race_count: z.number().int().nonnegative().optional(),
+  french_race_count: z.number().int().nonnegative().optional(),
+  meetings: z.array(SmspariazMeetingSchema).optional(),
+  races: z.array(SmspariazRaceSchema).optional(),
+  error_code: SmspariazRacecardErrorCodeSchema.optional(),
+  error: z.string().min(1).optional(),
+}).strict();
+
+export const SmspariazRacecardResponseSchema = SmspariazRacecardResponseFields.superRefine((value, ctx) => {
+  const branch = value.success ? SmspariazRacecardSuccessSchema : SmspariazRacecardFailureSchema;
+  const result = branch.safeParse(value);
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      ctx.addIssue({ code: "custom", path: issue.path, message: issue.message });
+    }
+  }
+});
 
 export type SmspariazRace = z.infer<typeof SmspariazRaceSchema>;
 export type SmspariazRacecardSuccess = z.infer<typeof SmspariazRacecardSuccessSchema>;
 export type SmspariazRacecardFailure = z.infer<typeof SmspariazRacecardFailureSchema>;
-export type SmspariazRacecardResponse = z.infer<typeof SmspariazRacecardResponseSchema>;
+export type SmspariazRacecardResponse = SmspariazRacecardSuccess | SmspariazRacecardFailure;
 
 type FetchImplementation = (
   input: string | URL | Request,

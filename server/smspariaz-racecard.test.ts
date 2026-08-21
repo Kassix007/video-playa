@@ -1,11 +1,16 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
 import {
   extractTextFromPdf,
   getMauritiusDate,
   getSmspariazDailyRacecard,
   parseSmspariazRacecardText,
+  SMSPARIAZ_RACECARD_SOURCE,
+  SmspariazRacecardResponseSchema,
 } from "./smspariaz-racecard.js";
+import { MAURITIUS_TIMEZONE } from "./mauritius-time.js";
 
 const CURRENT_TEXT = `
 PROGRAMME DES COURSES FRANÇAISES DU VENDREDI 21 AOÛT 2026
@@ -173,5 +178,102 @@ describe("SMSPariaz daily racecard", () => {
     if (result.success) return;
     assert.equal(result.error_code, "SMSPARIAZ_RACECARD_PARSE_FAILED");
     assert.match(result.error, /invalid cross-reference table/);
+  });
+});
+
+describe("SMSPariaz racecard MCP output schema", () => {
+  const successOutput = {
+    success: true as const,
+    programme_date: "2026-08-21",
+    timezone: MAURITIUS_TIMEZONE,
+    fetched_at: "2026-08-21T08:00:00+04:00",
+    source: SMSPARIAZ_RACECARD_SOURCE,
+    meeting_count: 1,
+    race_count: 1,
+    french_race_count: 1,
+    meetings: [{
+      meeting_number: 2,
+      racecourse: "Longchamp",
+      country: "France",
+      race_count: 1,
+      race_ids: ["R2C1"],
+    }],
+    races: [{
+      race_id: "R2C1",
+      meeting_number: 2,
+      race_number: 1,
+      racecourse: "Longchamp",
+      off_time: "14:30",
+      off_time_mauritius: "14:30",
+      country: "France",
+    }],
+  };
+  const failureOutput = {
+    success: false as const,
+    programme_date: "2026-08-21",
+    timezone: MAURITIUS_TIMEZONE,
+    fetched_at: "2026-08-21T08:00:00+04:00",
+    source: SMSPARIAZ_RACECARD_SOURCE,
+    error_code: "SMSPARIAZ_RACECARD_STALE" as const,
+    error: "Expected the Mauritius programme for 2026-08-21, but SMSPariaz returned 2026-08-10.",
+  };
+
+  function callTool(structuredContent: unknown, isError: boolean) {
+    const server = new McpServer({ name: "racecard-schema-test", version: "1.0.0" });
+    server.registerTool(
+      "get_smspariaz_daily_racecard",
+      {
+        title: "Get current SMSPariaz daily racecard",
+        description: "Regression fixture for the racecard output schema.",
+        inputSchema: z.object({}).strict(),
+        outputSchema: SmspariazRacecardResponseSchema,
+      },
+      async () => ({
+        content: [{ type: "text" as const, text: "fixture" }],
+        structuredContent: structuredContent as Record<string, unknown>,
+        ...(isError ? { isError: true } : {}),
+      }),
+    );
+    const handler = (server.server as unknown as {
+      _requestHandlers: Map<string, (request: unknown, extra: unknown) => Promise<unknown>>;
+    })._requestHandlers.get("tools/call")!;
+    return handler(
+      { method: "tools/call", params: { name: "get_smspariaz_daily_racecard", arguments: {} } },
+      { signal: new AbortController().signal, requestId: 1, sendNotification: async () => {}, sendRequest: async () => {} },
+    ) as Promise<{ isError?: boolean; content: Array<{ type: string; text: string }>; structuredContent?: unknown }>;
+  }
+
+  it("validates a successful programme through the tools/call path without a _zod crash", async () => {
+    const result = await callTool(successOutput, false);
+    assert.notEqual(result.isError, true);
+    assert.deepEqual(result.structuredContent, successOutput);
+    for (const item of result.content) {
+      assert.doesNotMatch(item.text, /_zod/);
+    }
+  });
+
+  it("passes a structured failure result through untouched", async () => {
+    const result = await callTool(failureOutput, true);
+    assert.equal(result.isError, true);
+    for (const item of result.content) {
+      assert.doesNotMatch(item.text, /_zod/);
+    }
+  });
+
+  it("rejects a success payload missing required programme fields", async () => {
+    const { races: _races, ...withoutRaces } = successOutput;
+    const result = await callTool(withoutRaces, false);
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /Output validation error/);
+    assert.doesNotMatch(result.content[0].text, /_zod/);
+  });
+
+  it("accepts both discriminated branches at the schema level", () => {
+    assert.equal(SmspariazRacecardResponseSchema.safeParse(successOutput).success, true);
+    assert.equal(SmspariazRacecardResponseSchema.safeParse(failureOutput).success, true);
+    assert.equal(
+      SmspariazRacecardResponseSchema.safeParse({ ...failureOutput, races: [] }).success,
+      false,
+    );
   });
 });
