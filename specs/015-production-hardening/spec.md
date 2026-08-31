@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-29
 
-**Status**: Draft
+**Status**: Complete
 
 **Input**: User description: "Clean the codebase to a production-ready level and perform a repository-wide security audit."
 
@@ -40,7 +40,7 @@ As a maintainer responsible for deployment risk, I receive a repository-wide sec
 1. **Given** the audit begins, **When** repository boundaries are mapped, **Then** browser code, server code, deployment functions, media inputs, external requests, authorization, persistence, and operational configuration are included or explicitly excluded with a reason.
 2. **Given** a possible weakness is discovered, **When** it is assessed, **Then** it is reported only after source-backed validation and calibrated severity.
 3. **Given** the audit completes, **When** the maintainer reads the report, **Then** they can distinguish validated findings from coverage limitations and non-security quality issues.
-4. **Given** a security fix would change behavior or risk, **When** the audit identifies it, **Then** remediation is deferred to an explicitly approved finding-fix task.
+4. **Given** a security fix would change behavior or risk, **When** the audit identifies it, **Then** remediation occurs only after explicit approval through the finding-fix workflow.
 
 ---
 
@@ -102,7 +102,7 @@ As a maintainer, I receive a concise handoff that separates completed cleanup, v
 - **FR-010**: Every reported security finding MUST include source evidence, severity, confidence, root cause, validation, attack path, and affected scope.
 - **FR-011**: Unvalidated hypotheses MUST NOT be reported as confirmed vulnerabilities.
 - **FR-012**: Security report artifacts MUST state coverage and limitations honestly.
-- **FR-013**: Security findings MUST NOT be remediated automatically under this audit; each remediation requires explicit approval through the appropriate finding-fix workflow.
+- **FR-013**: Security findings MUST NOT be remediated automatically under this audit; each remediation requires explicit approval through the appropriate finding-fix workflow. The user's "make the changes" instruction approves remediation of validated findings in this specification.
 - **FR-014**: Sensitive values encountered during review MUST NOT be reproduced in chat, reports, or command history.
 - **FR-015**: The final production build and all applicable automated tests MUST run after cleanup changes.
 - **FR-016**: The final handoff MUST separate completed cleanup, validated security findings, accepted limitations, and recommended follow-up work.
@@ -125,7 +125,7 @@ As a maintainer, I receive a concise handoff that separates completed cleanup, v
 
 - The requested scope is the complete repository, including browser code, server modules, deployment functions, scripts, and configuration.
 - Production cleanup authorizes high-confidence non-security refactoring and removal of proven obsolete code.
-- Security remediation is not implied by the request for an audit and requires a follow-up approval per finding.
+- Security remediation requires a follow-up approval per finding; the user's "make the changes" instruction supplies that approval for validated findings in this task.
 - Existing product behavior and public interfaces remain stable unless a separate specification authorizes change.
 - Generated outputs and dependency directories are excluded from source review when repository ignore rules identify them as non-source artifacts.
 
@@ -139,8 +139,13 @@ As a maintainer, I receive a concise handoff that separates completed cleanup, v
 ## Out of Scope
 
 - Shipping, deployment, publication, or changes to production infrastructure.
-- Automatic remediation of validated security findings.
 - New product features, visual redesigns, or changes to public behavior.
 - Deep multi-pass security scanning, penetration testing against live systems, or social-engineering tests.
 - Broad dependency upgrades without a source-backed production or security need.
 - Rewriting stable subsystems solely to adopt a different style or architecture.
+
+## Delivery Record
+
+- The validated public-history GitHub-token quota issue was remediated through the approved finding-fix workflow.
+- Root server tests, production static analysis, production build, and the mobile verification suite passed.
+- The completed security report records one remediated medium-severity finding and deployment follow-ups for archive visibility and scheduled-function reachability.

@@ -32,5 +32,6 @@
 ## Notes
 
 - Validation passed on the first review iteration.
-- The specification separates authorized non-security cleanup from security remediation, which requires explicit follow-up approval.
+- The specification records that remediation remains approval-gated; the user explicitly approved the validated findings in this task with "make the changes".
+- Quality verification completed: root server suite (135 tests), production static analysis, production build, and the mobile package verification suite passed. The production build retains an advisory large-chunk warning.
 - The requested scope is the full repository; generated outputs and ignored dependency directories are excluded from source review.
