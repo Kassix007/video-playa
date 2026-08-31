@@ -8,6 +8,7 @@
     "build:mcp-widget": "node scripts/build-mcp-widget.mjs",
     "build": "npm run build:mcp-widget && tsc -p tsconfig.mcp.json && tsc -b && vite build",
     "test:mcp": "tsx --test server/*.test.ts",
+    "migrate:horsee": "tsx scripts/migrate-council-history-to-archive.ts",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"

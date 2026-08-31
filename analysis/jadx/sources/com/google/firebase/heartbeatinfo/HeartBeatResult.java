@@ -1,0 +1,17 @@
+package com.google.firebase.heartbeatinfo;
+
+import com.google.auto.value.AutoValue;
+import java.util.List;
+
+/* JADX INFO: loaded from: classes.dex */
+@AutoValue
+public abstract class HeartBeatResult {
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static HeartBeatResult create(String str, List<String> list) {
+        return new AutoValue_HeartBeatResult(str, list);
+    }
+
+    public abstract List<String> getUsedDates();
+
+    public abstract String getUserAgent();
+}

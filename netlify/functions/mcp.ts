@@ -11,7 +11,7 @@ import {
 import { logCouncilSecurityEvent } from "../../server/council-audit.js";
 import { guardCouncilMcpRequest } from "../../server/council-request-security.js";
 import { createCouncilRunStatusStore } from "../../server/council-run-status.js";
-import { createCouncilResultStore } from "../../server/council-store.js";
+import { createArchiveAwareCouncilResultStore } from "../../server/council-archive-runtime.js";
 import { createHorseeMcpServer } from "../../server/horsee-mcp.js";
 import { addHorseeToolSecuritySchemes } from "../../server/horsee-tool-security.js";
 import { createCouncilRuntimeEnvironment } from "../../server/netlify-runtime.js";
@@ -62,7 +62,7 @@ export default async function handler(
   }
 
   const writePolicy = getCouncilWritePolicy(authConfig);
-  const store = createCouncilResultStore(runtimeEnvironment);
+  const store = createArchiveAwareCouncilResultStore(runtimeEnvironment);
   const statusStore = createCouncilRunStatusStore(runtimeEnvironment);
   const server = createHorseeMcpServer(store, statusStore, writePolicy, { requestId });
   const transport = new WebStandardStreamableHTTPServerTransport({

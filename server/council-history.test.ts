@@ -6,6 +6,7 @@ import {
   sortCouncilResultsNewest,
 } from "./council-history.js";
 import type { CouncilResult } from "./council-schema.js";
+import { deduplicateCouncilResults } from "./council-store.js";
 
 function result(raceId: string, analysedAt: string): CouncilResult {
   return {
@@ -65,5 +66,13 @@ describe("Council history date queries", () => {
       { date: "2026-08-20", count: 2 },
       { date: "2026-08-21", count: 1 },
     ]);
+  });
+
+  it("counts only the newest current result for a legacy date/race identity", () => {
+    const older = result("R1C1", "2026-08-20T10:00:00.000Z");
+    const newer = { ...older, analysed_at: "2026-08-20T11:00:00.000Z", final_selection: "Updated" };
+    const current = deduplicateCouncilResults([older, newer, result("R1C2", "2026-08-20T12:00:00.000Z")]);
+    assert.deepEqual(current.map((item) => item.final_selection), ["#1 Alpha", "Updated"]);
+    assert.deepEqual(aggregateCouncilDateCounts(current, "2026-08"), [{ date: "2026-08-20", count: 2 }]);
   });
 });

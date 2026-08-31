@@ -1,0 +1,33 @@
+package b;
+
+import android.os.Build;
+import android.view.View;
+import android.view.Window;
+import i3.C1136a;
+import n5.AbstractC1397A;
+import w1.p0;
+import w1.q0;
+import w1.r0;
+import w1.s0;
+
+/* JADX INFO: loaded from: classes.dex */
+public class r extends q {
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // b.p, com.google.android.gms.internal.measurement.I1
+    public void B0(C statusBarStyle, C navigationBarStyle, Window window, View view, boolean z5, boolean z6) {
+        kotlin.jvm.internal.m.e(statusBarStyle, "statusBarStyle");
+        kotlin.jvm.internal.m.e(navigationBarStyle, "navigationBarStyle");
+        kotlin.jvm.internal.m.e(window, "window");
+        kotlin.jvm.internal.m.e(view, "view");
+        AbstractC1397A.A(window, false);
+        window.setStatusBarColor(z5 ? statusBarStyle.f9853b : statusBarStyle.f9852a);
+        window.setNavigationBarColor(z6 ? navigationBarStyle.f9853b : navigationBarStyle.f9852a);
+        window.setStatusBarContrastEnforced(false);
+        window.setNavigationBarContrastEnforced(false);
+        C1136a c1136a = new C1136a(view);
+        int i = Build.VERSION.SDK_INT;
+        C3.a s0Var = i >= 35 ? new s0(window, c1136a) : i >= 30 ? new r0(window, c1136a) : i >= 26 ? new q0(window, c1136a) : new p0(window, c1136a);
+        s0Var.P(!z5);
+        s0Var.O(!z6);
+    }
+}

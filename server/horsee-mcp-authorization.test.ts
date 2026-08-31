@@ -79,6 +79,14 @@ class RecordingStore implements CouncilResultStore {
   }
 }
 
+class CurrentResultRecordingStore extends RecordingStore {
+  override async save(savedResult: CouncilResult, actor: CouncilWriteActor): Promise<void> {
+    const existing = this.writes.findIndex((write) => write.result.race_id === savedResult.race_id);
+    if (existing >= 0) this.writes.splice(existing, 1);
+    this.writes.push({ result: savedResult, actor });
+  }
+}
+
 class RecordingRunStatusStore implements CouncilRunStatusStore {
   readonly writes: CouncilRunStatus[] = [];
 
@@ -315,5 +323,19 @@ describe("save_council_result authorization boundary", () => {
     });
 
     assert.equal(store.writes.length, 0);
+  });
+
+  it("keeps MCP latest/history envelopes compatible with one current result per race", async () => {
+    const store = new CurrentResultRecordingStore();
+    const corrected = { ...result, analysed_at: "2026-08-20T13:00:00.000Z", final_selection: "#4 Alpha corrected" };
+    await withClient(store, validAuthInfo(), async (client) => {
+      await client.callTool({ name: "save_council_result", arguments: result });
+      await client.callTool({ name: "save_council_result", arguments: corrected });
+      const latest = await client.callTool({ name: "get_latest_council_result", arguments: {} });
+      const history = await client.callTool({ name: "get_council_history", arguments: { limit: 10 } });
+      assert.equal((latest.structuredContent as { result?: CouncilResult }).result?.final_selection, corrected.final_selection);
+      assert.deepEqual((history.structuredContent as { results?: CouncilResult[] }).results, [corrected]);
+    });
+    assert.equal(store.writes.length, 1);
   });
 });

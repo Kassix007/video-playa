@@ -1,0 +1,30 @@
+[
+  {
+    "key": "control_android_hints",
+    "finalURL": "https://www.smspariaz.com/",
+    "title": "SMS PARIAZ LTD",
+    "requests": 27,
+    "responses": 27,
+    "blocked": 0,
+    "scripts": 3,
+    "cookies": 1,
+    "localStorage": 2,
+    "sessionStorage": 0,
+    "bridgeEvents": 0,
+    "navigationError": null
+  },
+  {
+    "key": "appua_android_hints",
+    "finalURL": "https://www.smspariaz.com/",
+    "title": "SMS PARIAZ LTD",
+    "requests": 27,
+    "responses": 27,
+    "blocked": 0,
+    "scripts": 3,
+    "cookies": 1,
+    "localStorage": 2,
+    "sessionStorage": 0,
+    "bridgeEvents": 0,
+    "navigationError": null
+  }
+]

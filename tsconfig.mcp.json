@@ -8,5 +8,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["server/**/*.ts", "netlify/functions/**/*.ts", "mcp-app/**/*.ts"]
+  "include": ["server/**/*.ts", "netlify/functions/**/*.ts", "mcp-app/**/*.ts", "scripts/**/*.ts"]
 }
