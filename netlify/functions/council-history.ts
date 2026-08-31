@@ -1,6 +1,6 @@
 import type { Context } from "@netlify/functions";
 import { isCouncilHistoryDate } from "../../server/council-history.js";
-import { createCouncilResultStore } from "../../server/council-store.js";
+import { createArchiveAwareCouncilResultStore } from "../../server/council-archive-runtime.js";
 import { MAURITIUS_TIMEZONE } from "../../server/mauritius-time.js";
 import { createCouncilRuntimeEnvironment } from "../../server/netlify-runtime.js";
 
@@ -15,7 +15,7 @@ export default async function handler(request: Request, context: Context): Promi
       { status: 400, headers: { "Cache-Control": "no-store" } },
     );
   }
-  const store = createCouncilResultStore(createCouncilRuntimeEnvironment(context));
+  const store = createArchiveAwareCouncilResultStore(createCouncilRuntimeEnvironment(context));
   const results = await store.getByDate(date);
   return Response.json(
     { date, timezone: MAURITIUS_TIMEZONE, count: results.length, results },

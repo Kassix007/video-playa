@@ -31,6 +31,60 @@
   force = true
 
 [[redirects]]
+  from = "/api/horsee/scheduler/status"
+  to = "/.netlify/functions/horsee-scheduler-api"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/horsee/scheduler/run"
+  to = "/.netlify/functions/horsee-scheduler-api"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/horsee/jobs/today"
+  to = "/.netlify/functions/horsee-jobs"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/horsee/jobs/ready"
+  to = "/.netlify/functions/horsee-jobs"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/horsee/jobs/next"
+  to = "/.netlify/functions/horsee-jobs"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/horsee/jobs/*"
+  to = "/.netlify/functions/horsee-jobs"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/horsee/archive/status"
+  to = "/.netlify/functions/horsee-archive-api"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/horsee/archive/run"
+  to = "/.netlify/functions/horsee-archive-api"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/horsee/archive/cleanup"
+  to = "/.netlify/functions/horsee-archive-api"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/council/today"
   to = "/.netlify/functions/council-today"
   status = 200

@@ -1,0 +1,1354 @@
+{
+  "capturedAt": "2026-08-28T09:22:13.990Z",
+  "targetURL": "https://www.smspariaz.com/login/",
+  "variant": {
+    "key": "login_iphone",
+    "label": "Public /login/ page, iPhone Safari-like UA",
+    "targetURL": "https://www.smspariaz.com/login/",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "deviceScaleFactor": 3,
+    "bridge": false
+  },
+  "finalURL": "https://www.smspariaz.com/login/",
+  "networkIdle": true,
+  "navigationError": null,
+  "cookies": [
+    {
+      "name": "PHPSESSID",
+      "domain": "www.smspariaz.com",
+      "path": "/",
+      "secure": false,
+      "httpOnly": false,
+      "sameSite": "Lax",
+      "expires": -1,
+      "valueLength": 26,
+      "valueSha256": "5ee9f0917904d4c9f33c0db653ee373965f67f92e3b136bcaef539d4b65c4ded"
+    }
+  ],
+  "summary": {
+    "url": "https://www.smspariaz.com/login/",
+    "title": "SMS PARIAZ LTD",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1",
+    "bridgePresent": false,
+    "metas": [
+      {
+        "name": null,
+        "property": null,
+        "httpEquiv": null,
+        "content": ""
+      },
+      {
+        "name": "theme-color",
+        "property": null,
+        "httpEquiv": null,
+        "content": "#FFFFFF"
+      },
+      {
+        "name": "viewport",
+        "property": null,
+        "httpEquiv": null,
+        "content": "width=device-width, initial-scale=1.0"
+      }
+    ],
+    "scripts": [
+      {
+        "index": 0,
+        "src": "https://v2.zopim.com/?5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y",
+        "type": "text/javascript",
+        "async": true,
+        "defer": false,
+        "integrity": "",
+        "inlineLength": 0,
+        "inlinePreview": ""
+      },
+      {
+        "index": 1,
+        "src": "https://player.twitch.tv/js/embed/v1.js",
+        "type": "",
+        "async": false,
+        "defer": false,
+        "integrity": "",
+        "inlineLength": 0,
+        "inlinePreview": ""
+      },
+      {
+        "index": 2,
+        "src": "",
+        "type": "",
+        "async": false,
+        "defer": false,
+        "integrity": "",
+        "inlineLength": 47,
+        "inlinePreview": "var PAGE=0; var MOBILE=0;"
+      },
+      {
+        "index": 3,
+        "src": "",
+        "type": "text/javascript",
+        "async": false,
+        "defer": false,
+        "integrity": "",
+        "inlineLength": 442,
+        "inlinePreview": "window.$zopim||(function(d,s){var z=$zopim=function(c){z._.push(c)},$=z.s= d.createElement(s),e=d.getElementsByTagName(s)[0];z.set=function(o){z.set. _.push(o)};z._=[];z.set._=[];$.async=!0;$.setAttribute(\"charset\",\"utf-8\"); $.src=\"https://v2.zopim.com/?5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y\";z.t=+new Dat"
+      },
+      {
+        "index": 4,
+        "src": "https://www.smspariaz.com/js/mobile.js",
+        "type": "",
+        "async": true,
+        "defer": false,
+        "integrity": "",
+        "inlineLength": 0,
+        "inlinePreview": ""
+      },
+      {
+        "index": 5,
+        "src": "",
+        "type": "",
+        "async": false,
+        "defer": false,
+        "integrity": "",
+        "inlineLength": 143,
+        "inlinePreview": "var MOBILE=1; window.addEventListener('load', function () { if (MOBILE == 1) { loadProfile(); } });"
+      },
+      {
+        "index": 6,
+        "src": "https://www.smspariaz.com/lib/jquery.js",
+        "type": "",
+        "async": false,
+        "defer": false,
+        "integrity": "",
+        "inlineLength": 0,
+        "inlinePreview": ""
+      },
+      {
+        "index": 7,
+        "src": "https://www.smspariaz.com/js/site.js?v=1.590",
+        "type": "",
+        "async": false,
+        "defer": false,
+        "integrity": "",
+        "inlineLength": 0,
+        "inlinePreview": ""
+      },
+      {
+        "index": 8,
+        "src": "",
+        "type": "",
+        "async": false,
+        "defer": false,
+        "integrity": "",
+        "inlineLength": 1107,
+        "inlinePreview": "var BASE=\"https://www.smspariaz.com/\"; if(PAGE==1){ $('#left-menu').show(); loadHomepage(); loadLocal('main-content-local'); //loadToppool('main-content2'); } if(PAGE=='Peakpool'){ loadPeakpool(); } else if(PAGE=='Pmu'){ loadPmu(); } else if(PAGE=='International'){ loadInternational(); } else if(PAG"
+      }
+    ],
+    "stylesheets": [
+      "https://www.smspariaz.com/style/reset.css",
+      "https://www.smspariaz.com/font/css/fontawesome.css",
+      "https://www.smspariaz.com/font/css/brands.css",
+      "https://www.smspariaz.com/font/css/solid.css",
+      "https://www.smspariaz.com/style/style.css?version=1.6",
+      "https://www.smspariaz.com/style/print.css"
+    ],
+    "forms": [
+      {
+        "index": 0,
+        "id": "",
+        "name": "",
+        "action": "https://www.smspariaz.com/login/",
+        "method": "GET",
+        "className": "form-inline",
+        "text": "Login",
+        "data": {},
+        "fields": [
+          {
+            "tag": "INPUT",
+            "type": "text",
+            "name": "",
+            "id": "",
+            "className": ""
+          },
+          {
+            "tag": "INPUT",
+            "type": "password",
+            "name": "",
+            "id": "",
+            "className": ""
+          },
+          {
+            "tag": "BUTTON",
+            "type": "submit",
+            "name": "",
+            "id": "",
+            "className": "submit"
+          }
+        ]
+      },
+      {
+        "index": 1,
+        "id": "",
+        "name": "",
+        "action": "https://www.smspariaz.com/login/",
+        "method": "GET",
+        "className": "form-inline",
+        "text": "Register Forget Password?",
+        "data": {},
+        "fields": []
+      },
+      {
+        "index": 2,
+        "id": "login",
+        "name": "",
+        "action": "https://www.smspariaz.com/login/",
+        "method": "POST",
+        "className": "optrequest",
+        "text": "Your registered primary phone number: Who referred you? Phone number:",
+        "data": {},
+        "fields": [
+          {
+            "tag": "INPUT",
+            "type": "text",
+            "name": "number",
+            "id": "",
+            "className": "phone inp"
+          },
+          {
+            "tag": "INPUT",
+            "type": "text",
+            "name": "referer",
+            "id": "",
+            "className": "phone inp"
+          },
+          {
+            "tag": "INPUT",
+            "type": "submit",
+            "name": "otpsubmit",
+            "id": "",
+            "className": "sendsms"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "index": 0,
+        "tag": "BUTTON",
+        "id": "",
+        "className": "submit",
+        "text": "Login",
+        "data": {}
+      },
+      {
+        "index": 1,
+        "tag": "INPUT",
+        "id": "",
+        "className": "sendsms",
+        "text": "GET OTP",
+        "data": {}
+      }
+    ],
+    "links": [
+      {
+        "index": 0,
+        "text": "Home",
+        "href": "https://www.smspariaz.com/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 1,
+        "text": "Daily Racecard",
+        "href": "https://www.smspariaz.com/racecard/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 2,
+        "text": "Magazine",
+        "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 3,
+        "text": "News",
+        "href": "https://www.smspariaz.com/news/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 4,
+        "text": "Help",
+        "href": "https://www.smspariaz.com/help/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 5,
+        "text": "Outlet",
+        "href": "https://www.smspariaz.com/outlet/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 6,
+        "text": "Mobile App",
+        "href": "https://www.smspariaz.com/mobile/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 7,
+        "text": "Deposit",
+        "href": "https://www.smspariaz.com/deposit/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 8,
+        "text": "Withdrawal",
+        "href": "https://www.smspariaz.com/withdrawal/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 9,
+        "text": "Register",
+        "href": "https://www.smspariaz.com/login/#",
+        "id": "",
+        "className": "link-register",
+        "data": {}
+      },
+      {
+        "index": 10,
+        "text": "Forget Password?",
+        "href": "https://www.smspariaz.com/login/#",
+        "id": "",
+        "className": "link-register",
+        "data": {}
+      },
+      {
+        "index": 11,
+        "text": "",
+        "href": "https://www.smspariaz.com/smsfootball/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 12,
+        "text": "You can now place your football bets directly by SMS through our mobile app.Tap here to learn more.",
+        "href": "https://www.smspariaz.com/mobile/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 13,
+        "text": "",
+        "href": "https://www.youtube.com/@smspariazltd",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 14,
+        "text": "Local Races",
+        "href": "https://www.smspariaz.com/local/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 15,
+        "text": "Football",
+        "href": "https://www.smspariaz.com/smsfootball/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 16,
+        "text": "Peakpool",
+        "href": "https://www.smspariaz.com/peakpool/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 17,
+        "text": "Toppool",
+        "href": "https://www.smspariaz.com/toppool/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 18,
+        "text": "Cumbre vieja absent de la BARBÉ CUP !",
+        "href": "https://www.smspariaz.com/news?id=167",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 19,
+        "text": "Hippisme: entretien exclusif avec le nouveau jockey de l’écurie Aqua Stallions, Cody Collins",
+        "href": "https://www.smspariaz.com/news?id=166",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 20,
+        "text": "Hippisme : Séance animée ce mardi matin : focus sur l’écurie Vicky Ruhee",
+        "href": "https://www.smspariaz.com/news?id=165",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 21,
+        "text": "A la rencontre de Subiraj Gujadhur et Selvom Mootien : cap sur une saison qui s’annonce animée",
+        "href": "https://www.smspariaz.com/news?id=164",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 22,
+        "text": "Hippisme : The Centurion taille patron... nos entretiens avec Raymond Danielson et Selven Chowreemootoo",
+        "href": "https://www.smspariaz.com/news?id=163",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 23,
+        "text": "List of outlets.",
+        "href": "https://www.smspariaz.com/outlet/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 24,
+        "text": "",
+        "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 25,
+        "text": "",
+        "href": "https://www.smspariaz.com/media/downloads/smsfootball-mag.pdf",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 26,
+        "text": "CONTACT US",
+        "href": "https://www.smspariaz.com/contact/",
+        "id": "",
+        "className": "",
+        "data": {}
+      },
+      {
+        "index": 27,
+        "text": "RULES AND REGULATIONS",
+        "href": "https://www.smspariaz.com/rules/",
+        "id": "",
+        "className": "",
+        "data": {}
+      }
+    ],
+    "iframes": [
+      {
+        "index": 0,
+        "src": "about:blank",
+        "name": "",
+        "title": "No content",
+        "id": "",
+        "className": "",
+        "data": {
+          "data-product": "web_widget"
+        }
+      },
+      {
+        "index": 1,
+        "src": "",
+        "name": "",
+        "title": "Opens a widget where you can chat to one of our agents",
+        "id": "launcher",
+        "className": "",
+        "data": {}
+      }
+    ],
+    "hiddenFields": [],
+    "bodyText": "PRODUCT Login To place bets by the app directly, please login. This is a one time process only. Already have an account? Your registered primary phone number: Who referred you? Phone number: You do not have an account? Visit an outlet to register an account. List of outlets. Any issues? Send h to 8685. LIVE STREAMS SMS PARIAZ LTD is licenced and regulated by the Mauritius Gambling Regulatory Authority. CONTACT US RULES AND REGULATIONS Copyright © 2020 SMS PARIAZ LTD",
+    "localStorage": [
+      {
+        "key": "ZD-store",
+        "valueLength": 62,
+        "valueSha256": "d2079489efe677d216627cde1e0eb48745f348c371d4a6c5ea7799b16f4c239c"
+      },
+      {
+        "key": "ZD-suid",
+        "valueLength": 94,
+        "valueSha256": "b50980f7ba4a7ef7328ab15282bbb0979f62f8b3338a2b303e816479512b4b3b"
+      }
+    ],
+    "sessionStorage": [],
+    "analysisEvents": [
+      {
+        "at": 1787908926442,
+        "kind": "fetch",
+        "method": "GET",
+        "url": "https://ekr.zdassets.com/compose/zopim_chat/5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y",
+        "contentType": "",
+        "stack": "    at window.fetch (<anonymous>:48:108)\n    at https://v2.zopim.com/?5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y:1:6298\n    at new Promise (<anonymous>)\n    at p.getProducts (https://v2.zopim.com/?5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y:1:6016)\n    at https://v2.zopim.com/?5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y:1:9548"
+      }
+    ]
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/login/",
+      "resourceType": "document",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/style/reset.css",
+      "resourceType": "stylesheet",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/font/css/fontawesome.css",
+      "resourceType": "stylesheet",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/font/css/brands.css",
+      "resourceType": "stylesheet",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/font/css/solid.css",
+      "resourceType": "stylesheet",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/style/style.css?version=1.6",
+      "resourceType": "stylesheet",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://player.twitch.tv/js/embed/v1.js",
+      "resourceType": "script",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/images/logo_small.png",
+      "resourceType": "image",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/media/banner/81pgav9vxh4w0s0g8c.jpeg",
+      "resourceType": "image",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/media/news/ajoi6pw3s68k4k0kcs_middle.jpeg",
+      "resourceType": "image",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/media/news/1us71tvtkgu8wcwgk4_middle.jpeg",
+      "resourceType": "image",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/lib/jquery.js",
+      "resourceType": "script",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/js/site.js?v=1.590",
+      "resourceType": "script",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/style/print.css",
+      "resourceType": "stylesheet",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://v2.zopim.com/?5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y",
+      "resourceType": "script",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com//images/logo_fb.png",
+      "resourceType": "image",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/font/webfonts/fa-solid-900.woff2",
+      "resourceType": "font",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://static.zdassets.com/ekr/asset_composer.js",
+      "resourceType": "script",
+      "redirectFrom": "https://v2.zopim.com/?5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y"
+    },
+    {
+      "method": "GET",
+      "url": "https://ekr.zdassets.com/compose/zopim_chat/5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y",
+      "resourceType": "fetch",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/js/mobile.js",
+      "resourceType": "script",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://static.zdassets.com/web_widget/classic/latest/web-widget-main-0da2609.js",
+      "resourceType": "script",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://static.zdassets.com/web_widget/classic/latest/web-widget-5433-0da2609.js",
+      "resourceType": "script",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://static.zdassets.com/web_widget/classic/latest/web-widget-locales/classic/en-us-json-0da2609.js",
+      "resourceType": "script",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://smspariazltd.zendesk.com/embeddable/config",
+      "resourceType": "fetch",
+      "redirectFrom": null
+    },
+    {
+      "method": "GET",
+      "url": "https://static.zdassets.com/web_widget/classic/latest/web-widget-chat-sdk-0da2609.js",
+      "resourceType": "script",
+      "redirectFrom": null
+    }
+  ],
+  "responses": [
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/login/",
+      "resourceType": "document",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "headers": {
+        "cache-control": "no-store, no-cache, must-revalidate",
+        "connection": "Keep-Alive",
+        "content-type": "text/html; charset=UTF-8",
+        "date": "Fri, 28 Aug 2026 09:22:12 GMT",
+        "expires": "Thu, 19 Nov 1981 08:52:00 GMT",
+        "keep-alive": "timeout=5, max=100",
+        "pragma": "no-cache",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34",
+        "set-cookie": "<redacted>",
+        "transfer-encoding": "chunked",
+        "x-powered-by": "PHP/7.2.34"
+      },
+      "bodyBytes": 16553,
+      "bodySha256": "65bd28e6043bf7b3330c99512ce686b4e12393e012677a9aab3d972541ae10f5",
+      "textPreview": "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <link rel=\"icon\" href=\"https://www.smspariaz.com/images/favicon.png\" type=\"image/x-icon\"/>\r\n    <title> SMS PARIAZ LTD</title>\r\n    <link rel=\"stylesheet\" href=\"https://www.smspariaz.com/style/reset.css\"/>\r\n    <!-- reference your copy Font Awesome here (from our CDN or by hosting yourself) -->\r\n    <link href=\"https://www.smspariaz.com/font/css/fontawesome.css\" rel=\"stylesheet\">\r\n    <link href=\"https://www.smspariaz.com"
+    },
+    {
+      "method": "GET",
+      "url": "https://player.twitch.tv/js/embed/v1.js",
+      "resourceType": "script",
+      "status": 200,
+      "contentType": "application/x-javascript",
+      "headers": {
+        "connection": "keep-alive",
+        "content-encoding": "gzip",
+        "content-length": "6459",
+        "content-type": "application/x-javascript",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"b664362e07f48d891eba2c6c787f4a0c\"",
+        "strict-transport-security": "max-age=31536000",
+        "vary": "Access-Control-Request-Headers, Access-Control-Request-Method, Origin, Accept-Encoding",
+        "x-content-type-options": "nosniff",
+        "x-xss-protection": "1; mode=block"
+      },
+      "bodyBytes": 19719,
+      "bodySha256": "be778946856f376bf7af84fcc0ea8d7f6b0d023d84ab47a20390a337e848fd97",
+      "textPreview": "!function(e,t){\"object\"==typeof exports&&\"object\"==typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define([],t):\"object\"==typeof exports?exports.Twitch=t():e.Twitch=t()}(self,(()=>(()=>{\"use strict\";var e={454:e=>{var t=\"%[a-f0-9]{2}\",r=new RegExp(t,\"gi\"),n=new RegExp(\"(\"+t+\")+\",\"gi\");function i(e,t){try{return[decodeURIComponent(e.join(\"\"))]}catch(e){}if(1===e.length)return e;t=t||1;var r=e.slice(0,t),n=e.slice(t);return Array.prototype.concat.call([],i(r),i(n))}function "
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/style/reset.css",
+      "resourceType": "stylesheet",
+      "status": 200,
+      "contentType": "text/css",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "1179",
+        "content-type": "text/css",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"49b-5be83e0a323e7\"",
+        "keep-alive": "timeout=5, max=99",
+        "last-modified": "Sat, 27 Mar 2021 12:35:02 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": 1179,
+      "bodySha256": "51cb3c412b7611d53764d4529c1f34da5cd0136d64996b2ad24c58292c6b7b2d",
+      "textPreview": "/* http://meyerweb.com/eric/tools/css/reset/\r\n   v2.0 | 20110126\r\n   License: none (public domain)\r\n*/\r\n\r\nhtml, body, div, span, applet, object, iframe,\r\nh1, h2, h3, h4, h5, h6, p, blockquote, pre,\r\na, abbr, acronym, address, big, cite, code,\r\ndel, dfn, em, img, ins, kbd, q, s, samp,\r\nsmall, strike, strong, sub, sup, tt, var,\r\nb, u, i, center,\r\ndl, dt, dd, ol, ul, li,\r\nfieldset, form, label, legend,\r\ntable, caption, tbody, tfoot, thead, tr, th, td,\r\narticle, aside, canvas, details, embed,\r\nfigur"
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/font/css/brands.css",
+      "resourceType": "stylesheet",
+      "status": 200,
+      "contentType": "text/css",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "747",
+        "content-type": "text/css",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"2eb-5be83e0fc5f94\"",
+        "keep-alive": "timeout=5, max=100",
+        "last-modified": "Sat, 27 Mar 2021 12:35:08 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": 747,
+      "bodySha256": "46bddbf5154731108d18250fe6216d8422c62e30181d2358f913fdd1c56ee4b2",
+      "textPreview": "/*!\r\n * Font Awesome Free 5.15.1 by @fontawesome - https://fontawesome.com\r\n * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)\r\n */\r\n@font-face {\r\n  font-family: 'Font Awesome 5 Brands';\r\n  font-style: normal;\r\n  font-weight: 400;\r\n  font-display: block;\r\n  src: url(\"../webfonts/fa-brands-400.eot\");\r\n  src: url(\"../webfonts/fa-brands-400.eot?#iefix\") format(\"embedded-opentype\"), url(\"../webfonts/fa-brands-400.woff2\") format(\"woff2\"), url(\""
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/font/css/solid.css",
+      "resourceType": "stylesheet",
+      "status": 200,
+      "contentType": "text/css",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "743",
+        "content-type": "text/css",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"2e7-5be83e10a4a11\"",
+        "keep-alive": "timeout=5, max=100",
+        "last-modified": "Sat, 27 Mar 2021 12:35:09 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": 743,
+      "bodySha256": "1927020ba7019c5149f6833b7d8b95098c05cac2a930dba945bf5a93534b8183",
+      "textPreview": "/*!\r\n * Font Awesome Free 5.15.1 by @fontawesome - https://fontawesome.com\r\n * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)\r\n */\r\n@font-face {\r\n  font-family: 'Font Awesome 5 Free';\r\n  font-style: normal;\r\n  font-weight: 900;\r\n  font-display: block;\r\n  src: url(\"../webfonts/fa-solid-900.eot\");\r\n  src: url(\"../webfonts/fa-solid-900.eot?#iefix\") format(\"embedded-opentype\"), url(\"../webfonts/fa-solid-900.woff2\") format(\"woff2\"), url(\"../we"
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/images/logo_small.png",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/png",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "7780",
+        "content-type": "image/png",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"1e64-5be83df9cef1e\"",
+        "keep-alive": "timeout=5, max=100",
+        "last-modified": "Sat, 27 Mar 2021 12:34:45 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": null,
+      "bodySha256": null,
+      "textPreview": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/media/banner/81pgav9vxh4w0s0g8c.jpeg",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/jpeg",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "406182",
+        "content-type": "image/jpeg",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"632a6-6579342c4ce78\"",
+        "keep-alive": "timeout=5, max=100",
+        "last-modified": "Mon, 27 Jul 2026 08:10:52 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": null,
+      "bodySha256": null,
+      "textPreview": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/font/css/fontawesome.css",
+      "resourceType": "stylesheet",
+      "status": 200,
+      "contentType": "text/css",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "76575",
+        "content-type": "text/css",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"12b1f-5be83e116dccf\"",
+        "keep-alive": "timeout=5, max=98",
+        "last-modified": "Sat, 27 Mar 2021 12:35:09 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": 76575,
+      "bodySha256": "c34907e51cd9bac9135dbbc9852c3081c0c54b5f3902a180e38baa50d32f93d2",
+      "textPreview": "/*!\r\n * Font Awesome Free 5.15.1 by @fontawesome - https://fontawesome.com\r\n * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)\r\n */\r\n.fa,\r\n.fas,\r\n.far,\r\n.fal,\r\n.fad,\r\n.fab {\r\n  -moz-osx-font-smoothing: grayscale;\r\n  -webkit-font-smoothing: antialiased;\r\n  display: inline-block;\r\n  font-style: normal;\r\n  font-variant: normal;\r\n  text-rendering: auto;\r\n  line-height: 1; }\r\n\r\n.fa-lg {\r\n  font-size: 1.33333em;\r\n  line-height: 0.75em;\r\n  vertic"
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/style/style.css?version=1.6",
+      "resourceType": "stylesheet",
+      "status": 200,
+      "contentType": "text/css",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "34674",
+        "content-type": "text/css",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"8772-644f68b52645f\"",
+        "keep-alive": "timeout=5, max=100",
+        "last-modified": "Tue, 02 Dec 2025 11:39:10 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": 34674,
+      "bodySha256": "66973e444005d5b8d0cc1d3ac58d0b16a606166d8890a53a597033e1421a3dcb",
+      "textPreview": "/*LAYOUT STARTS HERE*/\r\n:root{\r\n    --background: #f4f6f1;\r\n    --second: #5e7e36;\r\n    --hoverbutton: #f3f5f1;\r\n    --border: #a24d25;\r\n    --header: #d9974b;\r\n    --boldfont:#333333;\r\n    --solidfont:#111111;\r\n    --danger:#FF9999;\r\n    --success:#cae7c7;\r\n    --whitefont:#FFFFFF ;\r\n    --maingridbackground:#e1e2df;\r\n    --outlet: #495f2e;\r\n}\r\n.c1{\r\n    color:var(var(--boldfont));\r\n}\r\n\r\n.c2{\r\n    color: var(--header);\r\n}\r\n\r\n.c3{\r\n    color: var(--second);\r\n}\r\n\r\n.c4{\r\n    color: var(--border);\r"
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/media/news/ajoi6pw3s68k4k0kcs_middle.jpeg",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/jpeg",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "63832",
+        "content-type": "image/jpeg",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"f958-65a099c66facb\"",
+        "keep-alive": "timeout=5, max=99",
+        "last-modified": "Thu, 27 Aug 2026 16:13:05 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": null,
+      "bodySha256": null,
+      "textPreview": null
+    },
+    {
+      "method": "GET",
+      "url": "https://v2.zopim.com/?5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y",
+      "resourceType": "script",
+      "status": 302,
+      "contentType": "text/html; charset=UTF-8",
+      "headers": {
+        "cf-ray": "a3224014ee055ec4-MRU",
+        "content-type": "text/html; charset=UTF-8",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "location": "https://static.zdassets.com/ekr/asset_composer.js",
+        "server": "cloudflare",
+        "vary": "accept-encoding"
+      },
+      "bodyBytes": null,
+      "bodySha256": null,
+      "textPreview": null,
+      "bodyError": "response.body: Response body is unavailable for redirect responses"
+    },
+    {
+      "method": "GET",
+      "url": "https://static.zdassets.com/ekr/asset_composer.js",
+      "resourceType": "script",
+      "status": 200,
+      "contentType": "application/javascript",
+      "headers": {
+        "access-control-allow-headers": "*",
+        "access-control-allow-methods": "GET, HEAD",
+        "access-control-allow-origin": "*",
+        "access-control-max-age": "0",
+        "age": "41",
+        "cache-control": "public, max-age=3600, s-maxage=60",
+        "cf-cache-status": "HIT",
+        "cf-ray": "a32240153e9b5ec4-MRU",
+        "content-encoding": "br",
+        "content-type": "application/javascript",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "W/\"2212d7d4bff592ce5ad0f95527713e85\"",
+        "last-modified": "Mon, 10 Aug 2026 13:44:31 GMT",
+        "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+        "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=a2HjeUZqYT%2BbmZo3cFtiYmLMmyacrH%2F7oFsdOGssgUKmA3RRVN9Z9OCMpOwh3P5HRGuflZTy5nkYBumiFqnw9nzdkxyE8Bg27WUOFNVMxEtbdEEV4Qi%2BQh9IpNm12IPCYzLy3ww%3D\"}]}",
+        "server": "cloudflare",
+        "strict-transport-security": "max-age=0",
+        "x-amz-id-2": "kGMhTOLXrSJBdvHisNf9TDtQ4qb1qJM1//FVxtWz/6hGhdIeK/cgEmdvh8czn+1kbO4/sHwAsha/r2Ysw87qNGAPFxn1xhUX",
+        "x-amz-replication-status": "COMPLETED",
+        "x-amz-request-id": "VYMXHQH64MY91BHP",
+        "x-amz-server-side-encryption": "AES256",
+        "x-amz-version-id": "rGFzWz0Fca8UzQHfELbnSUezLwK7rOeA"
+      },
+      "bodyBytes": 9693,
+      "bodySha256": "1da79e989f7ed098b77d20036920649850917664d9d5fc9f81e60af1f2767651",
+      "textPreview": "(()=>{var e,t,r={367(e){function t(e){const t=document.createElement(\"a\");return t.href=e,t.search.split(\"?\")[1]||\"\"}e.exports={getQueryParamsString:t,parseUrlParams:function(e){const r=t(e);return\"\"===r?{}:r.split(\"&\").reduce(function(e,t){const r=t.split(\"=\");return e[r[0]]=decodeURIComponent(r[1]),e},{})},loadScript:function(e,t=()=>{}){const r=document.createElement(\"script\");r.type=\"text/javascript\",r.onerror=function(){t(new Error(\"Script failed to load\"))},r.readyState?r.onreadystatechang"
+    },
+    {
+      "method": "GET",
+      "url": "https://ekr.zdassets.com/compose/zopim_chat/5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y",
+      "resourceType": "fetch",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "headers": {
+        "access-control-allow-methods": "GET, POST, OPTIONS",
+        "access-control-allow-origin": "*",
+        "access-control-expose-headers": "",
+        "access-control-max-age": "7200",
+        "age": "20",
+        "cache-control": "max-age=300, public, stale-while-revalidate=300, stale-if-error=21600",
+        "cdn-cache-control": "max-age=60",
+        "cf-cache-status": "HIT",
+        "cf-ray": "a322401578ef3111-MRU",
+        "content-encoding": "br",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Fri, 28 Aug 2026 09:22:14 GMT",
+        "etag": "W/\"8f7308ef0ea02fc686378f24f9314911\"",
+        "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=xhZGHs1Gur%2FT3S%2BHqNvBHxHkWS9YvW%2BhprwZpWUuE18QA9smc3glmw2TLUdK%2Frir5qkznFxxYrexFW3Hur%2BYrNvjBrdgHVERuRnJgnsr53OpQTPvObxTXZ32eD9tvYEU3aA%3D\"}]}",
+        "server": "cloudflare",
+        "strict-transport-security": "max-age=0",
+        "vary": "Accept,Origin, Accept-Encoding",
+        "via": "zorg",
+        "x-cache-status": "EXPIRED",
+        "x-content-type-options": "nosniff",
+        "x-download-options": "noopen",
+        "x-envoy-decorator-operation": "/",
+        "x-envoy-upstream-service-time": "14",
+        "x-frame-options": "SAMEORIGIN",
+        "x-permitted-cross-domain-policies": "none",
+        "x-request-id": "a31b35a50cb31c47-SEA",
+        "x-runtime": "0.012333",
+        "x-xss-protection": "1; mode=block",
+        "x-zendesk-zorg": "yes",
+        "zendesk-service": "embed-key-registry"
+      },
+      "bodyBytes": 832,
+      "bodySha256": "8f7308ef0ea02fc686378f24f9314911bc2ea63e34f70b5fa628537e9273e10d",
+      "textPreview": "{\"products\":[{\"name\":\"web_widget\",\"id\":\"smspariazltd.zendesk.com\",\"bootstrap\":{\"config\":{\"features\":{\"prechatFormVisibleDepartments\":true},\"color\":\"#ff9a00\",\"brand\":\"SMS Pariaz Ltd\",\"embeds\":{\"chat\":{\"embed\":\"chat\",\"props\":{\"standalone\":true,\"badge\":{\"layout\":\"image_right\",\"text\":\"Chat with us\",\"color\":\"#eeeeee\",\"enabled\":true,\"imagePath\":\"\"},\"color\":\"#ff9a00\",\"mediatorHost\":\"widget-mediator.zopim.com\",\"forms\":{\"offlineEnabled\":true},\"zopimId\":\"5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y\"}},\"launcher\":{\"em"
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/media/news/1us71tvtkgu8wcwgk4_middle.jpeg",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/jpeg",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "87888",
+        "content-type": "image/jpeg",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"15750-6598cd72eb157\"",
+        "keep-alive": "timeout=5, max=99",
+        "last-modified": "Fri, 21 Aug 2026 11:21:40 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": null,
+      "bodySha256": null,
+      "textPreview": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/style/print.css",
+      "resourceType": "stylesheet",
+      "status": 200,
+      "contentType": "text/css",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "528",
+        "content-type": "text/css",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"210-5bf866181ef7b\"",
+        "keep-alive": "timeout=5, max=99",
+        "last-modified": "Fri, 09 Apr 2021 08:59:25 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": 528,
+      "bodySha256": "47b88bad466cdc7b23f753edad18598737128a66b750eac088985be9dbf99676",
+      "textPreview": ".advert-left{\r\n    display: none;\r\n}\r\n\r\n.left{\r\n    display: none;\r\n}\r\n\r\n.center{\r\n    display: block;\r\n}\r\n\r\n.right{\r\n    display: none;\r\n}\r\n\r\nheader,.main-header,.match-menu{\r\n    display: none;\r\n}\r\n\r\nfooter{\r\n    display: none;\r\n}\r\n\r\n.header-row{\r\n    background-color: #FFFFFF;\r\n    color: #000000;\r\n}\r\n\r\nbody{\r\n    background-color: #FFFFFF;\r\n\r\n}\r\n\r\n.football-table{\r\n    margin-bottom:0px;\r\n    margin-top:0px;\r\n}\r\n\r\n.grid-container{\r\n    background-color: #FFFFFF;\r\n}\r\n\r\n.football-table .rows ."
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/js/site.js?v=1.590",
+      "resourceType": "script",
+      "status": 200,
+      "contentType": "application/javascript",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "32592",
+        "content-type": "application/javascript",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"7f50-644f689b1570a\"",
+        "keep-alive": "timeout=5, max=97",
+        "last-modified": "Tue, 02 Dec 2025 11:38:43 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": 32592,
+      "bodySha256": "373d10892efd82b87f21f580c400ff9a1e0eeeaa96fd7319ca816f7da4cb9b79",
+      "textPreview": "G_NETSTAKE=1;\rG_MINSTAKE=50;\rG_MAXPAYOUT=5000000;\rG_TAX=0.12;\rG_S_NETSTAKE=1.12\r\rif ('serviceWorker' in navigator) {\r    window.addEventListener('load', function() {\r        navigator.serviceWorker.register('/service-worker.js');\r    });\r}\r\r\r\r$(\".betslip-toggler\").click(function(){\r    if($(\"#betslip-block\").is(':visible')){\r        $(\"#betslip-open-close\").removeClass('fa-angle-up');\r        $(\"#betslip-open-close\").addClass('fa-angle-down');\r    }\r    else{\r        $(\"#betslip-open-close\").rem"
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com//images/logo_fb.png",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/png",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "614836",
+        "content-type": "image/png",
+        "date": "Fri, 28 Aug 2026 09:22:14 GMT",
+        "etag": "\"961b4-642ed982c8200\"",
+        "keep-alive": "timeout=5, max=96",
+        "last-modified": "Thu, 06 Nov 2025 14:08:08 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": null,
+      "bodySha256": null,
+      "textPreview": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/font/webfonts/fa-solid-900.woff2",
+      "resourceType": "font",
+      "status": 200,
+      "contentType": "",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "80300",
+        "date": "Fri, 28 Aug 2026 09:22:14 GMT",
+        "etag": "\"139ac-5be83e2fb6b48\"",
+        "keep-alive": "timeout=5, max=98",
+        "last-modified": "Sat, 27 Mar 2021 12:35:41 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": null,
+      "bodySha256": null,
+      "textPreview": null
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/lib/jquery.js",
+      "resourceType": "script",
+      "status": 200,
+      "contentType": "application/javascript",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "89478",
+        "content-type": "application/javascript",
+        "date": "Fri, 28 Aug 2026 09:22:13 GMT",
+        "etag": "\"15d86-5be83dfd0ff33\"",
+        "keep-alive": "timeout=5, max=99",
+        "last-modified": "Sat, 27 Mar 2021 12:34:48 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": 89478,
+      "bodySha256": "f36844906ad2309877aae3121b87fb15b9e09803cb4c333adc7e1e35ac92e14b",
+      "textPreview": "/*! jQuery v3.5.1 | (c) JS Foundation and other contributors | jquery.org/license */\r\n!function(e,t){\"use strict\";\"object\"==typeof module&&\"object\"==typeof module.exports?module.exports=e.document?t(e,!0):function(e){if(!e.document)throw new Error(\"jQuery requires a window with a document\");return t(e)}:t(e)}(\"undefined\"!=typeof window?window:this,function(C,e){\"use strict\";var t=[],r=Object.getPrototypeOf,s=t.slice,g=t.flat?function(e){return t.flat.call(e)}:function(e){return t.concat.apply([]"
+    },
+    {
+      "method": "GET",
+      "url": "https://static.zdassets.com/web_widget/classic/latest/web-widget-main-0da2609.js",
+      "resourceType": "script",
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "headers": {
+        "access-control-allow-headers": "*",
+        "access-control-allow-methods": "GET, HEAD",
+        "access-control-allow-origin": "*",
+        "access-control-max-age": "0",
+        "age": "79534",
+        "cache-control": "public, max-age=31536000",
+        "cf-cache-status": "HIT",
+        "cf-ray": "a3224018fcd55ec4-MRU",
+        "content-encoding": "br",
+        "content-type": "application/javascript; charset=utf-8",
+        "date": "Fri, 28 Aug 2026 09:22:14 GMT",
+        "etag": "W/\"e7d6a5551e73978febd5bda4bb35cb97\"",
+        "expires": "Thu, 26 Aug 2027 12:55:10 GMT",
+        "last-modified": "Wed, 26 Aug 2026 12:55:11 GMT",
+        "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+        "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=4IppGDXcOcWRofa8v5XzJv5C%2BA2stgUXZSlMH5U35Zb93u813hPF0YOVGFnlrsKdU35kNL6OvEz20DJM6iQVdXuBThLeE8l5lZcw80u3%2Bvlqyj5MzEoCpj%2FinoQTCjNkYYJKInQ%3D\"}]}",
+        "server": "cloudflare",
+        "strict-transport-security": "max-age=0",
+        "x-amz-id-2": "wsOLcGgqc/64TCWKTmwtafuxXJgwM3BaRt+m3aaJP+HFapy5CKcrhZuqVV4tO+CzJ4OwqxdxSD7BiEQnftm48nEP4fUMMoOF",
+        "x-amz-replication-status": "COMPLETED",
+        "x-amz-request-id": "JC8E3M87BS6F9KK5",
+        "x-amz-server-side-encryption": "AES256",
+        "x-amz-version-id": "U7iFmKkYXYeMWJoCHS.Rzqe4mbkXM2d."
+      },
+      "bodyBytes": 773485,
+      "bodySha256": "ad6931d4c5ab59da5f5ee51c1ff48f7f542b05508f22da024cd1e6e054406e16",
+      "textPreview": "/*! Our embeddable contains third-party, open source software and/or libraries. To view them and their license terms, go to https://developer.zendesk.com/documentation/classic-web-widget-sdks/web-widget/getting-started/legal/ */\n(()=>{var e,t,n,r,o={11149(e,t,n){\"use strict\";n.r(t),n.d(t,{default:()=>i});var r,o=n(82017);function a(){return a=Object.assign?Object.assign.bind():function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)({}).hasOwnProperty.call(n,r)&&(e[r]=n"
+    },
+    {
+      "method": "GET",
+      "url": "https://static.zdassets.com/web_widget/classic/latest/web-widget-locales/classic/en-us-json-0da2609.js",
+      "resourceType": "script",
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "headers": {
+        "access-control-allow-headers": "*",
+        "access-control-allow-methods": "GET, HEAD",
+        "access-control-allow-origin": "*",
+        "access-control-max-age": "0",
+        "age": "79531",
+        "cache-control": "public, max-age=31536000",
+        "cf-cache-status": "HIT",
+        "cf-ray": "a322401a2e345ec4-MRU",
+        "content-encoding": "br",
+        "content-type": "application/javascript; charset=utf-8",
+        "date": "Fri, 28 Aug 2026 09:22:14 GMT",
+        "etag": "W/\"c20fa51b322503d3ea1e2114ea92a2ef\"",
+        "expires": "Thu, 26 Aug 2027 12:55:12 GMT",
+        "last-modified": "Wed, 26 Aug 2026 12:55:13 GMT",
+        "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+        "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=phJzU%2BcRTgKokPfrcZq12P3OF37sfFWxgh0PkRm3Sxyryl95%2BrddGlpz3Knajom6sRPe8JsQA4yc6rWtPuwQIXINENVMIw4MO4nKS5%2B2mP2dKvEzcSXegPcHMVXbIKCqGauv3PI%3D\"}]}",
+        "server": "cloudflare",
+        "strict-transport-security": "max-age=0",
+        "x-amz-id-2": "jB6iFwnr7TWIcqOXyNztPNiViBQWuJrGotvSlcLp1s47Py72K1qdEhcn/BuPMNUPR09VJlXT2JOI5obgVvTTsP3spn/C4yCw",
+        "x-amz-replication-status": "COMPLETED",
+        "x-amz-request-id": "7NQNQDY2RTHB21P4",
+        "x-amz-server-side-encryption": "AES256",
+        "x-amz-version-id": "7o1Bfvphgv_yc3ERAzlcRbLR6BFNpP9G"
+      },
+      "bodyBytes": 25883,
+      "bodySha256": "b332261833a5ad26babf99a9215b507f7758616a8894484450d26725f891614d",
+      "textPreview": "\"use strict\";(globalThis.webpackChunk_zendesk_web_widget_classic=globalThis.webpackChunk_zendesk_web_widget_classic||[]).push([[9393],{46933(e){e.exports=JSON.parse('{\"locale\":{\"locale\":\"en-us\",\"rtl\":false,\"translations\":{\"embeddable_framework.answerBot.article.feedback.no.need_help\":\"No, I need help\",\"embeddable_framework.answerBot.article.feedback.no.reason.related\":\"It\\'s related, but it didn\\'t answer my question\",\"embeddable_framework.answerBot.article.feedback.no.reason.title\":\"Please tell"
+    },
+    {
+      "method": "GET",
+      "url": "https://www.smspariaz.com/js/mobile.js",
+      "resourceType": "script",
+      "status": 200,
+      "contentType": "application/javascript",
+      "headers": {
+        "accept-ranges": "bytes",
+        "connection": "Keep-Alive",
+        "content-length": "19682",
+        "content-type": "application/javascript",
+        "date": "Fri, 28 Aug 2026 09:22:14 GMT",
+        "etag": "\"4ce2-6531967d2e133\"",
+        "keep-alive": "timeout=5, max=98",
+        "last-modified": "Sun, 31 May 2026 09:07:21 GMT",
+        "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34"
+      },
+      "bodyBytes": 19682,
+      "bodySha256": "a558938c793dc970fa1eec1e684c7b1d3aab67a4eaf71881c9e2c654d04b6e06",
+      "textPreview": "function checkLogin(){\r\n    var loginId = localStorage.getItem('loginid');\r\n    var phone = localStorage.getItem('phone');\r\n    var token = localStorage.getItem('token');\r\n    if (!loginId || !phone || !token) {\r\n        return false;\r\n    }\r\n    return true;\r\n}\r\n\r\nfunction isLogin(){\r\n\r\n    return true;\r\n}\r\n\r\n\r\nfunction logalert(){\r\n\r\n        MOBILE = 1;\r\n        //ADD MENU ITEEMS TO MENU\r\n        var menu = document.getElementById('main-menu');\r\n\r\n        menu.innerHTML += '<li><a href=\"' + BA"
+    },
+    {
+      "method": "GET",
+      "url": "https://static.zdassets.com/web_widget/classic/latest/web-widget-5433-0da2609.js",
+      "resourceType": "script",
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "headers": {
+        "access-control-allow-headers": "*",
+        "access-control-allow-methods": "GET, HEAD",
+        "access-control-allow-origin": "*",
+        "access-control-max-age": "0",
+        "age": "79533",
+        "cache-control": "public, max-age=31536000",
+        "cf-cache-status": "HIT",
+        "cf-ray": "a322401a2e355ec4-MRU",
+        "content-encoding": "br",
+        "content-type": "application/javascript; charset=utf-8",
+        "date": "Fri, 28 Aug 2026 09:22:14 GMT",
+        "etag": "W/\"d927a613131420c6215996d66624d1a0\"",
+        "expires": "Thu, 26 Aug 2027 12:55:10 GMT",
+        "last-modified": "Wed, 26 Aug 2026 12:55:11 GMT",
+        "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+        "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=agkYWJRx2PUeGAJDehm6btTfIIfZ6acVAkJB7k6018bIJ4w2EZ3aNYFUTrE7duDXTjDZSSnupfj%2FUPyaS4iX0O3KYGpCpApqe6wYaUYOt%2Fcpr35MSyjLKuF2rYyGzBgWAmgXgSU%3D\"}]}",
+        "server": "cloudflare",
+        "strict-transport-security": "max-age=0",
+        "x-amz-id-2": "7oJo4aOgStVx7YY4Rx/Fe2dZ4twiFXn3w3pteCZxnMeJNnw+iDC8V9e3RYLaCiARTAYy/vixTXN9xSMWfm38eXfxyhiGOUby",
+        "x-amz-replication-status": "COMPLETED",
+        "x-amz-request-id": "KMAASWRSY2HBB818",
+        "x-amz-server-side-encryption": "AES256",
+        "x-amz-version-id": "Ae7UKrllf1rkLuwtdTDTFeT0r6pl_MDu"
+      },
+      "bodyBytes": 446112,
+      "bodySha256": "bdaf5f916b339642fe972f4f7c5c313fec0000f5c9e9d7c30393484f01358afb",
+      "textPreview": "\"use strict\";(globalThis.webpackChunk_zendesk_web_widget_classic=globalThis.webpackChunk_zendesk_web_widget_classic||[]).push([[5433],{65433(e,t,n){n.r(t),n.d(t,{BrowserClient:()=>ql,ErrorBoundary:()=>nS,MULTIPLEXED_TRANSPORT_EXTRA_KEY:()=>ps,OpenFeatureIntegrationHook:()=>bb,Profiler:()=>Xb,SDK_VERSION:()=>i,SEMANTIC_ATTRIBUTE_SENTRY_OP:()=>ar,SEMANTIC_ATTRIBUTE_SENTRY_ORIGIN:()=>cr,SEMANTIC_ATTRIBUTE_SENTRY_SAMPLE_RATE:()=>sr,SEMANTIC_ATTRIBUTE_SENTRY_SOURCE:()=>or,Scope:()=>Re,WINDOW:()=>Bo,a"
+    },
+    {
+      "method": "GET",
+      "url": "https://static.zdassets.com/web_widget/classic/latest/web-widget-chat-sdk-0da2609.js",
+      "resourceType": "script",
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "headers": {
+        "access-control-allow-headers": "*",
+        "access-control-allow-methods": "GET, HEAD",
+        "access-control-allow-origin": "*",
+        "access-control-max-age": "0",
+        "age": "79532",
+        "cache-control": "public, max-age=31536000",
+        "cf-cache-status": "HIT",
+        "cf-ray": "a322401a8ec25ec4-MRU",
+        "content-encoding": "br",
+        "content-type": "application/javascript; charset=utf-8",
+        "date": "Fri, 28 Aug 2026 09:22:14 GMT",
+        "etag": "W/\"1c5e6a8254b7cbd8cdd02a6b6e8a270d\"",
+        "expires": "Thu, 26 Aug 2027 12:55:10 GMT",
+        "last-modified": "Wed, 26 Aug 2026 12:55:11 GMT",
+        "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+        "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=JziFqcHVnoF%2F0%2BaUOlOP45UaxyEiScbr%2BApFWv2bJ8pFRFzEsUiT95%2BXuFp0hVSY9pAHchEYQ3heOCoBi98qgKtDpYhRpAROORLUnL0YBWVE69bNLY7CixSzrWExmXcuoEO8KqE%3D\"}]}",
+        "server": "cloudflare",
+        "strict-transport-security": "max-age=0",
+        "x-amz-id-2": "B3kdE+1MkAVc3QLg3q+b9t7IuC/4LEwAnSkv8D8zE6eTBxuBB1OVULya5Q+h1QoX+2LnQpQWIzo03rdFZtWKO1vkkkYP5+oa",
+        "x-amz-replication-status": "COMPLETED",
+        "x-amz-request-id": "XFDSMDDR8XCQ6NDR",
+        "x-amz-server-side-encryption": "AES256",
+        "x-amz-version-id": "u0R8vTcxC4nsyn7h5NstjMrrSc8VkBCi"
+      },
+      "bodyBytes": 222455,
+      "bodySha256": "09b3fa5fb99e2fbd3266ee793c9f462bd1d372c1284ecd64c5082b8f2f4430ae",
+      "textPreview": "/*! Our embeddable contains third-party, open source software and/or libraries. To view them and their license terms, go to https://developer.zendesk.com/documentation/classic-web-widget-sdks/web-widget/getting-started/legal/ */\n(globalThis.webpackChunk_zendesk_web_widget_classic=globalThis.webpackChunk_zendesk_web_widget_classic||[]).push([[9758],{9871(e){var t;window,t=function(){return function(e){var t={};function r(o){if(t[o])return t[o].exports;var n=t[o]={i:o,l:!1,exports:{}};return e[o]."
+    },
+    {
+      "method": "GET",
+      "url": "https://smspariazltd.zendesk.com/embeddable/config",
+      "resourceType": "fetch",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "headers": {
+        "access-control-allow-methods": "GET",
+        "access-control-allow-origin": "*",
+        "access-control-expose-headers": "",
+        "access-control-max-age": "7200",
+        "age": "59",
+        "cache-control": "public, max-age=60, stale-while-revalidate=600, stale-if-error=3600",
+        "cf-cache-status": "HIT",
+        "cf-ray": "a322401aab848e6d-MRU",
+        "content-encoding": "br",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Fri, 28 Aug 2026 09:22:14 GMT",
+        "last-modified": "Fri, 28 Aug 2026 09:21:14 GMT",
+        "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.01,\"max_age\":604800}",
+        "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=BwtOm4jt1wN2YpeOEMkxkOB6N7CQxmwa0Mb4%2FarxTzW1mWWC4X3irLE3gMtRzBX5Nrhka9RU3kbKxY2Xqjh%2BqPiDhD2RzPxxjmpkGOnE5uCTW4dhpcqi4nSwEAQ%2BlYpGdMer94xnnpYbEg%3D%3D\"}]}",
+        "server": "cloudflare",
+        "set-cookie": "<redacted>",
+        "vary": "Origin, Accept-Encoding",
+        "via": "zorg",
+        "x-cache-status": "EXPIRED",
+        "x-envoy-decorator-operation": "/embeddable",
+        "x-envoy-upstream-service-time": "7",
+        "x-openapi-route-path": "/embeddable/config",
+        "x-request-id": "a3223ea2de7e2857-FRA",
+        "x-request-validation": "matched",
+        "x-runtime": "0.002328",
+        "x-zendesk-origin-server": "embeddable-app-server-67555997b9-knpbb",
+        "x-zendesk-zorg": "yes",
+        "zendesk-service": "embeddable"
+      },
+      "bodyBytes": 484,
+      "bodySha256": "ce06a818c305ba1250185320219b46db5c695113e3e07985eea742552ec98f35",
+      "textPreview": "{\"brand\":\"SMS Pariaz Ltd\",\"brandCount\":1,\"color\":\"#ff9a00\",\"cp4\":true,\"embeds\":{\"chat\":{\"embed\":\"chat\",\"props\":{\"color\":\"#ff9a00\",\"zopimId\":\"5y8EkrX0y9Lu0nD2Gb6ERt1kKBgO4P1Y\",\"standalone\":true,\"badge\":{\"color\":\"#eeeeee\",\"enabled\":true,\"imagePath\":\"\",\"layout\":\"image_right\",\"text\":\"Chat with us\"},\"forms\":{\"offlineEnabled\":true},\"mediatorHost\":\"widget-mediator.zopim.com\"}},\"launcher\":{\"embed\":\"launcher\",\"props\":{\"color\":\"#ff9a00\"}}},\"features\":{\"prechatFormVisibleDepartments\":true}}"
+    }
+  ],
+  "blockedNetwork": [],
+  "consoleMessages": [
+    {
+      "type": "warning",
+      "text": "Service Worker registration blocked by Playwright",
+      "location": {
+        "url": "",
+        "line": 2,
+        "column": 86,
+        "lineNumber": 2,
+        "columnNumber": 86
+      }
+    }
+  ],
+  "pageErrors": [],
+  "popups": [],
+  "scriptFiles": [
+    {
+      "filename": "login_iphone__www.smspariaz.com__site.js__373d10892efd.js",
+      "url": "https://www.smspariaz.com/js/site.js?v=1.590",
+      "bytes": 32592,
+      "sha256": "373d10892efd82b87f21f580c400ff9a1e0eeeaa96fd7319ca816f7da4cb9b79"
+    },
+    {
+      "filename": "login_iphone__www.smspariaz.com__jquery.js__f36844906ad2.js",
+      "url": "https://www.smspariaz.com/lib/jquery.js",
+      "bytes": 89478,
+      "sha256": "f36844906ad2309877aae3121b87fb15b9e09803cb4c333adc7e1e35ac92e14b"
+    },
+    {
+      "filename": "login_iphone__www.smspariaz.com__mobile.js__a558938c793d.js",
+      "url": "https://www.smspariaz.com/js/mobile.js",
+      "bytes": 19682,
+      "sha256": "a558938c793dc970fa1eec1e684c7b1d3aab67a4eaf71881c9e2c654d04b6e06"
+    }
+  ]
+}

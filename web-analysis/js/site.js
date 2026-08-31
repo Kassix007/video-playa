@@ -1,0 +1,978 @@
+G_NETSTAKE=1;
+G_MINSTAKE=50;
+G_MAXPAYOUT=5000000;
+G_TAX=0.12;
+G_S_NETSTAKE=1.12
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js');
+    });
+}
+
+
+
+$(".betslip-toggler").click(function(){
+    if($("#betslip-block").is(':visible')){
+        $("#betslip-open-close").removeClass('fa-angle-up');
+        $("#betslip-open-close").addClass('fa-angle-down');
+    }
+    else{
+        $("#betslip-open-close").removeClass('fa-angle-down');
+        $("#betslip-open-close").addClass('fa-angle-up');
+    }
+
+
+});
+
+$("#category-toggler").click(function(){
+    if($("#betslip-icon").is(':visible')){
+        $("#left-menu").toggle();
+        if($("#left-menu").is(':visible')){
+            $("#category-open-close").removeClass('fa-angle-up');
+            $("#category-open-close").addClass('fa-angle-down');
+        }
+        else{
+            $("#category-open-close").removeClass('fa-angle-down');
+            $("#category-open-close").addClass('fa-angle-up');
+        }
+    }
+});
+
+$(".left-category").click(function (){
+    var id=$(this).data('id');
+
+    $('.category-subcategory[data-categoryid='+id+']').toggle();
+    if($('.category-subcategory[data-categoryid='+id+']').is(':visible')) {
+        $(this).find("i").removeClass("fa-angle-up");
+        $(this).find("i").addClass("fa-angle-down");
+    }
+    else{
+        $(this).find("i").removeClass("fa-angle-down");
+        $(this).find("i").addClass("fa-angle-up");
+    }
+});
+
+
+$(".showmap").click(function (){
+    var longitude=$(this).data('longitude');
+    var latitude=$(this).data('latitude');
+    var id=$(this).data('id');
+
+
+
+    $("#map-"+id).toggle();
+
+    // The location of Uluru
+    const uluru = { lat: latitude, lng: longitude };
+    // The map, centered at Uluru
+    const map = new google.maps.Map(document.getElementById("gmap-"+id), {
+        zoom: 15,
+        center: uluru,
+    });
+    // The marker, positioned at Uluru
+    const marker = new google.maps.Marker({
+        position: uluru,
+        map: map,
+    });
+
+});
+
+
+$("#refresh").click(function (){
+    if(PAGE=='Peakpool'){
+        loadPeakpool();
+    }
+    else if(PAGE=='Pmu'){
+        loadPmu();
+    }
+    else if(PAGE=='International'){
+        loadInternational();
+    }
+    else if(PAGE=='Local'){
+        loadLocal();
+    }
+    else if(PAGE=='Toppool'){
+        loadToppool();
+    }
+    else if(PAGE==1){
+
+        loadHomepage();
+        loadLocal('main-content-local');
+        //loadToppool('main-content2');
+    }
+});
+
+$("#bet-help").click(function (){
+    $("#help").show();
+    $("#main-content").hide();
+    $("#main-content2").hide();
+    $("#main-content-local").hide();
+    $("#bet-help").addClass('selected');
+    $("#allFixture").removeClass('selected');
+});
+
+function bindFixtureEvents() {
+    $(".fixture-toggle").click(function () {
+        var id = $(this).data('id');
+
+        $('.rows[data-id='+id+']').toggle();
+        if($('.rows[data-id='+id+']').is(':visible')) {
+            $(this).find("i").removeClass("fa-angle-up");
+            $(this).find("i").addClass("fa-angle-down");
+        }
+        else{
+            $(this).find("i").removeClass("fa-angle-down");
+            $(this).find("i").addClass("fa-angle-up");
+        }
+    });
+}
+
+$("#allFixture").click(function (){
+    if(PAGE=='Peakpool'){
+        loadPeakpool();
+    }
+    else if(PAGE=='Pmu'){
+        loadPmu();
+    }
+    else if(PAGE=='International'){
+        loadInternational();
+    }
+    else if(PAGE=='Local'){
+        loadLocal();
+    }
+    else if(PAGE=='Toppool'){
+        loadToppool();
+    }
+    else if(PAGE==1){
+
+       loadHomepage();
+        loadLocal('main-content-local');
+        //loadToppool('main-content2');
+    }
+    $("#help").hide();
+    $("#bet-help").removeClass('selected');
+    $("#main-content").show();
+    $("#main-content2").show();
+    $("#main-content-local").show();
+    $("#allFixture").addClass('selected');
+})
+
+$(".streaming-button").click(function (){
+
+    $("#player").html("");
+    $("#player-load").html("Loading...");
+    var id = $(this).data('id');
+    var channel = $(this).data('channel');
+    loadStream('player',channel);
+});
+
+
+function loadStream(div,channel) {
+    var options = {
+        channel: channel, // our channel id: streamingsmspariaz || streamingsmspariaz2 || streamingsmspariaz3 || smspariaz5
+        width: "100%",
+        height: "400px"
+    };
+    var player = new Twitch.Player(div, options);
+
+    player.addEventListener(Twitch.Player.READY,function(){
+        initiate(player);
+    }, false);
+
+
+}
+
+function initiate(player) {
+    player.addEventListener(Twitch.Player.ONLINE,function(){
+        handleOnline(player);
+    }, false);
+    player.addEventListener(Twitch.Player.OFFLINE,function(){
+        handleOffline(player);
+    }, false);
+    // player.removeEventListener(Twitch.Player.READY, initiate);
+
+
+}
+
+function handleOnline(player) {
+    //document.getElementById("twitch").classList.remove('hide');
+    player.removeEventListener(Twitch.Player.ONLINE, handleOnline);
+    player.addEventListener(Twitch.Player.OFFLINE, handleOffline);
+    player.setMuted(false);
+
+
+}
+
+function handleOffline(player) {
+    //document.getElementById("twitch").classList.add('hide');
+    player.removeEventListener(Twitch.Player.OFFLINE, handleOffline);
+    player.addEventListener(Twitch.Player.ONLINE, handleOnline);
+    player.setMuted(true);
+
+
+}
+
+
+function loadHomepage() {
+/*
+    var path=BASE+"service/homepage_json.php?";
+    var loading="<h1 class='no-fixture'>Loading....</h1>";
+    var error="<h1 class='no-fixture'>Fixture currently unavailable.</h1>";
+
+    $("#main-content").html(loading);
+
+    var jqxhr = $.ajax(path)
+        .done(function (res) {
+            var content='';
+            content=' <div class="content-header">FIXED ODDS ON INTERNATIONAL RACES</div>';
+            if(res==""){
+                $("#main-content").html(content+error);
+                return;
+            }
+            var fixture = $.parseJSON(res);
+            var races=fixture[0].races;
+            if(races.length==0){
+                content+=error;
+            }
+            else {
+                $.each(races,function(k,v){
+                    var race=v.race;
+
+                    var rid= 'R' + race.race_number ;
+                    content += '<div class="race-table">';
+                    content += '<div class="header-row fixture-toggle"  data-id='+rid+'>';
+                    content +='<div class="left">';
+                    content += 'R' + race.race_number ;
+                    content +='</div>';
+                    content += '<div class="title"><i class="fa fa-angle-up"></i>' + race.race_time +
+
+                        ' - ' + race.race_details + '' +
+                        '</div>';
+                    content +="</div>"
+                    content += '<div class="clearfix"></div>' ;
+
+                    content += '<div class="rows"  data-id='+rid+'>' ;
+                    content += '<div class="header">' +
+                        '<div class="number">No.</div>' +
+                        '<div class="horse">Horse</div>' +
+                        '<div class="odds">Win</div>' +
+                        '<div class="odds">Place</div>' +
+                        '<div class="clearfix"></div>' +
+                        '</div>';
+
+                    //HORSES
+                    $.each(v.runners, function (indexHorse, v2) {
+
+                        var horse=v2;
+                        content += '<div class="row">' +
+                            '<div class="number">' + horse.horse_number + '</div>' +
+                            '<div class="horse">' + horse.horse_name + '</div>' +
+                            '<div class="odds">' + horse.win + '</div>' +
+                            '<div class="odds">' + horse.place + '</div>' +
+                            '<div class="clearfix"></div>' +
+                            '</div>';
+                    });
+
+                    content+="</div>";
+                    content += '</div>';
+
+
+                });
+            }
+            $("#main-content").html(content);
+            bindFixtureEvents();
+        })
+        .fail(function () {
+            $("#main-content").html(error);
+        })
+        .always(function () {
+
+        });
+    */
+}
+
+
+function loadPeakpool() {
+
+    var path=BASE+"service/peakpool_json.php?";
+    var loading="<h1 class='no-fixture'>Loading...</h1>";
+    var error="<h1 class='no-fixture'>Fixture currently unavailable.</h1>";
+
+    $("#main-content").html(loading);
+
+    var jqxhr = $.ajax(path)
+        .done(function (res) {
+            var content='';
+            var fixture = $.parseJSON(res);
+
+
+            if(fixture.length==0){
+                content+=error;
+            }
+            else {
+                $.each(fixture, function (indexRace, race) {
+
+                    var rid= 'R' + race.meeting_number+ 'C' + race.number ;
+                    content += '<div class="race-table">';
+                    content += '<div class="header-row fixture-toggle"  data-id='+rid+'>';
+                    content +='<div class="left">';
+                    content += 'R' + race.meeting_number +'C' + race.number ;
+                    content +='</div>';
+                    content += '<div class="title"><i class="fa fa-angle-up"></i>' + race.time +
+                        ' - ' + race.track +
+                        '<br/><div class="subtitle">' + race.name + '</div>' +
+                        '</div>';
+                    content +="</div>"
+                    content += '<div class="clearfix"></div>' ;
+
+                    content += '<div class="rows"  data-id='+rid+'>' ;
+
+
+                    content += '<div class="header">' +
+                        '<div class="number">No.</div>' +
+                        '<div class="horse">Horse</div>' +
+                        '<div class="odds">Odds</div>' +
+                        '<div class="clearfix"></div>' +
+                        '</div>';
+
+                    //HORSES
+                    $.each(race.horses, function (indexHorse, horse) {
+                        /*content += '<div class="row">' +
+                            '<div class="number">' + horse.no + '</div>' +
+                            '<div class="horse">' + horse.name + '</div>' +
+                            '<div class="odds">' + horse.type + '</div>' +
+                            '<div class="clearfix"></div>' +
+                            '</div>';*/
+
+                        content += '<div class="row">' +
+                            '<div class="number">' + horse.no + '</div>' +
+                            '<div class="horse">' + horse.name + '</div>' +
+                            '<div class="odds" data-rh="R' + race.meeting_number +'C' + race.number+'H'+horse.no+'" data-horse="'+horse.name+'" data-type="win">' + horse.type + '</div>' +
+                            '<div class="clearfix"></div>' +
+                            '</div>';
+
+                    });
+                    content+="</div>";
+
+                    content += '</div>';
+                });
+            }
+            $("#main-content").html(content);
+
+            bindFixtureEvents();
+            var allOdds=document.querySelectorAll(".odds");
+            allOdds.forEach((odd,id)=>{
+                odd.addEventListener('click',(e)=>{
+                    addPeakpoolSelection(odd);
+
+                });
+            });
+            if(fixture.length>0) {
+                if (window.matchMedia("(max-width: 768px)").matches) {
+                    $(".footer-betslip").css("display", "grid");
+                }
+            }
+
+
+        })
+        .fail(function () {
+            $("#main-content").html(error);
+        })
+        .always(function () {
+
+        });
+}
+
+function loadPmu() {
+
+    var path=BASE+"service/pmu_json.php";
+    var loading="<h1 class='no-fixture'>Loading...</h1>";
+    var error="<h1 class='no-fixture'>Fixture currently unavailable.</h1>";
+
+    $("#main-content").html(loading);
+
+    var jqxhr = $.ajax(path)
+        .done(function (res) {
+            var content='';
+            var fixture = $.parseJSON(res);
+
+
+            if(fixture.length==0){
+                content+=error;
+            }
+            else {
+                $.each(fixture, function (indexRace, race) {
+                    var rid= 'R' + race.meeting_number+ 'C' + race.number ;
+
+                    content += '<div class="race-table">';
+                    content += '<div class="header-row fixture-toggle"  data-id='+rid+'>';
+                    content +='<div class="left">';
+                    content += 'R' + race.meeting_number +'C' + race.number ;
+                    content +='</div>';
+                    content += '<div class="title"><i class="fa fa-angle-up"></i>' + race.time +
+                        ' - ' + race.track +
+                        '<br/><div class="subtitle">' + race.name + '</div>' +
+                        '</div>';
+                    content +="</div>"
+                    content += '<div class="clearfix"></div>' ;
+
+                    content += '<div class="rows"  data-id='+rid+'>' ;
+                    content += '<div class="header">' +
+                        '<div class="number">No.</div>' +
+                        '<div class="horse">Horse</div>' +
+                        '<div class="odds"></div>' +
+                        '<div class="clearfix"></div>' +
+                        '</div>';
+
+                    //HORSES
+                    $.each(race.horses, function (indexHorse, horse) {
+                        content += '<div class="row">' +
+                            '<div class="number">' + horse.no + '</div>' +
+                            '<div class="horse">' + horse.name + '</div>' +
+                            '<div class="odds">'  + '</div>' +
+                            '<div class="clearfix"></div>' +
+                            '</div>';
+                    });
+                    content+="</div>";
+
+                    content += '</div>';
+                });
+            }
+            $("#main-content").html(content);
+            bindFixtureEvents();
+        })
+        .fail(function () {
+            $("#main-content").html(error);
+        })
+        .always(function () {
+
+        });
+}
+
+function loadToppool(selDiv) {
+
+    if (selDiv === undefined) {
+        selDiv="main-content";
+    }
+        var path=BASE+"service/toppool_json.php";
+    var loading="<h1 class='no-fixture'>Loading...</h1>";
+    var error="<h1 class='no-fixture'>Fixture currently unavailable.</h1>";
+
+    $("#main-content").html(loading);
+
+    var jqxhr = $.ajax(path)
+        .done(function (res) {
+            var content='';
+            content=' <div class="content-header">TOPPOOL</div>';
+            if(res==""){
+                $("#main-content").html(error);
+                return;
+            }
+            var fixture = $.parseJSON(res);
+
+
+            if(fixture.length==0){
+                content+=error;
+            }
+            else if(fixture.msg){
+                content+=error;
+            }
+            else {
+                var groups=fixture.group;
+                $.each(groups, function (indexGroup, group) {
+
+
+                    var rid= group.number;
+                    content += '<div class="football-table">';
+                    content += '<div class="header-row fixture-toggle"  data-id='+rid+'>';
+
+                    content += '<div class="title"><i class="fa fa-angle-up"></i>' +
+                        ' GROUP ' + group.number +
+                        '</div>';
+                    content +="</div>"
+                    content += '<div class="clearfix"></div>' ;
+
+                    content += '<div class="rows"  data-id='+rid+'>' ;
+                    content += '<div class="header">' +
+                        '<div class="number">No.</div>' +
+                        '<div class="time">Time.</div>' +
+                        '<div class="match">Match</div>' +
+                        '' +
+                        '<div class="clearfix"></div>' +
+                        '</div>';
+
+                    //match
+                   $.each(group.match, function (indexMatch, match) {
+                        content += '<div class="row">' +
+                            '<div class="number">' + match.number + '</div>' +
+                            '<div class="time">' + match.time + '</div>' +
+                            '<div class="team-home">'+
+                            '<div class="team name-home">' + match.home + '</div>' +
+                            '<div class="odds odds-home">' + match.oddshome + '</div>' +
+                            '</div>'+
+                            '<div class="team-draw">'+
+                            '<div class="draw">' + 'Draw' + '</div>' +
+                            '<div class="odds odds-draw">' + match.oddsdraw + '</div>' +
+                            '</div>'+
+                            '<div class="team-home">'+
+                            '<div class="team name-away">' + match.away + '</div>' +
+                            '<div class="odds odds-away">' + match.oddsaway + '</div>' +
+                            '</div>'+
+                            '<div class="clearfix"></div>' +
+                            '</div>';
+                    });
+                    content+="</div>";
+
+                    content += '</div>';
+
+
+                });
+            }
+
+            $("#"+selDiv).html("");
+            $("#"+selDiv).html(content);
+
+            bindFixtureEvents();
+
+        })
+        .fail(function () {
+            $("#"+selDiv).html(error);
+        })
+        .always(function () {
+
+        });
+}
+
+function loadInternational() {
+
+    var path=BASE+"service/international_json.php?";
+    var loading="<h1 class='no-fixture'>Loading...</h1>";
+    var error="<h1 class='no-fixture'>Fixture currently unavailable.</h1>";
+
+    $("#main-content").html(loading);
+
+    var jqxhr = $.ajax(path)
+        .done(function (res) {
+            var content='';
+            content=' <div class="content-header">FIXED ODDS ON INTERNATIONAL RACES</div>';
+            if(res==""){
+                $("#main-content").html(error);
+                return;
+            }
+            var fixture = $.parseJSON(res);
+            var races=fixture[0].races;
+            if(races.length==0){
+                content+=error;
+            }
+            else {
+                $.each(races,function(k,v){
+                    var race=v.race;
+
+                    var rid= 'R' + race.race_number ;
+                    content += '<div class="race-table">';
+                    content += '<div class="header-row fixture-toggle"  data-id='+rid+'>';
+                    content +='<div class="left">';
+                    content += 'R' + race.race_number ;
+                    content +='</div>';
+                    content += '<div class="title"><i class="fa fa-angle-up"></i>' + race.race_time +
+
+                        ' - ' + race.race_details + '' +
+                        '</div>';
+                    content +="</div>"
+                    content += '<div class="clearfix"></div>' ;
+
+                    content += '<div class="rows"  data-id='+rid+'>' ;
+                    content += '<div class="header">' +
+                        '<div class="number">No.</div>' +
+                        '<div class="horse">Horse</div>' +
+                        '<div class="odds">Win</div>' +
+                        '<div class="odds">Place</div>' +
+                        '<div class="clearfix"></div>' +
+                        '</div>';
+
+                    //HORSES
+                    $.each(v.runners, function (indexHorse, v2) {
+
+                        var horse=v2;
+                        content += '<div class="row">' +
+                            '<div class="number">' + horse.horse_number + '</div>' +
+                            '<div class="horse">' + horse.horse_name + '</div>' +
+                            '<div class="odds">' + horse.win + '</div>' +
+                            '<div class="odds">' + horse.place + '</div>' +
+                            '<div class="clearfix"></div>' +
+                            '</div>';
+
+                    });
+
+                    content+="</div>";
+                    content += '</div>';
+
+
+                });
+            }
+            $("#main-content").html("");
+            $("#main-content").html(content);
+            bindFixtureEvents();
+        })
+        .fail(function () {
+            $("#main-content").html(error);
+        })
+        .always(function () {
+
+        });
+}
+
+
+function loadLocal(selDiv) {
+
+    if (selDiv === undefined) {
+        selDiv="main-content";
+    }
+
+    var path=BASE+"service/local_json.php?";
+    var loading="<h1 class='no-fixture'>Loading...</h1>";
+    var error="<h1 class='no-fixture'>Horse Racing Fixtures currently unavailable.</h1>";
+
+    $("#"+selDiv).html(loading);
+
+    var jqxhr = $.ajax(path)
+        .done(function (res) {
+
+            $("#"+selDiv).html("");
+            var content='';
+            content=' <div class="content-header">FIXED ODDS ON LOCAL RACES</div>';
+            if(res==""){
+                $("#main-content").html(error);
+                return;
+            }
+            var fixture = $.parseJSON(res);
+            var races=fixture[0].races;
+            if(races.length==0){
+                content=error;
+            }
+            else {
+                $.each(races,function(k,v){
+                    var race=v.race;
+
+                    var rid= 'R' + race.race_number ;
+                    content += '<div class="race-table">';
+                    content += '<div class="header-row fixture-toggle"  data-id='+rid+'>';
+                    content +='<div class="left">';
+                    content += 'R' + race.race_number ;
+                    content +='</div>';
+                    content += '<div class="title"><i class="fa fa-angle-up"></i>' + race.race_time +
+
+                        ' - ' + race.race_details + '' +
+                        '</div>';
+                    content +="</div>"
+                    content += '<div class="clearfix"></div>' ;
+
+                    content += '<div class="rows"  data-id='+rid+'>' ;
+                    content += '<div class="header">' +
+                        '<div class="number">No.</div>' +
+                        '<div class="horse">Horse</div>' +
+                        '<div class="odds">Win</div>' +
+                        '<div class="odds">Place</div>' +
+                        '<div class="clearfix"></div>' +
+                        '</div>';
+
+                    //HORSES
+                    $.each(v.runners, function (indexHorse, v2) {
+
+                        var horse=v2;
+                        var type="";
+
+                        if(horse.type==1){
+                            type="<span class='horsetype'>[EA]</span>";
+                        }
+                        else if(horse.type==2){
+                            type="<span class='horsetype'>[SCRATCHED]</span>";
+                        }
+
+
+                        var chance=horse.chances;
+                        var chancetext="";
+
+                        if(!isNaN(chance)){
+                            if(horse.type == 2){
+                                // do nothing..
+                            }else{
+                                for(var i=0;i<chance;i++){
+                                    chancetext+='<i class="fas fa-smile smiley"></i>';
+                                }
+                            }
+                        }
+
+                        content += '<div class="row">' +
+                            '<div class="number">' + horse.horse_number + '</div>' +
+                            '<div class="horse">' + horse.horse_name + type+chancetext+ '</div>' +
+                            '<div class="odds" data-rh="R'+race.race_number+'H'+horse.horse_number+'" data-horse="'+horse.horse_name+'" data-type="win" data-odd="'+horse.win+'">' + horse.win + '</div>' +
+                            '<div class="odds" data-rh="R'+race.race_number+'H'+horse.horse_number+'" data-horse="'+horse.horse_name+'" data-type="place" data-odd="'+horse.place+'">' + horse.place + '</div>' +
+                            '<div class="clearfix"></div>' +
+                            '</div>';
+                    });
+
+                    content+="</div>";
+                    content += '</div>';
+
+
+                });
+            }
+
+
+
+            $("#"+selDiv).html("");
+            $("#"+selDiv).html(content);
+            bindFixtureEvents();
+
+            var allOdds=document.querySelectorAll(".odds");
+            allOdds.forEach((odd,id)=>{
+                odd.addEventListener('click',(e)=>{
+                    addSelection(odd);
+
+                });
+            });
+            if(races.length>0) {
+                if (window.matchMedia("(max-width: 768px)").matches) {
+                    $(".footer-betslip").css("display", "grid");
+                }
+            }
+
+        })
+        .fail(function () {
+            $("#"+selDiv).html(error);
+        })
+        .always(function () {
+
+        });
+
+
+
+
+}
+
+function addSelection(el){
+
+    var rh=el.getAttribute("data-rh");
+    var horse=el.getAttribute("data-horse");
+    var type=el.getAttribute("data-type");
+    var odd=el.getAttribute("data-odd");
+
+    var s="";
+
+    s+="<div class='row odds-selected'>";
+    s+="<div class='number'>"+rh+" - " +horse+"</div>";
+    s+="<div> Bet: "+type.toUpperCase()+" ODDS: "+odd+"</div>";
+    s+="<div class='clearfix'></div>";
+    s+="</div>";
+    s+="<input type='hidden' id='selection' value='"+rh+"' >";
+    s+="<input type='hidden' id='bettype' value='"+type+"' >";
+    s+="<input type='hidden' id='selodds' value='"+odd+"' >";
+    s+="<div class='row odds-selected'>";
+    s+="<div class='formstake'>" +
+        "<div class='stakepo'></div><input id='stake' class='stake' type='number' placeholder='Stake' onkeyup='validateStake(this)'/>" +
+        "<input id='po' class='stake' type='text' disabled placeholder='PO'/></div>" +
+        "<div class='smsplacebet'><input id='sendsms' type='button' onclick='sendSMS()' value='SEND SMS' disabled/>" +
+        "<div class='mobileplacebet' id='mobile-place-bet'></div>"+
+        "<input type='button' onclick='clearSMS()' value='Clear'/></div>" +
+        "</div>";
+    s+="<div class='clearfix'></div>";
+    s+="</div>";
+    $(".footer-betslip").html(s);
+    mobile();
+
+}
+
+function addPeakpoolSelection(el){
+
+    $(".footer-betslip").remove("footer-peakpool");
+    $(".footer-betslip").addClass("footer-betslip-normal");
+
+    var rh=el.getAttribute("data-rh");
+    var horse=el.getAttribute("data-horse");
+    var type="win";
+    var odd=el.getAttribute("data-odd");
+
+    var s="";
+
+    s+="<div class='row odds-selected'>";
+    s+="<div class='number'>"+rh+" - " +horse+"</div>";
+    s+="<div> Bet: "+type.toUpperCase()+"</div>";
+    s+="<div class='clearfix'></div>";
+    s+="</div>";
+    s+="<input type='hidden' id='selection' value='"+rh+"' >";
+    s+="<input type='hidden' id='bettype' value='"+type+"' >";
+    s+="<div class='row odds-selected'>";
+    s+="<div class='formstake'>" +
+        "<div class='stakepo'></div><input id='stake' class='stake' type='number' placeholder='Stake' onkeyup='validatePeakpoolStake(this)'/>" +
+        "<input type='radio' id='win' name='bettype' value='win' checked onchange='setType(0)'><label for='win'>Win</label>" +
+        "<input type='radio' id='place' name='bettype' value='place' onchange='setType(1)'><label for='place'>Place</label>" +
+        "<div class='smsplacebet'><input id='sendsms' type='button' onclick='sendSMS()' value='SEND SMS' disabled/>" +
+        "<div class='mobileplacebet' id='mobile-place-bet'></div>"+
+        "<input type='button' onclick='clearSMS()' value='Clear'/></div>" +
+        "</div>";
+    s+="<div class='clearfix'></div>";
+    s+="</div>";
+    $(".footer-betslip").html(s);
+    
+    mobile();
+
+}
+
+function setType(a){
+    if(a==0){
+        document.getElementById("bettype").value="win";
+    }
+    else if(a==1){
+        document.getElementById("bettype").value="place";
+    }
+}
+
+
+function sendSMS(){
+    var stake=$("#stake").val();
+    var rh=$("#selection").val();
+    var bettype=$("#bettype").val();
+    var t=0;
+    if(bettype=="win"){
+        t="";
+    }
+    else if(bettype=="place"){
+        t="P";
+    }
+    var sms=stake+""+rh+""+t;
+    window.location.href = 'sms:8685?&body=' + sms.trim();
+}
+
+function validateStake(input) {
+    var value = parseInt(input.value);
+    var valid = !isNaN(value) && value > 0;
+    var po=0;
+    var bettype=$("#bettype").val();
+    var odds=$("#selodds").val();
+    if(valid){
+        if(bettype=="win"){
+            po=value/114*parseInt(odds);
+        }
+        else if(bettype=="place"){
+            po=value/100*parseInt(odds);
+        }
+    }
+    if(!isNaN(po)){
+        $("#po").val("P:"+po.toFixed(2));
+
+    }
+    document.getElementById('sendsms').disabled = !valid;
+    if(MOBILE==1) {
+        if(document.getElementById('placebet')) {
+            document.getElementById('placebet').disabled = !valid;
+        }
+    }
+}
+
+
+function validatePeakpoolStake(input) {
+    var value = parseInt(input.value);
+    var valid = !isNaN(value) && value > 0;
+
+    document.getElementById('sendsms').disabled = !valid;
+    if(MOBILE==1) {
+        if(document.getElementById('placebet')) {
+            document.getElementById('placebet').disabled = !valid;
+        }
+    }
+}
+
+function clearSMS(){
+    $(".footer-betslip").html('<h3>BETSLIP CURRENTLY EMPTY<br/>Tap on an odd to add a selection and place bet<span id="byapp"></span>.</h3>');
+}
+
+function loadLocalOld() {
+
+    var path=BASE+"service/local_json.php?";
+    var loading="<h1 class='no-fixture'>Loading...</h1>";
+    var error="<h1 class='no-fixture'>Fixture currently unavailable.</h1>";
+
+    $("#main-content").html(loading);
+
+    var jqxhr = $.ajax(path)
+        .done(function (res) {
+            var content='';
+            var fixture = $.parseJSON(res);
+            var meeting=fixture[0].meeting;
+
+            if(meeting.length==0){
+                content+=error;
+            }
+
+            else {
+                var races=meeting[0].race;
+                $.each(races,function(indexRace,race){
+
+                    var rid= 'R' + race.number ;
+
+
+                    content += '<div class="race-table">';
+                    content += '<div class="header-row fixture-toggle"  data-id='+rid+'>';
+                    content +='<div class="left">';
+                    content += 'R' + race.number ;
+                    content +='</div>';
+                    content += '<div class="title"><i class="fa fa-angle-up"></i>'
+                        + race.start_time +' - '+race.distance+'m'+
+                        '<br/><div class="subtitle">' + race.name + '</div>' +
+                        '</div>';
+                    content +="</div>"
+                    content += '<div class="clearfix"></div>' ;
+
+
+
+                    content += '<div class="rows"  data-id='+rid+'>' ;
+                    content += '<div class="header">' +
+                        '<div class="number">No.</div>' +
+                        '<div class="horse">Horse</div>' +
+                        '<div class="odds">Win</div>' +
+                        '<div class="odds">Place</div>' +
+                        '<div class="clearfix"></div>' +
+                        '</div>';
+
+                    //HORSES
+                    $.each(race.runners, function (indexHorse, v2) {
+
+                        var horse=v2;
+                        content += '<div class="row">' +
+                            '<div class="number">' + horse.number + '</div>' +
+                            '<div class="horse">' + horse.name + '</div>' +
+                            '<div class="odds">' + horse.win + '</div>' +
+                            '<div class="odds">' + horse.place + '</div>' +
+                            '<div class="clearfix"></div>' +
+                            '</div>';
+                    });
+
+
+                    content += '</div>';
+                    content += '</div>';
+                });
+            }
+            $("#main-content").html(content);
+            bindFixtureEvents();
+
+        })
+        .fail(function () {
+            $("#main-content").html(error);
+        })
+        .always(function () {
+
+        });
+}
+
+function mobile(){
+
+}
+
+
+//WEB TO NATIVE
+const script = document.createElement('script');
+script.src = '/js/mobile.js';
+document.head.appendChild(script);
+

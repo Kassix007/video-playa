@@ -1,0 +1,49 @@
+package r5;
+
+import kotlin.jvm.internal.B;
+import kotlin.jvm.internal.m;
+import m5.AbstractC1362a;
+import q5.InterfaceC1524c;
+import q5.InterfaceC1529h;
+
+/* JADX INFO: renamed from: r5.c, reason: case insensitive filesystem */
+/* JADX INFO: loaded from: classes.dex */
+public final class C1582c extends s5.c {
+
+    /* JADX INFO: renamed from: q, reason: collision with root package name */
+    public int f16363q;
+
+    /* JADX INFO: renamed from: r, reason: collision with root package name */
+    public final /* synthetic */ B5.e f16364r;
+
+    /* JADX INFO: renamed from: s, reason: collision with root package name */
+    public final /* synthetic */ InterfaceC1524c f16365s;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+    public C1582c(InterfaceC1524c interfaceC1524c, InterfaceC1529h interfaceC1529h, B5.e eVar, InterfaceC1524c interfaceC1524c2) {
+        super(interfaceC1524c, interfaceC1529h);
+        this.f16364r = eVar;
+        this.f16365s = interfaceC1524c2;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // s5.a
+    public final Object invokeSuspend(Object obj) {
+        int i = this.f16363q;
+        if (i != 0) {
+            if (i != 1) {
+                throw new IllegalStateException("This coroutine had already completed");
+            }
+            this.f16363q = 2;
+            AbstractC1362a.e(obj);
+            return obj;
+        }
+        this.f16363q = 1;
+        AbstractC1362a.e(obj);
+        B5.e eVar = this.f16364r;
+        m.c(eVar, "null cannot be cast to non-null type kotlin.Function2<R of kotlin.coroutines.intrinsics.IntrinsicsKt__IntrinsicsJvmKt.createCoroutineUnintercepted, kotlin.coroutines.Continuation<T of kotlin.coroutines.intrinsics.IntrinsicsKt__IntrinsicsJvmKt.createCoroutineUnintercepted>, kotlin.Any?>");
+        B.b(2, eVar);
+        return eVar.invoke(this.f16365s, this);
+    }
+}

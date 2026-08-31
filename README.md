@@ -1,5 +1,7 @@
 # Video Playa + HORSEE Council
 
+Long-term scheduler and archive operations are documented in [docs/horsee-scheduler.md](docs/horsee-scheduler.md).
+
 Video Playa is a React/Vite stream desk. Its Equidia page includes the HORSEE Horse Racing Council, implemented as a remote MCP server and an MCP Apps UI.
 
 The Equidia player remains a normal browser player. HORSEE adds this separate flow:
@@ -37,7 +39,7 @@ Local Council results are stored in `.netlify/horsee-council-results.json`, whic
 - Branch deploys use `horsee-council-results-branch-<BRANCH-or-DEPLOY_ID>`.
 - An unrecognized Netlify context fails safe into a non-production namespace containing `DEPLOY_ID`.
 
-This prevents a PR preview or branch deploy from changing the production selection board. Netlify's per-invocation `Context` supplies the authoritative deploy context, deploy ID, and site identity; environment variables are fallbacks for local tests and explicitly configured values. Council results are retained without a history cap. New Netlify Blob keys are partitioned by Mauritius analysis date (`results/YYYY-MM-DD/...`) for efficient archive reads; legacy flat history keys remain readable and need no migration. Both storage implementations sit behind `CouncilResultStore`, so the backend can be replaced without changing existing tool responses.
+This prevents a PR preview or branch deploy from changing the production selection board. Netlify's per-invocation `Context` supplies the authoritative deploy context, deploy ID, and site identity; environment variables are fallbacks for local tests and explicitly configured values. New Council saves use one canonical `days/YYYY-MM-DD.json` document with one current result per race, plus bounded `latest.json`/`recent.json` caches. Legacy flat/dated history remains readable until the deliberate migration command archives it. Verified daily results and racecards live long-term in yearly GitHub repositories; old exact-date and month reads transparently fall back to that archive. Both storage implementations remain behind the existing `CouncilResultStore` contract.
 
 Current run progress is stored separately from verdicts. Netlify uses a single current-status key in `horsee-council-run-status-production`, with the same isolated Deploy Preview and branch suffixes as result storage. Local development uses `.netlify/horsee-council-run-status.json`. This status has no history and can never overwrite, populate, or count as a Council result; only `save_council_result` writes the Selection Board.
 
@@ -55,10 +57,15 @@ npm run test:mcp
 - Current Mauritius-day analyses: `http://localhost:8888/api/council/today`
 - Analyses for a date: `http://localhost:8888/api/council/history?date=2026-08-20`
 - Archive date counts: `http://localhost:8888/api/council/history/dates?month=2026-08`
+- Scheduler status: `http://localhost:8888/api/horsee/scheduler/status`
+- Today's/READY/next scheduler jobs: `/api/horsee/jobs/today`, `/api/horsee/jobs/ready`, `/api/horsee/jobs/next`
+- Archive health: `http://localhost:8888/api/horsee/archive/status`
 - OAuth protected-resource metadata: `http://localhost:8888/.well-known/oauth-protected-resource`
 - Production MCP: `https://<your-netlify-domain>/mcp`
 
 The MCP server identity is `horsee-council` version `1.1.0`.
+
+The scheduler runs every five minutes and prepares deterministic HARD prompts without calling any reasoning provider. The archive task runs daily, writes deterministic NDJSON, the parsed racecard, and a monthly index to `${HORSEE_GITHUB_ARCHIVE_OWNER}/${HORSEE_GITHUB_ARCHIVE_PREFIX}${year}`, and removes hot days only after verified archive success and retention eligibility. Configure `HORSEE_GITHUB_TOKEN` for writes; absence degrades to `NOT_CONFIGURED` without affecting scheduling or Council use. See [the scheduler/archive operations guide](docs/horsee-scheduler.md) for all environment variables, GitHub setup, authorized API calls, recovery, and the safe `npm run migrate:horsee -- --dry-run` workflow.
 
 ## MCP tools
 

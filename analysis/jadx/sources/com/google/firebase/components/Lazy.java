@@ -1,0 +1,50 @@
+package com.google.firebase.components;
+
+import com.google.firebase.inject.Provider;
+
+/* JADX INFO: loaded from: classes.dex */
+public class Lazy<T> implements Provider<T> {
+    private static final Object UNINITIALIZED = new Object();
+    private volatile Object instance;
+    private volatile Provider<T> provider;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public Lazy(T t6) {
+        this.instance = UNINITIALIZED;
+        this.instance = t6;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // com.google.firebase.inject.Provider
+    public T get() {
+        T t6;
+        T t7 = (T) this.instance;
+        Object obj = UNINITIALIZED;
+        if (t7 != obj) {
+            return t7;
+        }
+        synchronized (this) {
+            try {
+                t6 = (T) this.instance;
+                if (t6 == obj) {
+                    t6 = this.provider.get();
+                    this.instance = t6;
+                    this.provider = null;
+                }
+            } catch (Throwable th) {
+                throw th;
+            }
+        }
+        return t6;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public boolean isInitialized() {
+        return this.instance != UNINITIALIZED;
+    }
+
+    public Lazy(Provider<T> provider) {
+        this.instance = UNINITIALIZED;
+        this.provider = provider;
+    }
+}

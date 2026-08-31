@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import CouncilArchive from "../components/council/CouncilArchive";
+import HorseeSchedulerDashboard from "../components/council/HorseeSchedulerDashboard";
 import StreamPlayer from "../components/player/StreamPlayer";
 import {
   isCouncilResult,
@@ -306,6 +307,8 @@ export default function Equidia() {
             )}
           </div>
         </div>
+
+        <HorseeSchedulerDashboard />
 
         <div className="equidia-council-results" aria-labelledby="equidia-council-results-heading">
           <div className="equidia-council-results-head">

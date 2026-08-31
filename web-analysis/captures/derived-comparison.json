@@ -1,0 +1,1174 @@
+{
+  "generatedAt": "2026-08-28T09:31:43.674Z",
+  "primaryComparison": {
+    "control": {
+      "key": "control_android_hints",
+      "label": "Normal Android UA with fixed Android client hints",
+      "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36",
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "isMobile": true,
+      "hasTouch": true,
+      "extraHTTPHeaders": {
+        "sec-ch-ua-mobile": "?1",
+        "sec-ch-ua-platform": "\"Android\""
+      },
+      "bridge": false
+    },
+    "appua": {
+      "key": "appua_android_hints",
+      "label": "Exact SMSPARIAZAPP001 UA with the same fixed Android client hints",
+      "userAgent": "SMSPARIAZAPP001",
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "isMobile": true,
+      "hasTouch": true,
+      "extraHTTPHeaders": {
+        "sec-ch-ua-mobile": "?1",
+        "sec-ch-ua-platform": "\"Android\""
+      },
+      "bridge": false
+    },
+    "document": {
+      "control": {
+        "method": "GET",
+        "url": "https://www.smspariaz.com/",
+        "resourceType": "document",
+        "status": 200,
+        "contentType": "text/html; charset=UTF-8",
+        "headers": {
+          "cache-control": "no-store, no-cache, must-revalidate",
+          "connection": "Keep-Alive",
+          "content-type": "text/html; charset=UTF-8",
+          "date": "Fri, 28 Aug 2026 09:29:20 GMT",
+          "expires": "Thu, 19 Nov 1981 08:52:00 GMT",
+          "keep-alive": "timeout=5, max=100",
+          "pragma": "no-cache",
+          "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34",
+          "set-cookie": "<redacted>",
+          "transfer-encoding": "chunked",
+          "x-powered-by": "PHP/7.2.34"
+        },
+        "bodyBytes": 34575,
+        "bodySha256": "05ef33abda93051341afd597ffa784967b17b2970d70b4b43ef6f6f79e27b1bd",
+        "textPreview": "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <link rel=\"icon\" href=\"https://www.smspariaz.com/images/favicon.png\" type=\"image/x-icon\"/>\r\n    <title> SMS PARIAZ LTD</title>\r\n    <link rel=\"stylesheet\" href=\"https://www.smspariaz.com/style/reset.css\"/>\r\n    <!-- reference your copy Font Awesome here (from our CDN or by hosting yourself) -->\r\n    <link href=\"https://www.smspariaz.com/font/css/fontawesome.css\" rel=\"stylesheet\">\r\n    <link href=\"https://www.smspariaz.com"
+      },
+      "appua": {
+        "method": "GET",
+        "url": "https://www.smspariaz.com/",
+        "resourceType": "document",
+        "status": 200,
+        "contentType": "text/html; charset=UTF-8",
+        "headers": {
+          "cache-control": "no-store, no-cache, must-revalidate",
+          "connection": "Keep-Alive",
+          "content-type": "text/html; charset=UTF-8",
+          "date": "Fri, 28 Aug 2026 09:29:29 GMT",
+          "expires": "Thu, 19 Nov 1981 08:52:00 GMT",
+          "keep-alive": "timeout=5, max=100",
+          "pragma": "no-cache",
+          "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.2.34",
+          "set-cookie": "<redacted>",
+          "transfer-encoding": "chunked",
+          "x-powered-by": "PHP/7.2.34"
+        },
+        "bodyBytes": 34575,
+        "bodySha256": "05ef33abda93051341afd597ffa784967b17b2970d70b4b43ef6f6f79e27b1bd",
+        "textPreview": "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <link rel=\"icon\" href=\"https://www.smspariaz.com/images/favicon.png\" type=\"image/x-icon\"/>\r\n    <title> SMS PARIAZ LTD</title>\r\n    <link rel=\"stylesheet\" href=\"https://www.smspariaz.com/style/reset.css\"/>\r\n    <!-- reference your copy Font Awesome here (from our CDN or by hosting yourself) -->\r\n    <link href=\"https://www.smspariaz.com/font/css/fontawesome.css\" rel=\"stylesheet\">\r\n    <link href=\"https://www.smspariaz.com"
+      }
+    },
+    "structureSha256": {
+      "control": "d56fddbc7d746b65501944e18d6ecbd40345e619baad5c9186d9d194abe72288",
+      "appua": "d56fddbc7d746b65501944e18d6ecbd40345e619baad5c9186d9d194abe72288"
+    },
+    "bodyTextSha256": {
+      "control": "90388dec3e44a59704573528d771419a3206ed7d942fdfbc6d8fa62aaa397ace",
+      "appua": "90388dec3e44a59704573528d771419a3206ed7d942fdfbc6d8fa62aaa397ace"
+    },
+    "counts": {
+      "metas": {
+        "control": 3,
+        "appua": 3
+      },
+      "scripts": {
+        "control": 9,
+        "appua": 9
+      },
+      "stylesheets": {
+        "control": 6,
+        "appua": 6
+      },
+      "forms": {
+        "control": 2,
+        "appua": 2
+      },
+      "buttons": {
+        "control": 1,
+        "appua": 1
+      },
+      "links": {
+        "control": 28,
+        "appua": 28
+      },
+      "iframes": {
+        "control": 2,
+        "appua": 2
+      },
+      "hiddenFields": {
+        "control": 0,
+        "appua": 0
+      }
+    },
+    "cookieMetadata": {
+      "control": [
+        {
+          "name": "PHPSESSID",
+          "domain": "www.smspariaz.com",
+          "path": "/",
+          "secure": false,
+          "httpOnly": false,
+          "sameSite": "Lax",
+          "expires": -1,
+          "valueLength": 26
+        }
+      ],
+      "appua": [
+        {
+          "name": "PHPSESSID",
+          "domain": "www.smspariaz.com",
+          "path": "/",
+          "secure": false,
+          "httpOnly": false,
+          "sameSite": "Lax",
+          "expires": -1,
+          "valueLength": 26
+        }
+      ]
+    },
+    "localStorageKeys": {
+      "control": [
+        "ZD-store",
+        "ZD-suid"
+      ],
+      "appua": [
+        "ZD-store",
+        "ZD-suid"
+      ]
+    },
+    "sessionStorageKeys": {
+      "control": [],
+      "appua": []
+    },
+    "scriptHashes": {
+      "control": [
+        {
+          "filename": "control_android_hints__www.smspariaz.com__site.js__373d10892efd.js",
+          "url": "https://www.smspariaz.com/js/site.js?v=1.590",
+          "bytes": 32592,
+          "sha256": "373d10892efd82b87f21f580c400ff9a1e0eeeaa96fd7319ca816f7da4cb9b79"
+        },
+        {
+          "filename": "control_android_hints__www.smspariaz.com__jquery.js__f36844906ad2.js",
+          "url": "https://www.smspariaz.com/lib/jquery.js",
+          "bytes": 89478,
+          "sha256": "f36844906ad2309877aae3121b87fb15b9e09803cb4c333adc7e1e35ac92e14b"
+        },
+        {
+          "filename": "control_android_hints__www.smspariaz.com__mobile.js__a558938c793d.js",
+          "url": "https://www.smspariaz.com/js/mobile.js",
+          "bytes": 19682,
+          "sha256": "a558938c793dc970fa1eec1e684c7b1d3aab67a4eaf71881c9e2c654d04b6e06"
+        }
+      ],
+      "appua": [
+        {
+          "filename": "appua_android_hints__www.smspariaz.com__site.js__373d10892efd.js",
+          "url": "https://www.smspariaz.com/js/site.js?v=1.590",
+          "bytes": 32592,
+          "sha256": "373d10892efd82b87f21f580c400ff9a1e0eeeaa96fd7319ca816f7da4cb9b79"
+        },
+        {
+          "filename": "appua_android_hints__www.smspariaz.com__jquery.js__f36844906ad2.js",
+          "url": "https://www.smspariaz.com/lib/jquery.js",
+          "bytes": 89478,
+          "sha256": "f36844906ad2309877aae3121b87fb15b9e09803cb4c333adc7e1e35ac92e14b"
+        },
+        {
+          "filename": "appua_android_hints__www.smspariaz.com__mobile.js__a558938c793d.js",
+          "url": "https://www.smspariaz.com/js/mobile.js",
+          "bytes": 19682,
+          "sha256": "a558938c793dc970fa1eec1e684c7b1d3aab67a4eaf71881c9e2c654d04b6e06"
+        }
+      ]
+    },
+    "networkDiff": {
+      "onlyLeft": [],
+      "onlyRight": []
+    },
+    "responseDifferences": []
+  },
+  "channelMatrix": {
+    "normal": {
+      "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36",
+      "bridgePresent": false,
+      "bridgeEvents": [],
+      "MOBILE": null,
+      "logalertResult": null,
+      "links": [
+        {
+          "text": "Home",
+          "href": "https://www.smspariaz.com/"
+        },
+        {
+          "text": "Daily Racecard",
+          "href": "https://www.smspariaz.com/racecard/"
+        },
+        {
+          "text": "Magazine",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "News",
+          "href": "https://www.smspariaz.com/news/"
+        },
+        {
+          "text": "Help",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "Outlet",
+          "href": "https://www.smspariaz.com/outlet/"
+        },
+        {
+          "text": "Mobile App",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "Deposit",
+          "href": "https://www.smspariaz.com/deposit/"
+        },
+        {
+          "text": "Withdrawal",
+          "href": "https://www.smspariaz.com/withdrawal/"
+        },
+        {
+          "text": "Register",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "Forget Password?",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "You can now place your football bets directly by SMS through our mobile app. Tap here to learn more.",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "",
+          "href": "https://www.youtube.com/@smspariazltd"
+        },
+        {
+          "text": "Local Races",
+          "href": "https://www.smspariaz.com/local/"
+        },
+        {
+          "text": "Football",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "Peakpool",
+          "href": "https://www.smspariaz.com/peakpool/"
+        },
+        {
+          "text": "Toppool",
+          "href": "https://www.smspariaz.com/toppool/"
+        },
+        {
+          "text": "Cumbre vieja absent de la BARBÉ CUP !",
+          "href": "https://www.smspariaz.com/news?id=167"
+        },
+        {
+          "text": "Hippisme: entretien exclusif avec le nouveau jockey de l’écurie Aqua Stallions, Cody Collins",
+          "href": "https://www.smspariaz.com/news?id=166"
+        },
+        {
+          "text": "Hippisme : Séance animée ce mardi matin : focus sur l’écurie Vicky Ruhee",
+          "href": "https://www.smspariaz.com/news?id=165"
+        },
+        {
+          "text": "A la rencontre de Subiraj Gujadhur et Selvom Mootien : cap sur une saison qui s’annonce animée",
+          "href": "https://www.smspariaz.com/news?id=164"
+        },
+        {
+          "text": "Hippisme : The Centurion taille patron... nos entretiens avec Raymond Danielson et Selven Chowreemootoo",
+          "href": "https://www.smspariaz.com/news?id=163"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/smsfootball-mag.pdf"
+        },
+        {
+          "text": "CONTACT US",
+          "href": "https://www.smspariaz.com/contact/"
+        },
+        {
+          "text": "RULES AND REGULATIONS",
+          "href": "https://www.smspariaz.com/rules/"
+        }
+      ],
+      "requests": 27,
+      "blocked": []
+    },
+    "appua": {
+      "userAgent": "SMSPARIAZAPP001",
+      "bridgePresent": false,
+      "bridgeEvents": [],
+      "MOBILE": null,
+      "logalertResult": null,
+      "links": [
+        {
+          "text": "Home",
+          "href": "https://www.smspariaz.com/"
+        },
+        {
+          "text": "Daily Racecard",
+          "href": "https://www.smspariaz.com/racecard/"
+        },
+        {
+          "text": "Magazine",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "News",
+          "href": "https://www.smspariaz.com/news/"
+        },
+        {
+          "text": "Help",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "Outlet",
+          "href": "https://www.smspariaz.com/outlet/"
+        },
+        {
+          "text": "Mobile App",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "Deposit",
+          "href": "https://www.smspariaz.com/deposit/"
+        },
+        {
+          "text": "Withdrawal",
+          "href": "https://www.smspariaz.com/withdrawal/"
+        },
+        {
+          "text": "Register",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "Forget Password?",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "You can now place your football bets directly by SMS through our mobile app. Tap here to learn more.",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "",
+          "href": "https://www.youtube.com/@smspariazltd"
+        },
+        {
+          "text": "Local Races",
+          "href": "https://www.smspariaz.com/local/"
+        },
+        {
+          "text": "Football",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "Peakpool",
+          "href": "https://www.smspariaz.com/peakpool/"
+        },
+        {
+          "text": "Toppool",
+          "href": "https://www.smspariaz.com/toppool/"
+        },
+        {
+          "text": "Cumbre vieja absent de la BARBÉ CUP !",
+          "href": "https://www.smspariaz.com/news?id=167"
+        },
+        {
+          "text": "Hippisme: entretien exclusif avec le nouveau jockey de l’écurie Aqua Stallions, Cody Collins",
+          "href": "https://www.smspariaz.com/news?id=166"
+        },
+        {
+          "text": "Hippisme : Séance animée ce mardi matin : focus sur l’écurie Vicky Ruhee",
+          "href": "https://www.smspariaz.com/news?id=165"
+        },
+        {
+          "text": "A la rencontre de Subiraj Gujadhur et Selvom Mootien : cap sur une saison qui s’annonce animée",
+          "href": "https://www.smspariaz.com/news?id=164"
+        },
+        {
+          "text": "Hippisme : The Centurion taille patron... nos entretiens avec Raymond Danielson et Selven Chowreemootoo",
+          "href": "https://www.smspariaz.com/news?id=163"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/smsfootball-mag.pdf"
+        },
+        {
+          "text": "CONTACT US",
+          "href": "https://www.smspariaz.com/contact/"
+        },
+        {
+          "text": "RULES AND REGULATIONS",
+          "href": "https://www.smspariaz.com/rules/"
+        }
+      ],
+      "requests": 27,
+      "blocked": []
+    },
+    "normal_bridge": {
+      "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36",
+      "bridgePresent": true,
+      "bridgeEvents": [],
+      "MOBILE": null,
+      "logalertResult": null,
+      "links": [
+        {
+          "text": "Home",
+          "href": "https://www.smspariaz.com/"
+        },
+        {
+          "text": "Daily Racecard",
+          "href": "https://www.smspariaz.com/racecard/"
+        },
+        {
+          "text": "Magazine",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "News",
+          "href": "https://www.smspariaz.com/news/"
+        },
+        {
+          "text": "Help",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "Outlet",
+          "href": "https://www.smspariaz.com/outlet/"
+        },
+        {
+          "text": "Mobile App",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "Deposit",
+          "href": "https://www.smspariaz.com/deposit/"
+        },
+        {
+          "text": "Withdrawal",
+          "href": "https://www.smspariaz.com/withdrawal/"
+        },
+        {
+          "text": "Register",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "Forget Password?",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "You can now place your football bets directly by SMS through our mobile app. Tap here to learn more.",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "",
+          "href": "https://www.youtube.com/@smspariazltd"
+        },
+        {
+          "text": "Local Races",
+          "href": "https://www.smspariaz.com/local/"
+        },
+        {
+          "text": "Football",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "Peakpool",
+          "href": "https://www.smspariaz.com/peakpool/"
+        },
+        {
+          "text": "Toppool",
+          "href": "https://www.smspariaz.com/toppool/"
+        },
+        {
+          "text": "Cumbre vieja absent de la BARBÉ CUP !",
+          "href": "https://www.smspariaz.com/news?id=167"
+        },
+        {
+          "text": "Hippisme: entretien exclusif avec le nouveau jockey de l’écurie Aqua Stallions, Cody Collins",
+          "href": "https://www.smspariaz.com/news?id=166"
+        },
+        {
+          "text": "Hippisme : Séance animée ce mardi matin : focus sur l’écurie Vicky Ruhee",
+          "href": "https://www.smspariaz.com/news?id=165"
+        },
+        {
+          "text": "A la rencontre de Subiraj Gujadhur et Selvom Mootien : cap sur une saison qui s’annonce animée",
+          "href": "https://www.smspariaz.com/news?id=164"
+        },
+        {
+          "text": "Hippisme : The Centurion taille patron... nos entretiens avec Raymond Danielson et Selven Chowreemootoo",
+          "href": "https://www.smspariaz.com/news?id=163"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/smsfootball-mag.pdf"
+        },
+        {
+          "text": "CONTACT US",
+          "href": "https://www.smspariaz.com/contact/"
+        },
+        {
+          "text": "RULES AND REGULATIONS",
+          "href": "https://www.smspariaz.com/rules/"
+        }
+      ],
+      "requests": 27,
+      "blocked": []
+    },
+    "appua_bridge": {
+      "userAgent": "SMSPARIAZAPP001",
+      "bridgePresent": true,
+      "bridgeEvents": [],
+      "MOBILE": null,
+      "logalertResult": null,
+      "links": [
+        {
+          "text": "Home",
+          "href": "https://www.smspariaz.com/"
+        },
+        {
+          "text": "Daily Racecard",
+          "href": "https://www.smspariaz.com/racecard/"
+        },
+        {
+          "text": "Magazine",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "News",
+          "href": "https://www.smspariaz.com/news/"
+        },
+        {
+          "text": "Help",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "Outlet",
+          "href": "https://www.smspariaz.com/outlet/"
+        },
+        {
+          "text": "Mobile App",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "Deposit",
+          "href": "https://www.smspariaz.com/deposit/"
+        },
+        {
+          "text": "Withdrawal",
+          "href": "https://www.smspariaz.com/withdrawal/"
+        },
+        {
+          "text": "Register",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "Forget Password?",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "You can now place your football bets directly by SMS through our mobile app. Tap here to learn more.",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "",
+          "href": "https://www.youtube.com/@smspariazltd"
+        },
+        {
+          "text": "Local Races",
+          "href": "https://www.smspariaz.com/local/"
+        },
+        {
+          "text": "Football",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "Peakpool",
+          "href": "https://www.smspariaz.com/peakpool/"
+        },
+        {
+          "text": "Toppool",
+          "href": "https://www.smspariaz.com/toppool/"
+        },
+        {
+          "text": "Cumbre vieja absent de la BARBÉ CUP !",
+          "href": "https://www.smspariaz.com/news?id=167"
+        },
+        {
+          "text": "Hippisme: entretien exclusif avec le nouveau jockey de l’écurie Aqua Stallions, Cody Collins",
+          "href": "https://www.smspariaz.com/news?id=166"
+        },
+        {
+          "text": "Hippisme : Séance animée ce mardi matin : focus sur l’écurie Vicky Ruhee",
+          "href": "https://www.smspariaz.com/news?id=165"
+        },
+        {
+          "text": "A la rencontre de Subiraj Gujadhur et Selvom Mootien : cap sur une saison qui s’annonce animée",
+          "href": "https://www.smspariaz.com/news?id=164"
+        },
+        {
+          "text": "Hippisme : The Centurion taille patron... nos entretiens avec Raymond Danielson et Selven Chowreemootoo",
+          "href": "https://www.smspariaz.com/news?id=163"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/smsfootball-mag.pdf"
+        },
+        {
+          "text": "CONTACT US",
+          "href": "https://www.smspariaz.com/contact/"
+        },
+        {
+          "text": "RULES AND REGULATIONS",
+          "href": "https://www.smspariaz.com/rules/"
+        }
+      ],
+      "requests": 27,
+      "blocked": []
+    },
+    "native_normal": {
+      "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36",
+      "bridgePresent": false,
+      "bridgeEvents": [],
+      "MOBILE": 1,
+      "logalertResult": {
+        "called": true,
+        "mobile": 1
+      },
+      "links": [
+        {
+          "text": "Home",
+          "href": "https://www.smspariaz.com/"
+        },
+        {
+          "text": "Daily Racecard",
+          "href": "https://www.smspariaz.com/racecard/"
+        },
+        {
+          "text": "Magazine",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "News",
+          "href": "https://www.smspariaz.com/news/"
+        },
+        {
+          "text": "Help",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "Outlet",
+          "href": "https://www.smspariaz.com/outlet/"
+        },
+        {
+          "text": "Mobile App",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "Deposit",
+          "href": "https://www.smspariaz.com/deposit/"
+        },
+        {
+          "text": "Withdrawal",
+          "href": "https://www.smspariaz.com/withdrawal/"
+        },
+        {
+          "text": "Football",
+          "href": "https://www.smspariaz.com/football/"
+        },
+        {
+          "text": "Login",
+          "href": "https://www.smspariaz.com/login/"
+        },
+        {
+          "text": "Create Account",
+          "href": "https://www.smspariaz.com/register/"
+        },
+        {
+          "text": "Register",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "Forget Password?",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "You can now place your football bets directly by SMS through our mobile app. Tap here to learn more.",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "",
+          "href": "https://www.youtube.com/@smspariazltd"
+        },
+        {
+          "text": "Local Races",
+          "href": "https://www.smspariaz.com/local/"
+        },
+        {
+          "text": "Football",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "Peakpool",
+          "href": "https://www.smspariaz.com/peakpool/"
+        },
+        {
+          "text": "Toppool",
+          "href": "https://www.smspariaz.com/toppool/"
+        },
+        {
+          "text": "Cumbre vieja absent de la BARBÉ CUP !",
+          "href": "https://www.smspariaz.com/news?id=167"
+        },
+        {
+          "text": "Hippisme: entretien exclusif avec le nouveau jockey de l’écurie Aqua Stallions, Cody Collins",
+          "href": "https://www.smspariaz.com/news?id=166"
+        },
+        {
+          "text": "Hippisme : Séance animée ce mardi matin : focus sur l’écurie Vicky Ruhee",
+          "href": "https://www.smspariaz.com/news?id=165"
+        },
+        {
+          "text": "A la rencontre de Subiraj Gujadhur et Selvom Mootien : cap sur une saison qui s’annonce animée",
+          "href": "https://www.smspariaz.com/news?id=164"
+        },
+        {
+          "text": "Hippisme : The Centurion taille patron... nos entretiens avec Raymond Danielson et Selven Chowreemootoo",
+          "href": "https://www.smspariaz.com/news?id=163"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/smsfootball-mag.pdf"
+        },
+        {
+          "text": "CONTACT US",
+          "href": "https://www.smspariaz.com/contact/"
+        },
+        {
+          "text": "RULES AND REGULATIONS",
+          "href": "https://www.smspariaz.com/rules/"
+        }
+      ],
+      "requests": 27,
+      "blocked": []
+    },
+    "native_appua": {
+      "userAgent": "SMSPARIAZAPP001",
+      "bridgePresent": false,
+      "bridgeEvents": [],
+      "MOBILE": 1,
+      "logalertResult": {
+        "called": true,
+        "mobile": 1
+      },
+      "links": [
+        {
+          "text": "Home",
+          "href": "https://www.smspariaz.com/"
+        },
+        {
+          "text": "Daily Racecard",
+          "href": "https://www.smspariaz.com/racecard/"
+        },
+        {
+          "text": "Magazine",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "News",
+          "href": "https://www.smspariaz.com/news/"
+        },
+        {
+          "text": "Help",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "Outlet",
+          "href": "https://www.smspariaz.com/outlet/"
+        },
+        {
+          "text": "Mobile App",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "Deposit",
+          "href": "https://www.smspariaz.com/deposit/"
+        },
+        {
+          "text": "Withdrawal",
+          "href": "https://www.smspariaz.com/withdrawal/"
+        },
+        {
+          "text": "Football",
+          "href": "https://www.smspariaz.com/football/"
+        },
+        {
+          "text": "Login",
+          "href": "https://www.smspariaz.com/login/"
+        },
+        {
+          "text": "Create Account",
+          "href": "https://www.smspariaz.com/register/"
+        },
+        {
+          "text": "Register",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "Forget Password?",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "You can now place your football bets directly by SMS through our mobile app. Tap here to learn more.",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "",
+          "href": "https://www.youtube.com/@smspariazltd"
+        },
+        {
+          "text": "Local Races",
+          "href": "https://www.smspariaz.com/local/"
+        },
+        {
+          "text": "Football",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "Peakpool",
+          "href": "https://www.smspariaz.com/peakpool/"
+        },
+        {
+          "text": "Toppool",
+          "href": "https://www.smspariaz.com/toppool/"
+        },
+        {
+          "text": "Cumbre vieja absent de la BARBÉ CUP !",
+          "href": "https://www.smspariaz.com/news?id=167"
+        },
+        {
+          "text": "Hippisme: entretien exclusif avec le nouveau jockey de l’écurie Aqua Stallions, Cody Collins",
+          "href": "https://www.smspariaz.com/news?id=166"
+        },
+        {
+          "text": "Hippisme : Séance animée ce mardi matin : focus sur l’écurie Vicky Ruhee",
+          "href": "https://www.smspariaz.com/news?id=165"
+        },
+        {
+          "text": "A la rencontre de Subiraj Gujadhur et Selvom Mootien : cap sur une saison qui s’annonce animée",
+          "href": "https://www.smspariaz.com/news?id=164"
+        },
+        {
+          "text": "Hippisme : The Centurion taille patron... nos entretiens avec Raymond Danielson et Selven Chowreemootoo",
+          "href": "https://www.smspariaz.com/news?id=163"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/smsfootball-mag.pdf"
+        },
+        {
+          "text": "CONTACT US",
+          "href": "https://www.smspariaz.com/contact/"
+        },
+        {
+          "text": "RULES AND REGULATIONS",
+          "href": "https://www.smspariaz.com/rules/"
+        }
+      ],
+      "requests": 27,
+      "blocked": []
+    },
+    "native_appua_bridge": {
+      "userAgent": "SMSPARIAZAPP001",
+      "bridgePresent": true,
+      "bridgeEvents": [],
+      "MOBILE": 1,
+      "logalertResult": {
+        "called": true,
+        "mobile": 1
+      },
+      "links": [
+        {
+          "text": "Home",
+          "href": "https://www.smspariaz.com/"
+        },
+        {
+          "text": "Daily Racecard",
+          "href": "https://www.smspariaz.com/racecard/"
+        },
+        {
+          "text": "Magazine",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "News",
+          "href": "https://www.smspariaz.com/news/"
+        },
+        {
+          "text": "Help",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "Outlet",
+          "href": "https://www.smspariaz.com/outlet/"
+        },
+        {
+          "text": "Mobile App",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "Deposit",
+          "href": "https://www.smspariaz.com/deposit/"
+        },
+        {
+          "text": "Withdrawal",
+          "href": "https://www.smspariaz.com/withdrawal/"
+        },
+        {
+          "text": "Football",
+          "href": "https://www.smspariaz.com/football/"
+        },
+        {
+          "text": "Login",
+          "href": "https://www.smspariaz.com/login/"
+        },
+        {
+          "text": "Create Account",
+          "href": "https://www.smspariaz.com/register/"
+        },
+        {
+          "text": "Register",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "Forget Password?",
+          "href": "https://www.smspariaz.com/#"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "You can now place your football bets directly by SMS through our mobile app. Tap here to learn more.",
+          "href": "https://www.smspariaz.com/mobile/"
+        },
+        {
+          "text": "",
+          "href": "https://www.youtube.com/@smspariazltd"
+        },
+        {
+          "text": "Local Races",
+          "href": "https://www.smspariaz.com/local/"
+        },
+        {
+          "text": "Football",
+          "href": "https://www.smspariaz.com/smsfootball/"
+        },
+        {
+          "text": "Peakpool",
+          "href": "https://www.smspariaz.com/peakpool/"
+        },
+        {
+          "text": "Toppool",
+          "href": "https://www.smspariaz.com/toppool/"
+        },
+        {
+          "text": "Cumbre vieja absent de la BARBÉ CUP !",
+          "href": "https://www.smspariaz.com/news?id=167"
+        },
+        {
+          "text": "Hippisme: entretien exclusif avec le nouveau jockey de l’écurie Aqua Stallions, Cody Collins",
+          "href": "https://www.smspariaz.com/news?id=166"
+        },
+        {
+          "text": "Hippisme : Séance animée ce mardi matin : focus sur l’écurie Vicky Ruhee",
+          "href": "https://www.smspariaz.com/news?id=165"
+        },
+        {
+          "text": "A la rencontre de Subiraj Gujadhur et Selvom Mootien : cap sur une saison qui s’annonce animée",
+          "href": "https://www.smspariaz.com/news?id=164"
+        },
+        {
+          "text": "Hippisme : The Centurion taille patron... nos entretiens avec Raymond Danielson et Selven Chowreemootoo",
+          "href": "https://www.smspariaz.com/news?id=163"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/help/"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/TurfSportMag_27082026.pdf"
+        },
+        {
+          "text": "",
+          "href": "https://www.smspariaz.com/media/downloads/smsfootball-mag.pdf"
+        },
+        {
+          "text": "CONTACT US",
+          "href": "https://www.smspariaz.com/contact/"
+        },
+        {
+          "text": "RULES AND REGULATIONS",
+          "href": "https://www.smspariaz.com/rules/"
+        }
+      ],
+      "requests": 27,
+      "blocked": []
+    }
+  },
+  "ios": {
+    "chromiumUA": {
+      "pageErrors": [],
+      "consoleWarnings": [
+        {
+          "type": "warning",
+          "text": "Service Worker registration blocked by Playwright",
+          "location": {
+            "url": "",
+            "line": 2,
+            "column": 86,
+            "lineNumber": 2,
+            "columnNumber": 86
+          }
+        }
+      ],
+      "counts": {
+        "forms": 2,
+        "buttons": 1,
+        "links": 28,
+        "iframes": 2
+      }
+    },
+    "webkit": {
+      "pageErrors": [],
+      "consoleWarnings": [
+        {
+          "type": "warning",
+          "text": "Service Worker registration blocked by Playwright",
+          "location": {
+            "url": "web-inspector://bootstrap.js",
+            "line": 18,
+            "column": 90,
+            "lineNumber": 18,
+            "columnNumber": 90
+          }
+        }
+      ],
+      "counts": {
+        "forms": 2,
+        "buttons": 1,
+        "links": 28,
+        "iframes": 2
+      }
+    },
+    "requestDiff": {
+      "onlyLeft": [],
+      "onlyRight": [
+        "GET https://www.smspariaz.com/manifest.json"
+      ]
+    }
+  }
+}

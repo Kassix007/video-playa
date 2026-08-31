@@ -406,6 +406,235 @@
   line-height: 1.5;
 }
 
+.equidia-scheduler {
+  border-top: 1px solid var(--border-strong);
+  min-width: 0;
+  padding: clamp(20px, 4vw, 34px);
+}
+
+.equidia-scheduler-head {
+  align-items: end;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.equidia-scheduler-head h3,
+.equidia-scheduler-ready h4 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.equidia-scheduler-head h3 {
+  font-size: 1.55rem;
+}
+
+.equidia-scheduler-health {
+  align-items: center;
+  color: var(--accent);
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 0.57rem;
+  font-weight: 900;
+  gap: 8px;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.equidia-scheduler-health i {
+  background: currentColor;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 16%, transparent);
+  height: 7px;
+  width: 7px;
+}
+
+.equidia-scheduler-health[data-state="degraded"],
+.equidia-scheduler-health[data-state="not_configured"] {
+  color: var(--brand-strong);
+}
+
+.equidia-scheduler-health[data-state="error"] {
+  color: var(--danger);
+}
+
+.equidia-scheduler-message {
+  background: color-mix(in srgb, var(--panel-2) 84%, transparent);
+  border-left: 3px solid var(--border-strong);
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.6;
+  margin: 0;
+  padding: 16px;
+}
+
+.equidia-scheduler-message[data-state="error"] {
+  border-left-color: var(--danger);
+  color: var(--text);
+}
+
+.equidia-scheduler-metrics {
+  border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 0;
+}
+
+.equidia-scheduler-metrics > div {
+  border-right: 1px solid var(--border);
+  min-width: 0;
+  padding: 13px 12px;
+}
+
+.equidia-scheduler-metrics > div:last-child {
+  border-right: 0;
+}
+
+.equidia-scheduler-metrics dt,
+.equidia-scheduler-next > span,
+.equidia-scheduler-archive-health > span {
+  color: var(--muted);
+  font-size: 0.52rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.equidia-scheduler-metrics dd {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 4px 0 0;
+}
+
+.equidia-scheduler-grid {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.equidia-scheduler-next,
+.equidia-scheduler-archive-health {
+  background: color-mix(in srgb, var(--panel-2) 82%, transparent);
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px;
+}
+
+.equidia-scheduler-next > strong,
+.equidia-scheduler-archive-health > strong {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.equidia-scheduler-next p,
+.equidia-scheduler-archive-health p,
+.equidia-scheduler-archive-health small {
+  color: var(--muted);
+  font-size: 0.59rem;
+  line-height: 1.5;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.equidia-scheduler-job-identity {
+  align-items: baseline;
+  display: grid;
+  gap: 4px 10px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-width: 0;
+}
+
+.equidia-scheduler-job-identity b {
+  color: var(--brand-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+.equidia-scheduler-job-identity span {
+  font-size: 0.7rem;
+  font-weight: 800;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.equidia-scheduler-job-identity small {
+  color: var(--muted);
+  font-size: 0.5rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.equidia-scheduler-ready {
+  border-top: 1px solid var(--border-strong);
+  margin-top: 18px;
+  padding-top: 18px;
+}
+
+.equidia-scheduler-ready h4 {
+  font-size: 1.15rem;
+}
+
+.equidia-scheduler-ready > p,
+.equidia-scheduler-copy-status {
+  color: var(--muted);
+  font-size: 0.59rem;
+  line-height: 1.5;
+}
+
+.equidia-scheduler-ready ul {
+  display: grid;
+  gap: 1px;
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+
+.equidia-scheduler-ready li {
+  align-items: center;
+  background: color-mix(in srgb, var(--panel-2) 82%, transparent);
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-width: 0;
+  padding: 12px 14px;
+}
+
+.equidia-scheduler-ready button {
+  background: var(--brand);
+  border: 1px solid var(--brand);
+  color: var(--button-text);
+  cursor: pointer;
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  min-height: 44px;
+  padding: 0 14px;
+  text-transform: uppercase;
+}
+
+.equidia-scheduler-ready button:hover {
+  background: var(--brand-strong);
+  border-color: var(--brand-strong);
+}
+
+.equidia-scheduler-ready button:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.equidia-scheduler-copy-status {
+  margin: 10px 0 0;
+}
+
 .equidia-council-results {
   background: color-mix(in srgb, var(--panel-2) 72%, var(--panel));
   border-top: 1px solid var(--border);
@@ -1121,6 +1350,14 @@
     grid-template-columns: 1fr;
   }
 
+  .equidia-scheduler-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .equidia-scheduler-metrics > div:nth-child(3) {
+    border-right: 0;
+  }
+
   .equidia-council-card summary {
     grid-template-columns: 58px minmax(150px, 0.8fr) minmax(190px, 1fr) auto;
   }
@@ -1180,6 +1417,15 @@
 
   .equidia-council-results dl > div:nth-child(odd) {
     border-right: 0;
+  }
+
+  .equidia-scheduler-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .equidia-scheduler-grid {
+    grid-template-columns: 1fr;
   }
 
   .equidia-archive-head,
@@ -1299,6 +1545,7 @@
   }
 
   .equidia-council-console,
+  .equidia-scheduler,
   .equidia-council-results,
   .equidia-council-archive {
     padding-left: 14px;
@@ -1370,6 +1617,27 @@
   }
 
   .equidia-council-run {
+    width: 100%;
+  }
+
+  .equidia-scheduler-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .equidia-scheduler-metrics > div:nth-child(3) {
+    border-right: 1px solid var(--border);
+  }
+
+  .equidia-scheduler-metrics > div:nth-child(even) {
+    border-right: 0;
+  }
+
+  .equidia-scheduler-ready li {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .equidia-scheduler-ready button {
     width: 100%;
   }
 
