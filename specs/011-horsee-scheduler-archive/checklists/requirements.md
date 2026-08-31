@@ -32,4 +32,4 @@
 ## Notes
 
 - Validation passed on the first review. Product requirements describe the mandated operational/archive split and yearly repository behavior; implementation-specific file names, libraries, endpoints, and provider protocols are intentionally deferred to planning.
-
+- Amendment validated: automatic scheduling is disabled while preserving the manual authorized scheduling path and daily archive catch-up.

@@ -2,11 +2,9 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { describe, it } from "node:test";
 import { config as archiveConfig } from "../netlify/functions/horsee-archive.js";
-import { config as schedulerConfig } from "../netlify/functions/horsee-scheduler.js";
 
 describe("Netlify HORSEE routing and schedules", () => {
-  it("declares five-minute scheduling and daily Mauritius catch-up", () => {
-    assert.equal(schedulerConfig.schedule, "*/5 * * * *");
+  it("declares only the daily Mauritius archive catch-up", () => {
     assert.equal(archiveConfig.schedule, "30 22 * * *");
   });
 

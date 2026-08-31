@@ -8,6 +8,8 @@
 
 **Input**: User description: "Build a production-ready, provider-independent HORSEE scheduler with compact operational storage, daily yearly archives, safe migration, dashboard visibility, and reliable recovery for 6–7+ years without replacing the existing SMSPariaz racecard parser or Council workflow."
 
+**Amendment (2026-09-01)**: Automatic five-minute scheduling is disabled to control function usage. Authorized manual scheduling remains available; the daily archive schedule is unchanged.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Build Today's Reliable Race Queue (Priority: P1)
@@ -189,6 +191,7 @@ As an existing HORSEE client, I want racecard discovery, Council schemas, authen
 - **FR-001**: The system MUST use the existing direct SMSPariaz daily racecard capability as the sole authoritative source for programme discovery and MUST NOT replace it or substitute ordinary web search.
 - **FR-002**: The system MUST interpret every programme date, daily boundary, race time, retention boundary, and migration grouping in `Indian/Mauritius`.
 - **FR-003**: Each scheduling invocation MUST fetch and validate the current programme before reconciling work and MUST reject a programme that does not match the current Mauritius date.
+- **FR-003a**: Automatic five-minute scheduling MUST remain disabled until an explicitly approved usage budget and cadence are defined; authorized manual scheduling remains available.
 - **FR-004**: The system MUST maintain one current-day queue containing all discovered races and their operational states.
 - **FR-005**: Each job MUST have a deterministic identity composed of programme date and race identity, ensuring one operational job per race per day.
 - **FR-006**: Reconciliation MUST add newly discovered races without deleting completed work and MUST retain an observable indication when a previously queued race is removed or materially changed in the authoritative programme.
