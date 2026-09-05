@@ -40,6 +40,8 @@ describe("HORSEE tool securitySchemes", () => {
       writeScope: "horsee:council:write",
       smspariazSessionScope: "horsee:smspariaz:session",
       smspariazAppBetScope: "horsee:smspariaz:app-bet",
+      peakpoolPrepareScope: "horsee:peakpool:prepare",
+      peakpoolPlaceScope: "horsee:peakpool:place",
     };
     assert.deepEqual(getHorseeToolSecuritySchemes("smspariaz_get_smsfootball", scopes), [{ type: "noauth" }]);
     assert.deepEqual(getHorseeToolSecuritySchemes("smspariaz_session_status", scopes), [{
@@ -47,6 +49,13 @@ describe("HORSEE tool securitySchemes", () => {
     }]);
     assert.deepEqual(getHorseeToolSecuritySchemes("smspariaz_place_app_bet", scopes), [{
       type: "oauth2", scopes: ["horsee:smspariaz:app-bet"],
+    }]);
+    assert.deepEqual(getHorseeToolSecuritySchemes("smspariaz_get_peakpool", scopes), [{ type: "noauth" }]);
+    assert.deepEqual(getHorseeToolSecuritySchemes("smspariaz_prepare_peakpool_app_bet", scopes), [{
+      type: "oauth2", scopes: ["horsee:peakpool:prepare"],
+    }]);
+    assert.deepEqual(getHorseeToolSecuritySchemes("smspariaz_place_peakpool_app_bet", scopes), [{
+      type: "oauth2", scopes: ["horsee:peakpool:place"],
     }]);
     assert.throws(() => getHorseeToolSecuritySchemes("future_tool_without_policy", scopes));
   });

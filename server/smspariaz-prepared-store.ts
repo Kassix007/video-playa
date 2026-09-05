@@ -18,12 +18,27 @@ export const SmspariazCanonicalSelectionSchema = z.object({
   away: z.string().min(1).max(300),
 }).strict();
 
-export const SmspariazPreparedBetSchema = z.object({
+const PreparedBetBase = {
   schema_version: z.literal(1),
   handle: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
   state: z.enum(["PREPARED", "SUBMITTING", "SUCCEEDED", "REJECTED", "AMBIGUOUS", "EXPIRED"]),
   principal_hash: z.string().regex(/^[a-f0-9]{64}$/),
   session_generation: z.number().int().nonnegative(),
+  flow_fingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+  created_at: z.string().datetime(),
+  expires_at: z.string().datetime(),
+};
+
+const PreparedBetTerminalSchema = z.object({
+  error_code: z.string().max(100).optional(),
+  confirmation: z.string().max(500).optional(),
+  reference_hash: z.string().max(100).optional(),
+  completed_at: z.string().datetime(),
+}).strict();
+
+export const SmspariazFootballPreparedBetSchema = z.object({
+  ...PreparedBetBase,
+  product: z.literal("smsfootball"),
   game: z.enum(["s", "a"]),
   selections: z.array(SmspariazCanonicalSelectionSchema).min(1).max(25),
   stake: z.number().positive().max(1_000_000),
@@ -31,24 +46,41 @@ export const SmspariazPreparedBetSchema = z.object({
   total_odds: z.number().positive(),
   estimated_payout: z.number().nonnegative(),
   bookcode: z.string().min(1).max(500),
-  flow_fingerprint: z.string().regex(/^[a-f0-9]{64}$/),
-  created_at: z.string().datetime(),
-  expires_at: z.string().datetime(),
-  terminal: z.object({
-    error_code: z.string().max(100).optional(),
-    confirmation: z.string().max(500).optional(),
-    reference_hash: z.string().max(100).optional(),
-    completed_at: z.string().datetime(),
-  }).strict().optional(),
+  terminal: PreparedBetTerminalSchema.optional(),
 }).strict();
+
+export const PeakpoolPreparedSelectionSchema = z.object({
+  meeting_number: z.string().regex(/^\d{1,4}$/),
+  race_number: z.string().regex(/^\d{1,4}$/),
+  runner_number: z.string().regex(/^\d{1,4}$/),
+  selection_code: z.string().regex(/^R\d{1,4}C\d{1,4}H\d{1,4}$/),
+  bet_type: z.enum(["win", "place"]),
+  runner_name: z.string().min(1).max(300),
+  displayed_pool_value: z.string().min(1).max(100).optional(),
+}).strict();
+
+export const PeakpoolPreparedBetSchema = z.object({
+  ...PreparedBetBase,
+  product: z.literal("peakpool"),
+  selection: PeakpoolPreparedSelectionSchema,
+  unit_stake: z.number().int().positive().max(1_000_000),
+  programme_fingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+  terminal: PreparedBetTerminalSchema.optional(),
+}).strict();
+
+export const SmspariazPreparedBetSchema = z.discriminatedUnion("product", [
+  SmspariazFootballPreparedBetSchema,
+  PeakpoolPreparedBetSchema,
+]);
 export type SmspariazPreparedBet = z.infer<typeof SmspariazPreparedBetSchema>;
 export type SmspariazPreparedBetTerminal = NonNullable<SmspariazPreparedBet["terminal"]>;
+export type SmspariazPreparedBetProduct = SmspariazPreparedBet["product"];
 
 export interface SmspariazPreparedBetStore {
   readonly kind: "netlify-blobs" | "local-file" | "memory";
   create(record: SmspariazPreparedBet): Promise<void>;
   get(handle: string): Promise<SmspariazPreparedBet | null>;
-  claim(handle: string, principalHash: string, sessionGeneration: number, now: number): Promise<SmspariazPreparedBet>;
+  claim(handle: string, principalHash: string, sessionGeneration: number, now: number, expectedProduct?: SmspariazPreparedBetProduct): Promise<SmspariazPreparedBet>;
   complete(handle: string, state: "SUCCEEDED" | "REJECTED" | "AMBIGUOUS", terminal: SmspariazPreparedBetTerminal): Promise<void>;
 }
 
@@ -56,8 +88,15 @@ function validateHandle(handle: string): void {
   if (!/^[A-Za-z0-9_-]{43}$/.test(handle)) throw new Error("PREPARED_BET_INVALID");
 }
 
-function claimRecord(record: SmspariazPreparedBet | null, principalHash: string, sessionGeneration: number, now: number): SmspariazPreparedBet {
+function claimRecord(
+  record: SmspariazPreparedBet | null,
+  principalHash: string,
+  sessionGeneration: number,
+  now: number,
+  expectedProduct: SmspariazPreparedBetProduct = "smsfootball",
+): SmspariazPreparedBet {
   if (!record) throw new Error("PREPARED_BET_INVALID");
+  if (record.product !== expectedProduct) throw new Error("PREPARED_BET_INVALID");
   if (record.state !== "PREPARED") throw new Error("PREPARED_BET_ALREADY_USED");
   if (Date.parse(record.expires_at) <= now) return { ...record, state: "EXPIRED" };
   if (record.principal_hash !== principalHash || record.session_generation !== sessionGeneration) throw new Error("PREPARED_BET_INVALID");
@@ -78,11 +117,11 @@ export class MemorySmspariazPreparedBetStore implements SmspariazPreparedBetStor
     const record = this.records.get(handle);
     return record ? structuredClone(record) : null;
   }
-  async claim(handle: string, principalHash: string, sessionGeneration: number, now: number): Promise<SmspariazPreparedBet> {
+  async claim(handle: string, principalHash: string, sessionGeneration: number, now: number, expectedProduct: SmspariazPreparedBetProduct = "smsfootball"): Promise<SmspariazPreparedBet> {
     validateHandle(handle);
     let output!: SmspariazPreparedBet;
     const next = this.operation.then(() => {
-      const claimed = claimRecord(this.records.get(handle) ?? null, principalHash, sessionGeneration, now);
+      const claimed = claimRecord(this.records.get(handle) ?? null, principalHash, sessionGeneration, now, expectedProduct);
       this.records.set(handle, claimed);
       if (claimed.state === "EXPIRED") throw new Error("PREPARED_BET_EXPIRED");
       output = structuredClone(claimed);
@@ -116,7 +155,7 @@ abstract class EncryptedPreparedStore implements SmspariazPreparedBetStore {
   }
   abstract create(record: SmspariazPreparedBet): Promise<void>;
   abstract get(handle: string): Promise<SmspariazPreparedBet | null>;
-  abstract claim(handle: string, principalHash: string, sessionGeneration: number, now: number): Promise<SmspariazPreparedBet>;
+  abstract claim(handle: string, principalHash: string, sessionGeneration: number, now: number, expectedProduct?: SmspariazPreparedBetProduct): Promise<SmspariazPreparedBet>;
   abstract complete(handle: string, state: "SUCCEEDED" | "REJECTED" | "AMBIGUOUS", terminal: SmspariazPreparedBetTerminal): Promise<void>;
 }
 
@@ -145,10 +184,10 @@ export class LocalFileSmspariazPreparedBetStore extends EncryptedPreparedStore {
     await this.write(record);
   }
   async get(handle: string) { return this.read(handle); }
-  async claim(handle: string, principalHash: string, sessionGeneration: number, now: number): Promise<SmspariazPreparedBet> {
+  async claim(handle: string, principalHash: string, sessionGeneration: number, now: number, expectedProduct: SmspariazPreparedBetProduct = "smsfootball"): Promise<SmspariazPreparedBet> {
     let output!: SmspariazPreparedBet;
     const next = this.operation.then(async () => {
-      const claimed = claimRecord(await this.read(handle), principalHash, sessionGeneration, now);
+      const claimed = claimRecord(await this.read(handle), principalHash, sessionGeneration, now, expectedProduct);
       await this.write(claimed);
       if (claimed.state === "EXPIRED") throw new Error("PREPARED_BET_EXPIRED");
       output = claimed;
@@ -186,10 +225,10 @@ export class NetlifySmspariazPreparedBetStore extends EncryptedPreparedStore {
     if (!result.modified) throw new Error("PREPARED_BET_INVALID");
   }
   async get(handle: string) { return (await this.read(handle)).record; }
-  async claim(handle: string, principalHash: string, sessionGeneration: number, now: number): Promise<SmspariazPreparedBet> {
+  async claim(handle: string, principalHash: string, sessionGeneration: number, now: number, expectedProduct: SmspariazPreparedBetProduct = "smsfootball"): Promise<SmspariazPreparedBet> {
     for (let attempt = 0; attempt < 5; attempt += 1) {
       const current = await this.read(handle);
-      const claimed = claimRecord(current.record, principalHash, sessionGeneration, now);
+      const claimed = claimRecord(current.record, principalHash, sessionGeneration, now, expectedProduct);
       const result = await this.store.setJSON(this.key(handle), this.encrypt(claimed), { onlyIfMatch: current.etag! });
       if (!result.modified) continue;
       if (claimed.state === "EXPIRED") throw new Error("PREPARED_BET_EXPIRED");

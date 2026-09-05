@@ -5,6 +5,7 @@ import {
   getMauritiusDate,
   getSmspariazDailyRacecard,
   parseSmspariazRacecardText,
+  SmspariazRacecardToolOutputSchema,
 } from "./smspariaz-racecard.js";
 
 const CURRENT_TEXT = `
@@ -64,6 +65,13 @@ function createTextPdf(text: string): Uint8Array {
 }
 
 describe("SMSPariaz daily racecard", () => {
+  it("exposes an MCP-compatible top-level object output schema", () => {
+    const internal = SmspariazRacecardToolOutputSchema as unknown as {
+      _zod?: { def?: { type?: string } };
+    };
+    assert.equal(internal._zod?.def?.type, "object");
+  });
+
   it("loads the Node PDF runtime lazily and extracts text without browser globals", async () => {
     const runtime = globalThis as unknown as Record<string, unknown>;
     const keys = ["DOMMatrix", "ImageData", "Path2D"] as const;

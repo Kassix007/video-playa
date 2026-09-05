@@ -12,7 +12,15 @@ export type SmspariazEventName =
   | "app_bet_guard_rejected"
   | "app_bet_submitting"
   | "app_bet_response"
-  | "app_bet_flow_changed";
+  | "app_bet_flow_changed"
+  | "peakpool_programme_retrieved"
+  | "peakpool_programme_failed"
+  | "peakpool_bet_prepared"
+  | "peakpool_bet_validation_failed"
+  | "peakpool_app_bet_guard_rejected"
+  | "peakpool_app_bet_submitting"
+  | "peakpool_app_bet_response"
+  | "peakpool_app_bet_flow_changed";
 
 export interface SmspariazSafeEventFields {
   request_id?: string;
@@ -31,6 +39,9 @@ export interface SmspariazSafeEventFields {
 export interface SmspariazSafeDiagnostics {
   configured?: boolean;
   app_bet_enabled?: boolean;
+  peakpool_enabled?: boolean;
+  peakpool_app_bet_enabled?: boolean;
+  peakpool_flow_valid?: boolean;
   session_present?: boolean;
   auth_valid?: boolean;
   app_registered?: boolean;
@@ -41,6 +52,10 @@ export interface SmspariazSafeDiagnostics {
   mobile_script_sha256?: string;
   root_mobile_script_sha256?: string;
   flow_fingerprint?: string;
+  peakpool_flow_fingerprint?: string;
+  peakpool_fixture_fingerprint?: string;
+  peakpool_site_script_sha256?: string;
+  peakpool_mobile_script_sha256?: string;
   last_error?: string;
   last_event_at?: string;
 }
@@ -54,7 +69,9 @@ const EVENT_KEYS = new Set<keyof SmspariazSafeEventFields>([
 const DIAGNOSTIC_KEYS = new Set<keyof SmspariazSafeDiagnostics>([
   "configured", "app_bet_enabled", "session_present", "auth_valid", "app_registered",
   "app_mode_detected", "session_state", "storage_kind", "site_script_sha256",
-  "mobile_script_sha256", "root_mobile_script_sha256", "flow_fingerprint",
+  "mobile_script_sha256", "root_mobile_script_sha256", "flow_fingerprint", "peakpool_enabled",
+  "peakpool_app_bet_enabled", "peakpool_flow_valid", "peakpool_flow_fingerprint",
+  "peakpool_fixture_fingerprint", "peakpool_site_script_sha256", "peakpool_mobile_script_sha256",
   "last_error", "last_event_at",
 ]);
 

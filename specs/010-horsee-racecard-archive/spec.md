@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-21
 
-**Status**: Implemented and locally verified; deployment verification pending
+**Status**: Implemented, locally verified, and production verified
 
 **Input**: User description: "Add a read-only current SMSPariaz racecard tool for HORSEE, show all of today's Council analyses on Equidia, and provide a historical analysis calendar without breaking authentication, saves, latest-result lookup, or existing history consumers."
 
@@ -81,6 +81,8 @@ As an existing HORSEE client, I want authentication, result saving, latest-resul
 
 - The official programme redirects before returning the document or returns a response whose content is not a programme document.
 - The deployed serverless artifact contains the parser code but omits the PDF.js worker that the parser imports dynamically.
+- A function artifact built on Windows contains a Windows-only canvas binding and then runs on Netlify Linux, causing `Failed to load native binding` before text extraction.
+- A successful racecard reaches MCP output validation with a discriminated-union schema even though the SDK requires a top-level object schema, causing an internal `_zod` error instead of returning data.
 - The programme's printed date is absent, malformed, or differs from the Mauritius date around midnight in another timezone.
 - Text extraction splits race headings, times, horse names, or track labels across lines and pages.
 - Two races from different meetings share a race number or scheduled time.
@@ -122,6 +124,8 @@ As an existing HORSEE client, I want authentication, result saving, latest-resul
 - **FR-025**: Automated racecard and archive tests MUST use controlled fixtures or stubs and MUST NOT depend on the live SMSPariaz site or current production storage.
 - **FR-026**: Loading the HORSEE MCP MUST NOT require browser-only PDF globals; parser dependencies MUST load only when the racecard operation runs, and a parser failure MUST remain isolated to that operation.
 - **FR-027**: The deployed HORSEE MCP function MUST bundle the PDF.js worker at the module path used by the racecard parser so a valid official programme can be parsed without relying on files outside the serverless artifact.
+- **FR-028**: Racecard text extraction MUST NOT depend on a host-platform native canvas binding; a function assembled on Windows MUST run unchanged on Netlify Linux and isolate compatibility globals to the lazy text-extraction path.
+- **FR-029**: The racecard MCP tool MUST declare an SDK-compatible top-level object output schema while preserving strict success/failure validation before returning structured content.
 
 ### Key Entities
 
@@ -147,6 +151,8 @@ As an existing HORSEE client, I want authentication, result saving, latest-resul
 - **SC-009**: The production build completes successfully and the affected Equidia flows show no application runtime errors during desktop, tablet, and mobile browser checks.
 - **SC-010**: A production-equivalent Node function bundle initializes the MCP and advertises its existing tools without a `DOMMatrix`, `ImageData`, or `Path2D` startup failure.
 - **SC-011**: The production-equivalent MCP archive contains `pdfjs-dist/legacy/build/pdf.worker.mjs`, and the deployed racecard tool returns the current structured programme instead of a missing-worker error.
+- **SC-012**: The production function built from Windows contains no required host-specific canvas binding, and the deployed racecard tool parses a current non-empty programme without `Failed to load native binding`.
+- **SC-013**: A successful deployed tool call passes MCP output validation and returns structured counts without an internal `_zod` error.
 
 ## Assumptions
 
@@ -163,4 +169,7 @@ As an existing HORSEE client, I want authentication, result saving, latest-resul
 - The production build and lint checks completed successfully.
 - Desktop, tablet, and 360-pixel browser checks exercised Today, month navigation, populated-date selection, analysis expansion, and empty states with no page-level horizontal overflow.
 - The production MCP startup failure caused by a missing native PDF.js canvas dependency was reproduced, the parser was made lazy and Node-compatible, and the Netlify MCP artifact was verified to contain the canvas runtime; 60 backend tests, ESLint, and the production build passed.
-- The subsequent deployed racecard-call failure caused by an omitted `pdf.worker.mjs` was reproduced at the artifact boundary. A full offline Netlify build now contains `node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs`; 61 backend tests, ESLint, the production build, and a live 7-meeting/51-race/31-French-race source parse passed locally. Deployed tool-call verification remains pending until this follow-up is published.
+- The subsequent deployed racecard-call failure caused by an omitted `pdf.worker.mjs` was reproduced at the artifact boundary. A full offline Netlify build contains `node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs`; 61 backend tests, ESLint, the production build, and a live 7-meeting/51-race/31-French-race source parse passed locally before the final production recovery below.
+- On 2026-09-04, a Windows-built production function exposed a host-native `@napi-rs/canvas` mismatch and then an MCP discriminated-union output-schema incompatibility. The text-only parser now installs platform-neutral lazy PDF.js compatibility constructors, the function no longer externalizes the native canvas package, and the handler strictly parses the detailed response before validating it through an SDK-compatible object schema.
+- Final release gates passed: **231/231** backend tests, full ESLint, production build, and `git diff --check` (line-ending warnings only).
+- Netlify production deploy `6a9b081d7f2d7b009fb4a059` passed a direct MCP client smoke call. `get_smspariaz_daily_racecard` was discovered and returned the current `2026-09-04` programme with **7 meetings, 52 races, and 26 French races**, without native-binding, worker, or `_zod` errors.

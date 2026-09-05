@@ -2,6 +2,12 @@ import { createHash } from "node:crypto";
 import type { SmspariazConfig } from "./smspariaz-config.js";
 import type { SmspariazObservability } from "./smspariaz-observability.js";
 import type { SmspariazCookie } from "./smspariaz-session-store.js";
+import {
+  assertPeakpoolAppBetRequest,
+  type PeakpoolAppBetRequest,
+  type PeakpoolAppFlowVerification,
+  verifyPeakpoolAppFlowEvidence,
+} from "./peakpool-flow-profile.js";
 import { APP_BET_ALLOWED_ENDPOINTS, AUDITED_SMSPARIAZ_FLOW } from "./test-fixtures/smspariaz/flow-fixtures.js";
 
 export type SmspariazErrorCode =
@@ -20,6 +26,12 @@ export type SmspariazErrorCode =
   | "PREPARED_BET_ALREADY_USED"
   | "APP_BET_DISABLED"
   | "APP_BET_FLOW_CHANGED"
+  | "PEAKPOOL_PROGRAMME_UNAVAILABLE"
+  | "PEAKPOOL_PROGRAMME_INVALID"
+  | "PEAKPOOL_SELECTION_INVALID"
+  | "PEAKPOOL_FIXTURE_CHANGED"
+  | "PEAKPOOL_APP_BET_DISABLED"
+  | "PEAKPOOL_APP_FLOW_CHANGED"
   | "PROVIDER_REJECTED"
   | "PROVIDER_UNAVAILABLE"
   | "SUBMISSION_AMBIGUOUS"
@@ -178,13 +190,19 @@ export class SmspariazProviderClient {
     }
   }
 
-  private async postForm(path: string, form: URLSearchParams, cookies: SmspariazCookie[] = []) {
+  private async postForm(
+    path: string,
+    form: URLSearchParams,
+    cookies: SmspariazCookie[] = [],
+    referrerPath = "/smsfootball/",
+  ) {
+    const referrer = this.resolve(referrerPath);
     return this.request(path, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         Origin: this.origin.origin,
-        Referer: new URL("/smsfootball/", this.origin).href,
+        Referer: referrer.href,
       },
       body: form.toString(),
     }, cookies);
@@ -278,6 +296,26 @@ export class SmspariazProviderClient {
     return this.postForm(path, new URLSearchParams(fields), cookies);
   }
 
+  /**
+   * The only Peakpool egress method. It accepts a capability-like object made
+   * by `buildPeakpoolAppBetRequest`, not a raw endpoint or form body.  The
+   * SMSFootball generic form helper remains intentionally unable to send this
+   * product's direct compact message.
+   */
+  async postPeakpoolAppBet(request: PeakpoolAppBetRequest, cookies: SmspariazCookie[] = []) {
+    try {
+      assertPeakpoolAppBetRequest(request);
+    } catch {
+      this.telemetry?.emit("peakpool_app_bet_guard_rejected", { error_code: "PEAKPOOL_APP_FLOW_CHANGED" });
+      throw new SmspariazProviderError("PEAKPOOL_APP_FLOW_CHANGED", "Peakpool submission request no longer matches the audited product profile.");
+    }
+    if (this.origin.origin !== request.origin) {
+      this.telemetry?.emit("peakpool_app_bet_guard_rejected", { error_code: "PEAKPOOL_APP_FLOW_CHANGED" });
+      throw new SmspariazProviderError("PEAKPOOL_APP_FLOW_CHANGED", "Peakpool provider origin is not approved.");
+    }
+    return this.postForm(request.path, new URLSearchParams(request.fields), cookies, "/peakpool/");
+  }
+
   async verifyAppFlow(): Promise<SmspariazFlowVerification> {
     const [site, footballMobile, rootMobile] = await Promise.all([
       this.getText(AUDITED_SMSPARIAZ_FLOW.paths.siteScript),
@@ -300,5 +338,24 @@ export class SmspariazProviderClient {
     })).digest("hex");
     if (!valid) this.telemetry?.emit("app_bet_flow_changed", { error_code: "APP_BET_FLOW_CHANGED", flow_fingerprint: fingerprint });
     return { valid, fingerprint, observed };
+  }
+
+  async verifyPeakpoolAppFlow(): Promise<PeakpoolAppFlowVerification> {
+    const [site, rootMobile] = await Promise.all([
+      this.getText("/js/site.js?v=1.590"),
+      this.getText("/js/mobile.js"),
+    ]);
+    const observed = {
+      site: createHash("sha256").update(site).digest("hex"),
+      root_mobile: createHash("sha256").update(rootMobile).digest("hex"),
+    };
+    const verification = verifyPeakpoolAppFlowEvidence(observed);
+    if (!verification.valid) {
+      this.telemetry?.emit("peakpool_app_bet_flow_changed", {
+        error_code: "PEAKPOOL_APP_FLOW_CHANGED",
+        flow_fingerprint: verification.fingerprint,
+      });
+    }
+    return verification;
   }
 }

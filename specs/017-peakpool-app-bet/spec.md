@@ -4,9 +4,21 @@
 
 **Created**: 2026-09-01
 
-**Status**: Planned — implementation gated on provider-flow verification
+**Status**: Implementation verified and default-disabled — activation remains gated on owner-authorized no-cash provider-flow verification
 
 **Input**: User description: "Analyse horse racing Peakpool place bet by app and implementation plan." The product owner clarified that Peakpool uses a fixed, non-cash unit balance and leaderboard winnings; it is not a real-money wallet, deposit, withdrawal, or SMS-paid product.
+
+## Delivery Verification (2026-09-04)
+
+- Requirements checklist: **16/16 passed**.
+- Repository test suite: **231/231 passed**; all placement-capable transports are injected or mocked and no automated test sends a production request.
+- Production build: **passed** with only the existing Vite chunk-size advisory.
+- `git diff --check`: **passed** with Windows line-ending warnings only.
+- Default state: `PEAKPOOL_ENABLED=false`, `PEAKPOOL_APP_BET_ENABLED=false`, and `PEAKPOOL_APP_BET_VERIFIED=false` in the documented example; placement requires both explicit placement flags plus complete encrypted-session configuration.
+- Security review: product-bound prepared handles, separate prepare/place OAuth scopes, fixed HTTPS origin and route, redirect rejection, server-generated closed-world fields/messages, atomic one-attempt claims, terminal ambiguity, and redacted telemetry are implemented and covered by the green suite.
+- Documentation: environment variables, MCP tools, safe errors, drift response, and the exact owner-authorized no-cash verification gate are recorded in `docs/peakpool-app-bet.md` and `quickstart.md`.
+
+Task reconciliation: **35 of 36 complete**. T036 remains open because shared files currently contain overlapping feature-018 and pre-existing user changes, so an isolated feature-017 commit/push cannot be created safely without deliberate partitioning. This does not enable provider placement; live activation remains a separate manual gate under FR-016.
 
 ## User Scenarios & Testing *(mandatory)*
 

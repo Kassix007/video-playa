@@ -68,6 +68,24 @@ export const SmspariazRacecardResponseSchema = z.discriminatedUnion("success", [
   SmspariazRacecardFailureSchema,
 ]);
 
+// The MCP SDK normalizes tool output schemas as top-level object schemas. Keep
+// this protocol declaration object-shaped, while the handler separately parses
+// the stricter discriminated union above before returning structured content.
+export const SmspariazRacecardToolOutputSchema = z.object({
+  success: z.boolean(),
+  programme_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  timezone: z.literal(MAURITIUS_TIMEZONE),
+  fetched_at: z.string().min(1),
+  source: z.literal(SMSPARIAZ_RACECARD_SOURCE),
+  meeting_count: z.number().int().nonnegative().optional(),
+  race_count: z.number().int().nonnegative().optional(),
+  french_race_count: z.number().int().nonnegative().optional(),
+  meetings: z.array(SmspariazMeetingSchema).optional(),
+  races: z.array(SmspariazRaceSchema).optional(),
+  error_code: SmspariazRacecardErrorCodeSchema.optional(),
+  error: z.string().min(1).optional(),
+}).strict();
+
 export type SmspariazRace = z.infer<typeof SmspariazRaceSchema>;
 export type SmspariazRacecardSuccess = z.infer<typeof SmspariazRacecardSuccessSchema>;
 export type SmspariazRacecardFailure = z.infer<typeof SmspariazRacecardFailureSchema>;
@@ -304,12 +322,33 @@ export function parseSmspariazRacecardText(text: string): SmspariazRace[] {
 
 async function loadPdfParser(): Promise<typeof import("pdf-parse")> {
   const runtime = globalThis as unknown as Record<string, unknown>;
-  if (!runtime.DOMMatrix || !runtime.ImageData || !runtime.Path2D) {
-    const canvas = await import("@napi-rs/canvas");
-    runtime.DOMMatrix ??= canvas.DOMMatrix;
-    runtime.ImageData ??= canvas.ImageData;
-    runtime.Path2D ??= canvas.Path2D;
+
+  // PDF.js checks these browser rendering constructors while its Node module is
+  // initialized, even when callers only request text. The racecard path never
+  // renders pages, images, or paths, so platform-native canvas bindings are both
+  // unnecessary and unsafe to package from a Windows host for Netlify Linux.
+  // Minimal constructors satisfy the lazy text-only path; any future rendering
+  // requirement must introduce and test a separate runtime explicitly.
+  class PdfTextOnlyDOMMatrix {
+    readonly a = 1;
+    readonly b = 0;
+    readonly c = 0;
+    readonly d = 1;
+    readonly e = 0;
+    readonly f = 0;
+
+    constructor() {}
   }
+  class PdfTextOnlyImageData {
+    constructor() {}
+  }
+  class PdfTextOnlyPath2D {
+    constructor() {}
+  }
+
+  runtime.DOMMatrix ??= PdfTextOnlyDOMMatrix;
+  runtime.ImageData ??= PdfTextOnlyImageData;
+  runtime.Path2D ??= PdfTextOnlyPath2D;
   return import("pdf-parse");
 }
 

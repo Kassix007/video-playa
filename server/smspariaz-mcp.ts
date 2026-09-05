@@ -2,6 +2,13 @@ import { randomUUID } from "node:crypto";
 import type { AuthInfo } from "@modelcontextprotocol/sdk/server/auth/types.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import type {
+  PeakpoolAppBetService,
+  PeakpoolPlacementOutput,
+  PreparedPeakpoolAppBetOutput,
+} from "./peakpool-app-bet.js";
+import type { PeakpoolConfig } from "./peakpool-config.js";
+import { PeakpoolProgrammeSchema } from "./peakpool-programme.js";
 import type { SmspariazAppBetService } from "./smspariaz-app-bet.js";
 import type { SmspariazConfig } from "./smspariaz-config.js";
 import { SmsfootballProgrammeSchema, type SmspariazFootballClient } from "./smspariaz-football.js";
@@ -50,6 +57,34 @@ const PlacementOutputSchema = z.object({
   submitted_via: z.literal("smspariaz_app_flow"),
 }).strict();
 
+const PeakpoolSelectionOutputSchema = z.object({
+  meeting_number: z.string(),
+  race_number: z.string(),
+  runner_number: z.string(),
+  selection_code: z.string(),
+  bet_type: z.enum(["win", "place"]),
+  runner_name: z.string(),
+  displayed_pool_value: z.string().optional(),
+}).strict();
+
+const PeakpoolPreparedOutputSchema = z.object({
+  prepared_bet: z.string(),
+  expires_at: z.string(),
+  selection: PeakpoolSelectionOutputSchema,
+  unit_stake: z.number().int().positive(),
+  displayed_pool_value: z.string().optional(),
+  fixture_fingerprint: z.string(),
+  submitted: z.literal(false),
+}).strict();
+
+const PeakpoolPlacementOutputSchema = z.object({
+  success: z.literal(true),
+  reference: z.null(),
+  confirmation: z.string(),
+  unit_stake: z.number().int().positive(),
+  submitted_via: z.literal("smspariaz_peakpool_app_flow"),
+}).strict();
+
 const READ_ONLY = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true } as const;
 const STATE_WRITE = { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true } as const;
 const LOGOUT = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false } as const;
@@ -61,6 +96,13 @@ export interface SmspariazAuthPolicy {
   resourceMetadataUrl: string;
   sessionScope: string;
   appBetScope: string;
+  peakpoolPrepareScope: string;
+  peakpoolPlaceScope: string;
+}
+
+export interface PeakpoolRuntime {
+  readonly config: PeakpoolConfig;
+  readonly appBet: PeakpoolAppBetService;
 }
 
 function maskAccount(phone: string): string {
@@ -102,7 +144,10 @@ export class SmspariazSubsystem {
     private readonly appBet: SmspariazAppBetService,
     private readonly telemetry: SmspariazObservability,
     private readonly now: () => number = Date.now,
+    private readonly peakpool?: PeakpoolRuntime,
   ) {}
+
+  get peakpoolConfigured(): boolean { return this.peakpool?.config.configured === true; }
 
   async sessionStatus(validate = true) {
     const record = await this.sessionStore.get();
@@ -218,6 +263,29 @@ export class SmspariazSubsystem {
     }
   }
 
+  private requirePeakpool(): PeakpoolRuntime {
+    if (!this.peakpool?.config.configured) throw new Error("NOT_CONFIGURED");
+    return this.peakpool;
+  }
+
+  async getPeakpoolProgramme() {
+    return this.requirePeakpool().appBet.getProgramme();
+  }
+
+  async preparePeakpool(principal: string, input: Parameters<PeakpoolAppBetService["prepare"]>[2]): Promise<PreparedPeakpoolAppBetOutput> {
+    return this.requirePeakpool().appBet.prepare(await this.requireSession(), principal, input);
+  }
+
+  async placePeakpool(principal: string, preparedBet: string, approved: boolean): Promise<PeakpoolPlacementOutput> {
+    const session = await this.requireSession();
+    try {
+      return await this.requirePeakpool().appBet.place(session, principal, preparedBet, approved);
+    } catch (error) {
+      if (error instanceof Error && error.message === "SESSION_EXPIRED") await this.expireSession(session);
+      throw error;
+    }
+  }
+
   async debugStatus() {
     const record = await this.sessionStore.get();
     let flow: Awaited<ReturnType<SmspariazProviderClient["verifyAppFlow"]>> | null = null;
@@ -235,6 +303,37 @@ export class SmspariazSubsystem {
       site_script_sha256: flow?.observed.site ?? null,
       mobile_script_sha256: flow?.observed.footballMobile ?? null,
       root_mobile_script_sha256: flow?.observed.rootMobile ?? null,
+      flow_fingerprint: flow?.fingerprint ?? null,
+      last_error: this.telemetry.getDiagnostics().last_error ?? null,
+    };
+  }
+
+  async debugPeakpoolStatus() {
+    const runtime = this.requirePeakpool();
+    const record = await this.sessionStore.get();
+    let flow: Awaited<ReturnType<SmspariazProviderClient["verifyPeakpoolAppFlow"]>> | null = null;
+    try { flow = await this.provider.verifyPeakpoolAppFlow(); } catch { /* diagnostics remains safe */ }
+    const status = publicStatus(record);
+    this.telemetry.updateDiagnostics({
+      peakpool_enabled: runtime.config.enabled,
+      peakpool_app_bet_enabled: runtime.config.appBetEnabled,
+      peakpool_flow_valid: flow?.valid ?? false,
+      peakpool_flow_fingerprint: flow?.fingerprint,
+      peakpool_site_script_sha256: flow?.observed.site,
+      peakpool_mobile_script_sha256: flow?.observed.root_mobile,
+    });
+    return {
+      configured: runtime.config.configured,
+      app_bet_enabled: runtime.config.appBetEnabled,
+      verification_acknowledged: runtime.config.verificationAcknowledged,
+      session_present: record !== null && record.state !== "LOGGED_OUT",
+      auth_valid: status.authenticated,
+      app_registered: status.app_registered,
+      app_mode_detected: flow?.valid ?? false,
+      session_state: status.state,
+      storage_kind: this.sessionStore.kind,
+      site_script_sha256: flow?.observed.site ?? null,
+      mobile_script_sha256: flow?.observed.root_mobile ?? null,
       flow_fingerprint: flow?.fingerprint ?? null,
       last_error: this.telemetry.getDiagnostics().last_error ?? null,
     };
@@ -267,6 +366,8 @@ const SAFE_CODES = new Set([
   "INVALID_SELECTION", "INVALID_STAKE", "EVENT_CLOSED", "ODDS_CHANGED", "PREPARED_BET_INVALID",
   "PREPARED_BET_EXPIRED", "PREPARED_BET_ALREADY_USED", "APP_BET_DISABLED",
   "APP_BET_FLOW_CHANGED", "PROVIDER_REJECTED", "PROVIDER_UNAVAILABLE", "SUBMISSION_AMBIGUOUS",
+  "PEAKPOOL_PROGRAMME_UNAVAILABLE", "PEAKPOOL_PROGRAMME_INVALID", "PEAKPOOL_SELECTION_INVALID",
+  "PEAKPOOL_FIXTURE_CHANGED", "PEAKPOOL_APP_BET_DISABLED", "PEAKPOOL_APP_FLOW_CHANGED",
 ]);
 
 function safeCode(error: unknown): string {
@@ -301,6 +402,8 @@ function handler(
 export function registerSmspariazTools(server: McpServer, subsystem: SmspariazSubsystem, policy: SmspariazAuthPolicy): void {
   const sessionScheme = security(policy.sessionScope);
   const appBetScheme = security(policy.appBetScope);
+  const peakpoolPrepareScheme = security(policy.peakpoolPrepareScope);
+  const peakpoolPlaceScheme = security(policy.peakpoolPlaceScope);
   const noauth = security();
   server.registerTool("smspariaz_session_status", {
     title: "Check SMSPariaz session", description: "Validate the persisted SMSPariaz app session without exposing its credentials.",
@@ -352,4 +455,41 @@ export function registerSmspariazTools(server: McpServer, subsystem: SmspariazSu
     title: "Diagnose SMSPariaz integration", description: "Return safe session, app-mode, script-hash, flow, and last-error diagnostics without secrets.",
     inputSchema: z.object({}).strict(), annotations: READ_ONLY, _meta: { securitySchemes: sessionScheme },
   }, handler(policy, policy.sessionScope, async () => subsystem.debugStatus()) as never);
+
+  if (!subsystem.peakpoolConfigured) return;
+
+  server.registerTool("smspariaz_get_peakpool", {
+    title: "Get Peakpool horse-racing programme",
+    description: "Read the current authoritative Peakpool fixture and derived runner selection codes. This never authenticates or submits a ticket.",
+    inputSchema: z.object({}).strict(), outputSchema: PeakpoolProgrammeSchema, annotations: READ_ONLY,
+    _meta: { securitySchemes: noauth },
+  }, handler(policy, undefined, async () => subsystem.getPeakpoolProgramme()) as never);
+
+  server.registerTool("smspariaz_prepare_peakpool_app_bet", {
+    title: "Prepare Peakpool virtual-unit ticket",
+    description: "Validate one current Peakpool Win or Place selection and create a short-lived preview. It never submits a ticket or accepts a raw provider message.",
+    inputSchema: z.object({
+      unit_stake: z.number().int().min(1).max(1_000_000),
+      selection: z.object({
+        meeting_number: z.string().min(1).max(20),
+        race_number: z.string().min(1).max(20),
+        runner_number: z.string().min(1).max(20),
+        bet_type: z.enum(["win", "place"]),
+      }).strict(),
+    }).strict(), outputSchema: PeakpoolPreparedOutputSchema, annotations: STATE_WRITE,
+    _meta: { securitySchemes: peakpoolPrepareScheme },
+  }, (async (input: Parameters<SmspariazSubsystem["preparePeakpool"]>[1], extra: { authInfo?: AuthInfo }) => handler(policy, policy.peakpoolPrepareScope, async (auth) => subsystem.preparePeakpool(principal(auth!), input))(undefined, extra)) as never);
+
+  server.registerTool("smspariaz_place_peakpool_app_bet", {
+    title: "Place approved Peakpool virtual-unit ticket",
+    description: "Submit one prepared Peakpool ticket only through the guarded virtual-unit app profile after explicit approval. It cannot use wallet, SMS, cash, deposit, withdrawal, or generic message routes.",
+    inputSchema: z.object({ prepared_bet: z.string().regex(/^[A-Za-z0-9_-]{43}$/), approved: z.literal(true) }).strict(),
+    outputSchema: PeakpoolPlacementOutputSchema, annotations: PLACE, _meta: { securitySchemes: peakpoolPlaceScheme },
+  }, (async ({ prepared_bet, approved }: { prepared_bet: string; approved: true }, extra: { authInfo?: AuthInfo }) => handler(policy, policy.peakpoolPlaceScope, async (auth) => subsystem.placePeakpool(principal(auth!), prepared_bet, approved))(undefined, extra)) as never);
+
+  server.registerTool("smspariaz_debug_peakpool_status", {
+    title: "Diagnose Peakpool integration",
+    description: "Return safe Peakpool configuration, app-profile, and shared session diagnostics without tokens, cookies, raw messages, or balances.",
+    inputSchema: z.object({}).strict(), annotations: READ_ONLY, _meta: { securitySchemes: sessionScheme },
+  }, handler(policy, policy.sessionScope, async () => subsystem.debugPeakpoolStatus()) as never);
 }

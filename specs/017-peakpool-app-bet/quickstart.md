@@ -26,3 +26,29 @@ Only after the product owner authorizes it:
 5. Confirm that a single attempt returns a reference/outcome and that repeating the same prepared handle is blocked locally.
 
 No laptop needs to remain online after the hosted session is established.
+
+## Exact production flags and scopes
+
+Configure the shared encrypted SMSPariaz session foundation first. Peakpool then uses:
+
+```text
+PEAKPOOL_ENABLED=true
+PEAKPOOL_APP_BET_ENABLED=false
+PEAKPOOL_APP_BET_VERIFIED=false
+HORSEE_OAUTH_PEAKPOOL_PREPARE_SCOPE=horsee:peakpool:prepare
+HORSEE_OAUTH_PEAKPOOL_PLACE_SCOPE=horsee:peakpool:place
+```
+
+`PEAKPOOL_ENABLED=true` exposes the isolated programme/preparation surface only when the shared encrypted session configuration is complete. Keep both placement flags false until the authorized test above has captured and reviewed the current request and response. Enabling placement requires both flags to be true; either missing flag keeps it disabled.
+
+## Re-audit after provider drift
+
+If diagnostics report `PEAKPOOL_APP_FLOW_CHANGED` or `PEAKPOOL_FIXTURE_CHANGED`:
+
+1. set `PEAKPOOL_APP_BET_ENABLED=false` immediately;
+2. preserve only redacted request-shape, response-shape, and script-hash evidence from the authorized no-cash environment;
+3. update the sanitized fixture and immutable profile—never loosen origin, redirect, route, field, raw-message, or product checks;
+4. run `npm run test:mcp`, `npm run build`, and `git diff --check`;
+5. repeat the owner-authorized no-cash verification before setting either activation acknowledgement.
+
+Automated tests must continue to use injected transports and must never call the production placement endpoint.

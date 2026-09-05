@@ -9,7 +9,6 @@
   node_bundler = "esbuild"
 
 [functions.mcp]
-  external_node_modules = ["@napi-rs/canvas"]
   included_files = ["node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs"]
 
 [[redirects]]
