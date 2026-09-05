@@ -278,6 +278,22 @@
 
 ## Dependencies & Execution Order
 
+### Free PMU replacement
+
+- [ ] T100 Verify PMU programme, participant, final-arrival and definitive NATIONAL SIMPLE_GAGNANT shapes/units; capture minimal factual fixtures.
+- [x] T101 Implement/test strict PMU matching, finality, dividend normalization, pool isolation and dead-heat handling.
+- [x] T102 Add bounded protected PMU worker with non-mutating smoke mode, without reusing the unfinished ATR/Zone-Turf worker.
+- [ ] T103 Add/test transactional PMU settlement and explicit pricing-basis migration, preserving settled history and guarding pending legacy bets.
+- [ ] T104 Complete UI pricing labels/automatic refresh and verification, then deploy and commit tested changes only.
+
+### Automatic results completion
+
+- [ ] T095 Verify configured retrieval using bounded actual ATR pages; add real-layout parser fixtures only from successful retrieval.
+- [ ] T096 Add tested visibility-aware automatic browser refresh with stale-session guards and retained UI state.
+- [ ] T097 Add and test a forward-only all-winner settlement evidence guard before any wallet/bet changes.
+- [ ] T098 Bound worker retrieval and redact transport errors; verify source access without manufacturing results.
+- [ ] T099 Run repository/build/database and responsive checks, reconcile artifacts, and deploy/commit verified work; report any source-access blocker explicitly.
+
 ### Result-validation follow-up (independent of payout activation)
 
 - [X] T091 Add failing Node/Edge regressions for the supplied challenge, absent/wrong identity, invalid time, duplicate/unmatched runner fields, and void matching. *(Four regression groups failed before implementation.)*

@@ -35,6 +35,22 @@ Historical task reconciliation before payout activation: **84 of 85 tasks comple
 
 ## Clarifications
 
+### Session 2026-09-06 — free PMU replacement (supersedes ATR-only pricing)
+
+- The owner requires no paid provider, proxy, subscription, or account. PMU public read-only JSON replaces ATR as the automatic result source where coverage is proven; the SMSPariaz daily PDF remains the sole race universe.
+- Fantasy returns use PMU NATIONAL SIMPLE_GAGNANT definitive per-euro dividends, never provisional odds or a different pool chosen opportunistically. Gross credit is stake multiplied by the verified per-unit dividend. Published dead-heat dividends already account for the pool split and MUST NOT be divided again or have stake added again.
+- Historical settled results remain unchanged. Pending legacy ATR selections require an explicit operator migration decision before PMU repricing; no silent retrospective rule change.
+- All winners, runner identities, non-runners, race date/course/time/name, final-arrival and definitive-dividend flags must agree before mutation. Missing coverage stays visible and pending/review.
+- Availability of a public endpoint is not a data-use licence or uptime guarantee. No authentication, wagers, CAPTCHA solving, or undisclosed endpoint bypass is authorized.
+
+### PMU acceptance outcomes
+
+1. A finalized La Teste fixture with winner 4 and a 500-cent per-euro dividend normalizes to 5.00; stake 10.00 yields gross 50.00, not 60.00.
+2. Two declared joint winners each use their published dividend with no second divisor.
+3. Missing/duplicate/mismatched prices, different pools, partial results, ambiguous races and malformed identities cause no bet, balance or ledger mutation.
+4. Provider meeting numbers need not match SMSPariaz meeting numbers; full canonical identity and runner checks are required.
+5. Scheduled retrieval uses bounded reads and one programme per date per invocation. Visible pages refresh balances, bets and leaderboard automatically.
+
 ### Session 2026-09-04
 
 - Q: How should At The Races' finalized starting price affect fantasy payouts? → A: Originally locked pre-race pricing; superseded by the 2026-09-05 decision below.
@@ -254,6 +270,9 @@ As the maintainer, I want bounded result checks, source-controlled setup, and fa
 - **FR-060**: The programme MUST show the complete canonical PDF race count while rendering one meeting at a time; race headers MUST be collapsed initially, keyboard operable, expose expansion state, and mount runner rows only while expanded.
 - **FR-061**: Access-challenge responses MUST produce review-only observations with zero match confidence, no extracted winners or non-runners, and a bounded diagnostic instead of executable page content. Requested race metadata MUST NOT count as independently observed identity.
 - **FR-062**: Automatic confirmation and voiding MUST require identity extracted from the response itself: date, course, timezone-qualified scheduled time, race number, and the canonical race name when known. Missing, conflicting, duplicate, or unmatched runner evidence MUST withhold all settlement actions. A transport-only smoke response MUST NOT claim settlement readiness.
+- **FR-063**: While the page is visible, settled bets, balances, ledger, and leaderboard MUST refresh automatically within 30 seconds under normal connectivity, without clearing the selected meeting, race expansion, or stake input. Hidden pages MUST pause polling; returning to the page MUST refresh promptly. Responses from a previous signed-in identity MUST never restore private data.
+- **FR-064**: Before any settlement mutation, every declared winner MUST match a unique finalized ATR observation row with a valid price; provider, race ownership, winner set, and dead-heat count MUST agree even when nobody backed a winner. Invalid evidence MUST leave all pending bets and balances unchanged.
+- **FR-065**: Results retrieval MUST have bounded time, response size, and per-invocation work. Existing operator-configured retrieval may be verified, but no new paid provider, subscription, credentials purchase, or alternate odds authority is authorized by this follow-up.
 
 ### Result-validation follow-up acceptance (2026-09-05)
 

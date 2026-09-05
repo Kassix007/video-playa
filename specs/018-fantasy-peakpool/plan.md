@@ -6,6 +6,8 @@
 
 ## Summary
 
+**2026-09-06 amendment:** PMU supersedes ATR for future automatic results. Implement a separate dependency-free PMU adapter and protected `fantasy-pmu-result-checker` Edge worker; preserve unrelated unfinished ATR/Zone-Turf edits. Only allow public `online.turfinfo.api.pmu.fr/rest/client/1/programme` GETs. Match daily meetings/courses by independently observed metadata and complete participant identities. Require definitive arrival and NATIONAL SIMPLE_GAGNANT reports, `dividendeUnite=PourUnEuro`, consistent cent-denominated base-stake/per-euro values, and exact winner sets. Store provider-specific per-unit payout evidence, never pretend a PMU dividend is ATR SP. Forward SQL must validate all evidence before transaction mutations, preserve past settlements, and gate pending legacy repricing. Deploy in read-only smoke mode before any scheduled activation.
+
 Add `#/peakpool` as a fantasy-only Video Playa destination backed by Supabase Auth and Postgres. The browser uses Google sign-in, a publishable Supabase key, RLS-protected reads, and narrowly granted transactional RPCs. Postgres owns exact balances, immutable ledger entries, roles, locked quotes, idempotent placement, result evidence, and settlement. A protected Netlify read-only synchronizer reuses the canonical Node racecard parser and reconciles it with the public Peakpool runner feed; Supabase Cron/Edge orchestrates bounded result checks.
 
 Research did not establish how SMSPariaz `horse.type` values convert to decimal prices. The implementation therefore keeps those values unavailable and never uses them for payout. A pending fantasy WIN bet records only the active runner, exact stake, and acceptance evidence. After the race, a strongly matched finalized ATR result supplies the winner and fractional starting price; settlement converts that bounded price deterministically to a decimal multiplier and retains both forms as payout evidence. Missing or malformed ATR winner prices withhold settlement for review.
@@ -171,6 +173,10 @@ docs/fantasy-peakpool.md
 Pass. The artifacts retain a distinct owning specification, make responsive/accessibility validation explicit, add no media privileges, and define complete verification gates. The design's forced unavailable states are required by the fail-closed product brief and do not weaken the acceptance criteria.
 
 ## Complexity Tracking
+
+### Automatic updates and settlement completion
+
+Use visibility-aware 30-second browser refresh with in-flight coalescing, stale-session response guards, and retained programme/betslip state. Add a forward-only pre-settlement evidence guard before the existing transactional settlement function. Verify real ATR retrieval and fixtures before deployment; a challenge remains a blocker for acquisition, not grounds to weaken matching. Preserve and inspect existing proxy configuration without purchasing or introducing another service. Bounded transport and redacted worker diagnostics protect runtime limits and credentials.
 
 ### Result-validation follow-up (2026-09-05)
 
