@@ -89,6 +89,12 @@ The application restores the Supabase session at the root and then uses `#/peakp
 
 ## First administrator
 
+On 2026-09-06 the owner explicitly authorized Mechtomine as administrator. A unique profile was resolved and promoted by exact UUID in a trusted SQL session, with an `ADMIN_BOOTSTRAP` audit in the same statement. No wallet or bet was changed. The real browser session subsequently displayed Admin, player balances, result evidence and audit history.
+
+That check found that the settings editor initialized hard-coded defaults instead of reading saved values. Follow-up T109 adds protected settings retrieval and saved-value initialization, preserves result-check timings, blocks the form without a valid snapshot, and leaves balance-adjustment recipients unselected. Regression coverage: 259 repository tests, 141 database assertions and a successful production build. Production settings must not be saved merely to test the form.
+
+T109 production verification: Netlify `6a9d800e1555bbbcde84c239` and migration `202609060005` are live. The actual administrator session displays betting enabled, minimum stake 35, starting balance 1000, no maximum stake, close buffer 60 and quote age 120, matching the saved production snapshot. The player selector starts at Select player. Screenshots and DOM width checks at 375, 768 and 1280 pass without horizontal scrolling. York race review displays the PMU evidence warning and prevents winner-only confirmation; Escape closes the dialog. No console errors were captured. No settings, wallet adjustments, result actions or test wagers were submitted. Full mutation-flow verification remains T059 rather than claiming production writes were tested.
+
 1. Sign in once through Google so the profile exists.
 2. In a trusted Supabase SQL session, look up the intended `auth.users.id` by the known account.
 3. Run the documented one-time UUID-scoped bootstrap update from `docs/fantasy-peakpool.md`.

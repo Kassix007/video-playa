@@ -56,6 +56,10 @@ Historical task reconciliation before payout activation: **84 of 85 tasks comple
 
 ### Completion follow-up 2026-09-06
 
+- Administrator settings must open with the actual saved configuration, never placeholder defaults. Saving an unrelated setting must preserve existing result-check timings. Missing or invalid configuration must prevent submission. Player balance adjustments require an explicitly chosen player.
+
+Administrator follow-up delivered: Mechtomine has owner-authorized administrator access, recorded in the audit trail. Saved settings now display correctly, unavailable configuration prevents editing, and balance adjustments require choosing a recipient. The live settings screen passes all required widths; the review dialog opens and closes safely without changing race results. Full mutation-flow verification remains outstanding.
+
 - When the optional Peakpool feed is empty, a uniquely matched PMU race may supply a complete runner list to an otherwise empty canonical PDF race. Require date, course, race number, scheduled time and title agreement; ignore only terminal discipline labels such as Attelé/Monté. Preserve existing runner identities and never replace a race with accepted selections. Keep PMU source URL/hash as evidence and do not import pre-race odds.
 - For results only, differing/truncated sponsor titles may be accepted when date/course/race number/time uniquely identify the candidate AND every independently stored runner number/name matches the complete PMU field. Store both titles and the full field evidence; the database must independently check that field before relaxing title equality. A different field or ambiguous candidate must not settle.
 - Missing provider coverage remains an explicit limitation, not a fabricated result. Full signed-in QA requires a genuine user-controlled session.

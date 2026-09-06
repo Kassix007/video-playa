@@ -14,6 +14,8 @@ Research did not establish how SMSPariaz `horse.type` values convert to decimal 
 
 ## Technical Context
 
+Administrator verification follow-up: include saved game settings in the protected admin response, validate the complete settings shape before mounting its editor, initialize form state from that snapshot, and preserve non-editable result-check timings in submitted parameters. Do not auto-select a balance-adjustment recipient. Verify with parser/render/RPC regressions and a read-only production admin session; do not save test configuration or adjust production wallets.
+
 **Language/Version**: TypeScript 5.8, React 18, Node.js 22, SQL/PLpgSQL, Supabase Edge Functions on Deno.
 
 **Primary Dependencies**: Existing Vite/React/React Router/Zod stack; `@supabase/supabase-js`; existing Netlify Functions; Supabase Auth, Postgres, Data API, Cron, Vault, and Edge Functions.

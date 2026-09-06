@@ -83,6 +83,8 @@ where id = '<exact-auth-user-uuid>'::uuid and role = 'player';
 
 Confirm exactly one row changed. There is deliberately no browser RPC for role changes. Subsequent settings, balance, result, retry, void, and correction operations must use the admin RPCs and create immutable audit evidence.
 
+After promotion, allow the page's next automatic refresh or reload, then choose **Admin** near the top. The settings editor must show saved values before it permits editing. Saving settings requires a reason; the starting balance affects future players, not existing wallets. **Adjust balance** requires an explicitly selected player, signed credit amount, and reason. **Race review** exposes retry/void/review operations; avoid confirming guessed results. **Bet and audit search** is read-only until an explicit action is taken. PMU winner-only confirmation still cannot invent a dividend.
+
 ## 5. Market synchronization
 
 Deploy the Netlify function and configure the same long random `FANTASY_PEAKPOOL_SYNC_TOKEN` in Netlify and Supabase Vault. Create these Vault secrets:

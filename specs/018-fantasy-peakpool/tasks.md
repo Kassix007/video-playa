@@ -280,6 +280,8 @@
 
 ### Free PMU replacement
 
+- [x] T109 Fix administrator settings hydration and hidden timing preservation; reject missing configuration, require explicit adjustment recipient, test and deploy, then verify the real administrator screen without production test mutations. Netlify 6a9d800e1555bbbcde84c239 and migration 202609060005 live; 259 repository tests, 141 SQL assertions and build pass. Saved settings verified at all three widths; review dialog opens/closes with Escape; no console errors. Full mutation-flow matrix remains T059.
+
 - [x] T106 Backfill empty PDF race fields from strictly matched PMU participants, with evidence, bounded work and no overwrite of existing selections. Migration 202609060004 and worker deployed; local RPC regressions pass. Production already has fields for all 31 races, so this invocation correctly performed no backfill; a live empty-field write remains unexercised.
 - [x] T107 Accept result-title differences only with unique independent identity and database-verified complete participant agreement; test and settle the previously unmatched pending race if evidence passes. Craon R5 now validates against its complete field; production reports four settled PMU bets and one current-day pending bet.
 - [x] T108 Verify signed-in player flows with a genuine session, deploy verified fixes, rerun checks and commit without secrets; report any remaining coverage limits. Selection/stake validation, history, wallet and leaderboard checked without submitting a production bet; 255 repository tests, 138 database assertions and build pass. Full admin QA remains T059; York has no PMU coverage in today's programme.

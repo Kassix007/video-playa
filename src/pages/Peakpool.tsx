@@ -142,7 +142,8 @@ function PeakpoolContent() {
       {activeView === "leaderboard" && <PeakpoolLeaderboard rows={bootstrap?.leaderboard ?? []} />}
       {activeView === "admin" && bootstrap?.profile?.role === "admin" && <section className="peakpool-admin" aria-labelledby="peakpool-admin-title">
         <div className="peakpool-section-head"><div><p className="peakpool-kicker">Protected controls</p><h2 id="peakpool-admin-title">Fantasy administrator</h2></div></div>
-        <PeakpoolAdminSettings players={adminRows("players") as Array<{ id: string; display_name: string; role: string; balance: string | number }>} onChanged={async () => { await refresh(); await refreshAdmin(); }} />
+        {error && <p className="peakpool-error" role="status">{error}</p>}
+        <PeakpoolAdminSettings settings={admin?.settings} players={adminRows("players") as Array<{ id: string; display_name: string; role: string; balance: string | number }>} onChanged={async () => { await refresh(); await refreshAdmin(); }} />
         <PeakpoolAdminResults races={(bootstrap?.meetings ?? []).flatMap((meeting) => meeting.races)} onChanged={async () => { await refresh(); await refreshAdmin(); }} />
         <PeakpoolAdminAudit audit={adminRows("audit")} bets={adminRows("bets")} observations={adminRows("observations")} />
       </section>}
