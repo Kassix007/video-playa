@@ -10,6 +10,10 @@ Gross return includes stake: stake 10 at dividend 5 returns 50, not 60. Publishe
 
 Rollback activation by setting `FANTASY_PMU_RESULTS_ENABLED=false`. Do not undo completed ledger entries or restore ATR pricing over converted bets. The older setup notes below retain historical context; this section supersedes their result/pricing instructions.
 
+Completion migration `202609060004` and the PMU worker are deployed. The worker prioritizes results, then may backfill up to six completely empty future race fields from strictly matched PMU participants. It never replaces existing runners or imports pre-race odds. Participant URL/hash and non-runner status are retained. A result title may differ only when the unique date/course/race/time candidate also agrees with every stored runner number/name; SQL independently enforces the full-field check.
+
+Latest verification: all 31 current races have fields from the existing sync, four PMU bets are settled, and one current-day bet is pending. Wallet and ledger totals reconcile. Signed-in player selection, stake validation, histories and leaderboard work; no test wager was submitted. Admin-session QA remains outstanding. Today's York meeting is absent from PMU, so free PMU results are not universal coverage. Empty-field backfill passes local transactional tests but had no live empty field to mutate on this run.
+
 Fantasy Peakpool is a fantasy-credit game. It never logs in to SMSPariaz, sends an SMS, reads an SMSPariaz account, or calls a betting/account endpoint. Its only SMSPariaz inputs are the public daily racecard and public `service/peakpool_json.php` response.
 
 ## 1. Create the Supabase project

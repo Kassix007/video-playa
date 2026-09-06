@@ -159,6 +159,8 @@ docs/fantasy-peakpool.md
 
 ## Implementation Sequence
 
+Completion follow-up: extend the protected PMU worker with bounded current-day empty-field backfill through a service-only transactional RPC. Reuse one programme per invocation, preserve existing runners, persist participant URL/hash and non-runner status, and run capped backfill work after priority result checks. Separate strict backfill identity from result-only full-field title fallback; require matching full participants again in SQL. Test wrong date/title/field, duplicate numbers, non-runners, no-overwrite and service grants. Verify production backfill, existing unmatched bet and signed-in UI without creating artificial production wagers.
+
 Production verification follow-up: use a PMU-specific NFD normalization helper in SQL, matching the adapter's existing accent handling. The canonical `Critérium` and PMU `CRITERIUM` must compare equally; a genuinely different title still fails. Keep the legacy helper unchanged. Requeue unresolved PMU bets within their existing retry window after this validated fix.
 
 Release amendment 2026-09-06: apply an audited pending-only pricing-basis conversion after the PMU schema migration; preserve settled rows, wrap legacy settlement to reject PMU confirmed payouts while retaining explicit race-void refunds, update player labels/history, retarget the existing five-minute Vault job, deploy the protected worker and Netlify build, then enable PMU and verify actual settlements and balances. Keep strict identity matching; coverage gaps remain reviewable. Do not deploy the unfinished ATR/Zone-Turf worker.

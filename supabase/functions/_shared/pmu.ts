@@ -7,6 +7,18 @@ function array(value: unknown): unknown[] { if (!Array.isArray(value)) throw new
 function integer(value: unknown, min = 1): number { if (typeof value !== "number" || !Number.isSafeInteger(value) || value < min) throw new Error("PMU_INVALID_INTEGER"); return value; }
 function name(value: unknown): string { if (typeof value !== "string" || !value.trim()) throw new Error("PMU_INVALID_NAME"); return value; }
 function normalized(value: unknown): string { return name(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/gi, "").toLowerCase(); }
+export function pmuRaceTitle(value: unknown): string { return normalized(name(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+(?:attele|monte)\s*$/i, "")); }
+export function pmuParticipants(value: unknown) {
+  const rows = array(object(value).participants).map(object);
+  if (!rows.length || rows.length > 100) throw new Error("PMU_FIELD_INCOMPLETE");
+  const seen = new Set<number>();
+  return rows.map(p => {
+    const runnerNumber = integer(p.numPmu, 0), runnerName = name(p.nom).trim();
+    if (seen.has(runnerNumber) || runnerName.length > 300 || !["PARTANT", "NON_PARTANT"].includes(String(p.statut))) throw new Error("PMU_RUNNER_UNMATCHED");
+    seen.add(runnerNumber);
+    return { runnerNumber, runnerName, active: p.statut === "PARTANT" };
+  });
+}
 function day(milliseconds: number): string {
   const parts = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: "Indian/Mauritius", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(milliseconds)).map(p => [p.type, p.value]));
   return `${parts.year}-${parts.month}-${parts.day}`;
@@ -20,14 +32,14 @@ export function programmeCourses(value: unknown): Obj[] {
   if (meetings.length > 100) throw new Error("PMU_PROGRAMME_TOO_LARGE");
   return meetings.flatMap(m => array(object(m).courses).map(c => object(c)));
 }
-export function matchPmuRace(race: PmuRace, courses: unknown[]): Obj | undefined {
+export function matchPmuRace(race: PmuRace, courses: unknown[], requireTitle = true): Obj | undefined {
   const matches = courses.filter(value => {
     try {
       const c = object(value), off = integer(c.heureDepart);
       return day(off) === race.programme_date && normalized(object(c.hippodrome).libelleCourt) === normalized(race.racecourse)
         && integer(c.numOrdre) === race.race_number && integer(c.numReunion) > 0
         && Math.abs(off - Date.parse(race.official_off_at)) <= 5 * 60_000
-        && Boolean(race.race_name) && normalized(c.libelle) === normalized(race.race_name);
+        && (!requireTitle || (Boolean(race.race_name) && pmuRaceTitle(c.libelle) === pmuRaceTitle(race.race_name)));
     } catch { return false; }
   });
   return matches.length === 1 ? object(matches[0]) : undefined;
@@ -41,7 +53,7 @@ export function pmuDividend(groupValue: unknown, reportValue: unknown): number {
   return cents;
 }
 export function validatePmuResult(race: PmuRace, runners: PmuRunner[], courseValue: unknown, participantValue: unknown, reportValue: unknown) {
-  const c = matchPmuRace(race, [courseValue]);
+  const c = matchPmuRace(race, [courseValue], false);
   if (!c) throw new Error("PMU_RACE_UNMATCHED");
   if (c.arriveeDefinitive !== true || c.rapportsDefinitifsDisponibles !== true) throw new Error("PMU_RESULT_NOT_FINAL");
   const participants = array(object(participantValue).participants).map(object);
@@ -84,6 +96,7 @@ export function validatePmuResult(race: PmuRace, runners: PmuRunner[], courseVal
     race_number: integer(c.numOrdre), race_name: name(c.libelle), pmu_meeting: integer(c.numReunion),
     finishing_order, winner_runner_ids: order[0].map(n => mapped.get(n)!.id), non_runner_ids: nonRunnerIds,
     non_runners: participants.filter(p => p.statut === "NON_PARTANT").map(p => ({ runnerNumber: integer(p.numPmu, 0), runnerName: name(p.nom) })),
+    participants: pmuParticipants(participantValue), match_method: "COMPLETE_CANONICAL_FIELD" as const,
     payout_divisor: 1, pricing_basis: "PMU_NATIONAL_SIMPLE_GAGNANT_PER_EURO" as const };
 }
 

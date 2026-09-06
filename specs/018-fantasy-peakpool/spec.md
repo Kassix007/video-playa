@@ -54,6 +54,14 @@ Historical task reconciliation before payout activation: **84 of 85 tasks comple
 
 ### PMU acceptance outcomes
 
+### Completion follow-up 2026-09-06
+
+- When the optional Peakpool feed is empty, a uniquely matched PMU race may supply a complete runner list to an otherwise empty canonical PDF race. Require date, course, race number, scheduled time and title agreement; ignore only terminal discipline labels such as Attelé/Monté. Preserve existing runner identities and never replace a race with accepted selections. Keep PMU source URL/hash as evidence and do not import pre-race odds.
+- For results only, differing/truncated sponsor titles may be accepted when date/course/race number/time uniquely identify the candidate AND every independently stored runner number/name matches the complete PMU field. Store both titles and the full field evidence; the database must independently check that field before relaxing title equality. A different field or ambiguous candidate must not settle.
+- Missing provider coverage remains an explicit limitation, not a fabricated result. Full signed-in QA requires a genuine user-controlled session.
+
+Delivered outcome: all 31 current PDF races have runners from the existing sync, leaving no empty field to exercise the new fallback in production. The previously unmatched Craon R5 result now validates and production has four settled PMU bets, with one current-day pending bet. Genuine player selection/stake validation, history, wallet and leaderboard checks passed without submitting a test wager. Administrator-session verification and results for meetings absent from PMU (today: York) remain explicit limitations. Detailed release evidence is recorded in quickstart.md.
+
 1. A finalized La Teste fixture with winner 4 and a 500-cent per-euro dividend normalizes to 5.00; stake 10.00 yields gross 50.00, not 60.00.
 2. Two declared joint winners each use their published dividend with no second divisor.
 3. Missing/duplicate/mismatched prices, different pools, partial results, ambiguous races and malformed identities cause no bet, balance or ledger mutation.

@@ -280,6 +280,10 @@
 
 ### Free PMU replacement
 
+- [x] T106 Backfill empty PDF race fields from strictly matched PMU participants, with evidence, bounded work and no overwrite of existing selections. Migration 202609060004 and worker deployed; local RPC regressions pass. Production already has fields for all 31 races, so this invocation correctly performed no backfill; a live empty-field write remains unexercised.
+- [x] T107 Accept result-title differences only with unique independent identity and database-verified complete participant agreement; test and settle the previously unmatched pending race if evidence passes. Craon R5 now validates against its complete field; production reports four settled PMU bets and one current-day pending bet.
+- [x] T108 Verify signed-in player flows with a genuine session, deploy verified fixes, rerun checks and commit without secrets; report any remaining coverage limits. Selection/stake validation, history, wallet and leaderboard checked without submitting a production bet; 255 repository tests, 138 database assertions and build pass. Full admin QA remains T059; York has no PMU coverage in today's programme.
+
 - [x] T100 Verify PMU programme, participant, final-arrival and definitive NATIONAL SIMPLE_GAGNANT shapes/units; capture minimal factual fixtures.
 - [x] T101 Implement/test strict PMU matching, finality, dividend normalization, pool isolation and dead-heat handling.
 - [x] T102 Add bounded protected PMU worker with non-mutating smoke mode, without reusing the unfinished ATR/Zone-Turf worker.

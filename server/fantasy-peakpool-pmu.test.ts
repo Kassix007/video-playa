@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { matchPmuRace, validatePmuResult, pmuDividend, fetchPmuJson, PMU_BASE } from "../supabase/functions/_shared/pmu.js";
+import { matchPmuRace, validatePmuResult, pmuDividend, fetchPmuJson, PMU_BASE, pmuParticipants } from "../supabase/functions/_shared/pmu.js";
 
 const race = { id: "race", programme_date: "2026-09-05", racecourse: "La Teste", race_number: 1,
   race_name: "Prix de l'Association Un Grand Pas Pour Maël", official_off_at: new Date(1788598680000).toISOString() };
@@ -53,4 +53,20 @@ test("PMU fetch rejects other hosts before network access and bounds response si
 
 test("PMU non-runners cannot also appear in the finishing order", () => {
   assert.throws(() => validatePmuResult(race, runners, course, { participants: participants.participants.map(p => ({ ...p, statut: "NON_PARTANT" })) }, reports), /PMU_NON_RUNNER_CONFLICT/);
+});
+
+test("PMU backfill requires strict title identity, allowing only terminal discipline labels", () => {
+  assert.ok(matchPmuRace({ ...race, race_name: `${race.race_name} Attelé` }, [course]));
+  assert.equal(matchPmuRace({ ...race, race_name: "Unrelated" }, [course]), undefined);
+  assert.throws(() => pmuParticipants({ participants: [...participants.participants, participants.participants[0]] }), /PMU_RUNNER_UNMATCHED/);
+  assert.equal(pmuParticipants({ participants: [{ numPmu: 1, nom: "Alpha", statut: "NON_PARTANT" }] })[0].active, false);
+});
+
+test("result-only title fallback requires a complete independently stored field", () => {
+  const abbreviated = { ...race, race_name: "Truncated sponsor title" };
+  assert.equal(matchPmuRace(abbreviated, [course]), undefined);
+  assert.ok(matchPmuRace(abbreviated, [course], false));
+  assert.equal(matchPmuRace(abbreviated, [course, course], false), undefined);
+  assert.equal(validatePmuResult(abbreviated, runners, course, participants, reports).match_method, "COMPLETE_CANONICAL_FIELD");
+  assert.throws(() => validatePmuResult(abbreviated, [{ ...runners[0], runner_name: "Wrong horse" }, runners[1]], course, participants, reports), /PMU_RUNNER_UNMATCHED/);
 });
