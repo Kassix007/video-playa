@@ -6,13 +6,13 @@
 
 ## Headline
 
-The earlier completion percentage is obsolete: the results-source and payout requirements changed. SMSPariaz PDF remains authoritative for racecards; the new free PMU result adapter and protected worker are implemented. Automatic PMU settlement is **not enabled in production**.
+The PMU release is live on 2026-09-06. SMSPariaz PDF remains authoritative for racecards. PMU automatic settlement is enabled; ATR is disabled. Netlify deploy: `6a9cd9448bf68dcc68113f3b`.
 
 Production read-only smoke verification on the 2026-09-05 programme validated three real races, including LE COMBAT CONTINUE at a 5.00 gross dividend. Additional races matched identity, but exact title differences and missing meetings (including Stratford) prevent complete coverage. No production balances changed during verification.
 
-Local verification: 252 repository tests, 108 existing database assertions, ten new PMU database assertions, and production build passed. PMU database migration remains local only. Worker is deployed with activation disabled by default.
+Production migrations converted four pending ATR bets with audit, preserving settled rows and all existing credits. Three converted bets subsequently settled as losses against verified PMU results. One remains pending due to a truncated/different Craon R5 title. Wallet and ledger totals reconcile at 3350.00. The active five-minute schedule targets PMU, and unauthorized worker calls return 401.
 
-Remaining release gates: finish matching/coverage policy, non-runner and dead-heat SQL scenarios, pricing-basis UI/projection, protect PMU bets from the legacy ATR settlement path, configure the scheduler, verify signed-in flows at all three viewport sizes, and rerun final checks. Existing pending ATR-priced bets stay unchanged unless the user explicitly approves conversion. Settled history is preserved.
+Verification: production build and repository suite pass; 108 legacy and 20 PMU database assertions pass. Signed-out production checks pass at 375/768/1280 with no console errors or horizontal overflow. Full authenticated player/admin QA remains T059. Missing source coverage and truncated/different titles remain review-only. Do not claim every race can auto-settle.
 
 The sections below describe earlier implementation and must be read in light of this current release status.
 

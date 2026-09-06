@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(10);
+select plan(14);
 insert into auth.users(id,aud,role,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
 values ('90000000-0000-0000-0000-000000000001','authenticated','authenticated','{"provider":"google"}','{}',now(),now());
 insert into public.race_events(id,programme_date,external_race_id,meeting_number,race_number,racecourse,normalized_racecourse,race_name,official_off_at,state,racecard_observed_at)
@@ -19,6 +19,12 @@ select is((select count(*)::integer from public.bets where state='PENDING' and r
 update public.bets set pricing_basis='ATR_FINAL_SP' where race_id='90000000-0000-0000-0000-000000000002';
 select throws_ok($$select pg_temp.settle(pg_temp.evidence())$$,'P0001','PMU_LEGACY_BETS_REVIEW','legacy contracts are not repriced');
 update public.bets set pricing_basis='PMU_NATIONAL_SIMPLE_GAGNANT_PER_EURO' where race_id='90000000-0000-0000-0000-000000000002';
+insert into public.race_results(id,race_id,version,status,winner_runner_ids,joint_winner_count)
+values ('90000000-0000-0000-0000-000000000005','90000000-0000-0000-0000-000000000002',1,'CONFIRMED',array['90000000-0000-0000-0000-000000000003']::uuid[],1);
+select throws_ok($$select private.settle_fantasy_race('90000000-0000-0000-0000-000000000005',null,'legacy attempt')$$,'P0001','PMU_VERIFIED_DIVIDEND_REQUIRED','legacy path cannot settle PMU bets');
+select throws_ok($$select pg_temp.settle(pg_temp.evidence() || '{"non_runner_ids":["90000000-0000-0000-0000-000000000004"]}'::jsonb)$$,'P0001','PMU_ORDER_INVALID','non-runner cannot also finish');
+select ok(not has_function_privilege('anon','public.claim_pmu_fantasy_result_check_batch(integer)','EXECUTE'),'anonymous users cannot claim checks');
+select throws_ok($$select public.claim_pmu_fantasy_result_check_batch(4)$$,'P0001','INVALID_BATCH_LIMIT','worker claims remain bounded');
 select lives_ok($$select pg_temp.settle(pg_temp.evidence())$$,'validated result settles atomically');
 select is((select balance::text from public.wallets where user_id='90000000-0000-0000-0000-000000000001'),'1050.00','ten credits at 5 gross returns fifty (fixture starts after stake acceptance)');
 select is((select count(*)::integer from public.bets where state='WON' and race_id='90000000-0000-0000-0000-000000000002'),1,'winner updated');

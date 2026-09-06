@@ -4,11 +4,20 @@
 
 **Created**: 2026-09-04
 
-**Status**: In progress. The result-validation follow-up is locally verified; ATR-final payout activation and authenticated browser verification are not complete. Historical deployment evidence below is not verification of the current working tree.
+**Status**: PMU production release deployed on 2026-09-06. Four pending bets converted with audit; three settled against PMU and one remains unmatched/review. Settled history preserved. Full authenticated player/admin browser verification remains T059.
 
 **Input**: User description: "Add a fantasy-credit horse-racing competition that uses public SMSPariaz racecards and displayed prices but never accesses an SMSPariaz account or submits a real wager."
 
 ## Delivery Verification (updated 2026-09-05)
+
+### PMU production release — 2026-09-06 (current)
+
+- Netlify deploy `6a9cd9448bf68dcc68113f3b` serves the PMU labels/history and 30-second visible-tab refresh. HTTP 200, PMU bundle checks and signed-out 375/768/1280 overflow checks passed; no console errors. Today's public programme contains 31 PDF races, but expanded sampled race has unreconciled runners, so no authenticated placement was fabricated for QA.
+- Migrations `202609060001` through `202609060003` are applied. Pending conversion audited four bets without moving balances. Three subsequently settled as losses; one Craon R5 bet remains pending because its truncated canonical title differs from PMU. The race is not guessed or treated as a loss.
+- PMU enabled, ATR disabled; the existing active five-minute job targets the protected PMU worker. Unauthorized invocation returns 401. Wallet and immutable ledger totals both equal 3350.00 after live settlement.
+- Exact dead-heat and non-runner SQL fixtures pass, and PMU-specific SQL NFD normalization agrees with the adapter for accented titles. Existing settled records are excluded from conversion.
+- Remaining scope: T059 authenticated flow QA and future evidence-backed coverage improvements. Public endpoint availability is not a licence or uptime guarantee.
+- Final local checks: 253 repository tests and production build passed; SQL suites total 128 assertions. Spec requirements remain 16/16 checked, no clarification markers. Staged credential-pattern scan and diff check passed; unfinished ATR/Zone-Turf edits are excluded from this release commit.
 
 ### Current result-validation follow-up
 
@@ -39,7 +48,7 @@ Historical task reconciliation before payout activation: **84 of 85 tasks comple
 
 - The owner requires no paid provider, proxy, subscription, or account. PMU public read-only JSON replaces ATR as the automatic result source where coverage is proven; the SMSPariaz daily PDF remains the sole race universe.
 - Fantasy returns use PMU NATIONAL SIMPLE_GAGNANT definitive per-euro dividends, never provisional odds or a different pool chosen opportunistically. Gross credit is stake multiplied by the verified per-unit dividend. Published dead-heat dividends already account for the pool split and MUST NOT be divided again or have stake added again.
-- Historical settled results remain unchanged. Pending legacy ATR selections require an explicit operator migration decision before PMU repricing; no silent retrospective rule change.
+- Historical settled results remain unchanged. On 2026-09-06 the owner explicitly approved switching all existing pending selections to PMU dividends and deploying to production. Record an audit of the conversion without changing stakes or balances; new selections also use PMU. Legacy ATR settlement must not price PMU selections. Unmatched races remain pending/review, never guessed or silently lost.
 - All winners, runner identities, non-runners, race date/course/time/name, final-arrival and definitive-dividend flags must agree before mutation. Missing coverage stays visible and pending/review.
 - Availability of a public endpoint is not a data-use licence or uptime guarantee. No authentication, wagers, CAPTCHA solving, or undisclosed endpoint bypass is authorized.
 

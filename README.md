@@ -4,6 +4,8 @@ Long-term scheduler and archive operations are documented in [docs/horsee-schedu
 
 The authenticated SMSFootball app/leaderboard MCP capability is documented in [docs/smspariaz-app-bet.md](docs/smspariaz-app-bet.md). It is separate from the existing SMSPariaz racecard reader and is disabled until its encryption configuration is present; app placement is disabled by default.
 
+The separate HORSEE Peakpool virtual-unit MCP capability is documented in [docs/peakpool-app-bet.md](docs/peakpool-app-bet.md). It exposes a public programme reader and isolated prepare/place scopes, but provider placement is disabled by default and requires an owner-authorized no-cash flow verification. It is not the Supabase Fantasy Peakpool application described below.
+
 Video Playa is a React/Vite stream desk. Its Equidia page includes the HORSEE Horse Racing Council, implemented as a remote MCP server and an MCP Apps UI.
 
 The Equidia player remains a normal browser player. HORSEE adds this separate flow:
@@ -176,3 +178,8 @@ ChatGPT requires a publicly reachable HTTPS endpoint or an approved secure/devel
 - No API keys, ChatGPT credentials, or conversation tokens are stored.
 
 Current references: [OpenAI plugin authentication guide](https://developers.openai.com/plugins/build/auth), [OpenAI MCP server guide](https://developers.openai.com/plugins/build/mcp-server), [OpenAI MCP Apps UI guide](https://developers.openai.com/plugins/build/ui), [Netlify build environment variables](https://docs.netlify.com/build/configure-builds/environment-variables/), [Netlify rate limiting](https://www.netlify.com/blog/how-to-rate-limit-ai-features-and-avoid-surprise-costs/), and [MCP Apps specification](https://modelcontextprotocol.io/extensions/apps/overview).
+# Fantasy Peakpool
+
+Video Playa includes a Supabase-backed fantasy-credit horse-racing destination at `#/peakpool`. The SMSPariaz daily PDF supplies races; verified PMU final NATIONAL Simple Gagnant dividends determine payouts after the race. No pre-race odds are required. Missing result coverage remains pending/review. It cannot access an SMSPariaz account or submit a real wager.
+
+See [Fantasy Peakpool deployment](docs/fantasy-peakpool.md) for Google OAuth, migrations, RLS, first-admin bootstrap, scheduled result checks, evidence gates, and free-tier setup.

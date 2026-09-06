@@ -159,6 +159,10 @@ docs/fantasy-peakpool.md
 
 ## Implementation Sequence
 
+Production verification follow-up: use a PMU-specific NFD normalization helper in SQL, matching the adapter's existing accent handling. The canonical `Critérium` and PMU `CRITERIUM` must compare equally; a genuinely different title still fails. Keep the legacy helper unchanged. Requeue unresolved PMU bets within their existing retry window after this validated fix.
+
+Release amendment 2026-09-06: apply an audited pending-only pricing-basis conversion after the PMU schema migration; preserve settled rows, wrap legacy settlement to reject PMU confirmed payouts while retaining explicit race-void refunds, update player labels/history, retarget the existing five-minute Vault job, deploy the protected worker and Netlify build, then enable PMU and verify actual settlements and balances. Keep strict identity matching; coverage gaps remain reviewable. Do not deploy the unfinished ATR/Zone-Turf worker.
+
 1. Add pure market parsing, normalization classification, reconciliation, result parsing/matching, and arithmetic tests.
 2. Add source-controlled schema, RLS/grants, initialization trigger, transactional bet/settlement/admin RPCs, leaderboard view/RPC, and pgTAP tests.
 3. Add protected Netlify ingestion and disabled-by-default Supabase result worker/cron.

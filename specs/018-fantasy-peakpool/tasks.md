@@ -280,16 +280,17 @@
 
 ### Free PMU replacement
 
-- [ ] T100 Verify PMU programme, participant, final-arrival and definitive NATIONAL SIMPLE_GAGNANT shapes/units; capture minimal factual fixtures.
+- [x] T100 Verify PMU programme, participant, final-arrival and definitive NATIONAL SIMPLE_GAGNANT shapes/units; capture minimal factual fixtures.
 - [x] T101 Implement/test strict PMU matching, finality, dividend normalization, pool isolation and dead-heat handling.
 - [x] T102 Add bounded protected PMU worker with non-mutating smoke mode, without reusing the unfinished ATR/Zone-Turf worker.
-- [ ] T103 Add/test transactional PMU settlement and explicit pricing-basis migration, preserving settled history and guarding pending legacy bets.
-- [ ] T104 Complete UI pricing labels/automatic refresh and verification, then deploy and commit tested changes only.
+- [x] T103 Add/test transactional PMU settlement and explicit pricing-basis migration, preserving settled history and guarding pending legacy bets.
+- [x] T104 Complete UI pricing labels/automatic refresh and verification, then deploy and commit tested changes only. PMU receipt/history tests, production asset checks and signed-out 375/768/1280 checks passed; full authenticated QA is separately tracked by T059.
+- [x] T105 Apply the owner-approved pending-only PMU conversion with audit, legacy-path guard, scheduled activation and production verification; preserve settled history. Four converted; three settled, one strict title mismatch remains review-only. Netlify `6a9cd9448bf68dcc68113f3b`, worker enabled, ledger reconciled. T059 remains independent.
 
 ### Automatic results completion
 
 - [ ] T095 Verify configured retrieval using bounded actual ATR pages; add real-layout parser fixtures only from successful retrieval.
-- [ ] T096 Add tested visibility-aware automatic browser refresh with stale-session guards and retained UI state.
+- [x] T096 Add tested visibility-aware automatic browser refresh with stale-session guards and retained UI state.
 - [ ] T097 Add and test a forward-only all-winner settlement evidence guard before any wallet/bet changes.
 - [ ] T098 Bound worker retrieval and redact transport errors; verify source access without manufacturing results.
 - [ ] T099 Run repository/build/database and responsive checks, reconcile artifacts, and deploy/commit verified work; report any source-access blocker explicitly.

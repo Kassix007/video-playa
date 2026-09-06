@@ -1,5 +1,11 @@
 # Ingestion and Result Contracts
 
+## Current automatic provider: PMU (2026-09-06)
+
+`fantasy-pmu-result-checker` authenticates the cron bearer before every operation. Enable with `FANTASY_PMU_RESULTS_ENABLED=true`; ATR remains disabled. Authenticated `?smoke=true&date=YYYY-MM-DD` is read-only, with at most three full checks. `?status=true` reports redacted release health. Normal runs claim at most three races with a 70-second work budget, 12-second fetch timeouts, 3 MB response limits, no redirects, and only public PMU programme/participants/rapports-definitifs paths. No proxy or paid API.
+
+Exact independent race identity and complete participant mappings are required. Only definitive arrival plus final NATIONAL SIMPLE_GAGNANT per-euro dividends qualify. Missing coverage, different titles, incomplete results and fetch failures cannot settle bets. PDF races remain visible independently. Unresolved races back off then require review; administrators may retry or explicitly void. The earlier ATR contract below is historical.
+
 ## Protected Netlify market synchronization
 
 `POST /.netlify/functions/fantasy-peakpool-sync`
