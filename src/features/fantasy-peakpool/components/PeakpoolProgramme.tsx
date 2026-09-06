@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFantasyProgrammeView } from "../programme-view";
 import type { FantasyMeeting, FantasyRace, FantasyRunner } from "../types";
+import PeakpoolWinners from "./PeakpoolWinners";
 
 function mauritiusTime(value: string): string {
   const date = new Date(value);
@@ -75,6 +76,7 @@ export default function PeakpoolProgramme({
                   <span aria-hidden="true" className="peakpool-disclosure">⌄</span>
                 </div>
               </button>
+              <PeakpoolWinners race={race} />
               {expandedRaceId === race.id && (
                 race.runners.length ? (
                   <div className="peakpool-runner-list" role="list">

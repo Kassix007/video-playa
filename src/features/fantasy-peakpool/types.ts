@@ -39,6 +39,7 @@ export type FantasyRace = {
   officialOffAt: string;
   state: FantasyRaceState;
   runners: FantasyRunner[];
+  winners?: Array<{ id: string; number: number; name: string; pmuFinalDividend?: string }>;
 };
 
 export type FantasyMeeting = { meetingNumber: number; racecourse: string; races: FantasyRace[] };

@@ -1,5 +1,9 @@
 # Fantasy Peakpool Validation Quickstart
 
+## Today's winners release — 2026-09-07
+
+Netlify `6a9dcd1418b95a9fac837aca` and migration `202609060006` expose a minimal public winner projection in the existing current-day bootstrap. Settled cards show number/name and available final PMU dividend without expansion or Admin access. Latest result versions take precedence; pending/review/void states suppress winners. Privacy, correction and dead-heat regressions pass; repository tests (262), 149 database assertions and build pass. Local fixture screenshots at 375/768/1280 have no horizontal overflow or console errors. Production assets return 200 and contain the winner UI; a read-only real settled-race check returns ParisLongchamp R1 AVEC TOI at 120 cents per euro (×1.20). Since verification occurred after Mauritius midnight, responsive settled-card checks used isolated local fixtures, not invented production results. Automatic programme refresh supplies newly settled winners; no previous-day results browser is added.
+
 ## Current PMU release verification — 2026-09-06
 
 PMU replaces ATR for new and owner-approved converted pending bets. Production Netlify deploy `6a9cd9448bf68dcc68113f3b` and migrations through `202609060004` are live. Four pending bets converted with audit and all four are now settled; one new current-day PMU bet remains pending. PMU enabled, ATR disabled, active five-minute Vault URL points to PMU, unauthorized worker POST returns 401. Latest wallet/ledger totals both 3150.00. These are a verification snapshot, not fixed expected balances. No settled history was repriced.

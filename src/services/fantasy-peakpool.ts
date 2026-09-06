@@ -67,6 +67,15 @@ function mapRace(value: unknown): FantasyRace {
     officialOffAt: string(row.official_off_at),
     state: string(row.state, "UPCOMING") as FantasyRace["state"],
     runners: array(row.runners).map(mapRunner),
+    winners: row.state === "SETTLED" ? array(row.winners).flatMap(value => {
+      const winner = object(value);
+      if (typeof winner.runner_id !== "string" || typeof winner.runner_name !== "string" || !winner.runner_name.trim()
+        || !Number.isSafeInteger(winner.runner_number) || Number(winner.runner_number) < 0) return [];
+      const cents = winner.pmu_dividend_cents;
+      return [{ id: winner.runner_id, number: Number(winner.runner_number), name: winner.runner_name,
+        ...(typeof cents === "number" && Number.isSafeInteger(cents) && cents >= 100
+          ? { pmuFinalDividend: `${Math.floor(cents / 100)}.${String(cents % 100).padStart(2,"0")}` } : {}) }];
+    }) : [],
   };
 }
 

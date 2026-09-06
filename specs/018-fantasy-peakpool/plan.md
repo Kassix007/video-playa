@@ -14,6 +14,8 @@ Research did not establish how SMSPariaz `horse.type` values convert to decimal 
 
 ## Technical Context
 
+Today's winners follow-up: project only canonical winner number/name and final PMU per-euro dividend from the current confirmed result into the existing current-day bootstrap. Require the race to be SETTLED; bind dividend evidence to that result's observation. Render a compact result strip outside the collapsed runner disclosure, supporting dead heats and missing evidence. Preserve the existing automatic refresh, meeting pagination, and privacy boundaries. Cover SQL projection and client/render behavior, build, and verify production at 375/768/1280.
+
 Administrator verification follow-up: include saved game settings in the protected admin response, validate the complete settings shape before mounting its editor, initialize form state from that snapshot, and preserve non-editable result-check timings in submitted parameters. Do not auto-select a balance-adjustment recipient. Verify with parser/render/RPC regressions and a read-only production admin session; do not save test configuration or adjust production wallets.
 
 **Language/Version**: TypeScript 5.8, React 18, Node.js 22, SQL/PLpgSQL, Supabase Edge Functions on Deno.

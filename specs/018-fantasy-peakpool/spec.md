@@ -56,6 +56,10 @@ Historical task reconciliation before payout activation: **84 of 85 tasks comple
 
 ### Completion follow-up 2026-09-06
 
+- Today's programme must show confirmed winner numbers and names on settled race cards without requiring administrator access or expansion. Show every joint winner and each available finalized PMU dividend as a gross return multiplier. Never label pending, provisional, void or review-only races as having a confirmed winner; missing confirmed details must be explicit. Results refresh with the programme and must not expose private bets or administrator notes.
+
+Delivered: settled cards now show public winner details while collapsed, including joint winners and available PMU dividends. Only the latest confirmed result is displayed. Pending/review/void states suppress winner claims. Today's scope follows the Mauritius programme date; this does not add a historical-results browser.
+
 - Administrator settings must open with the actual saved configuration, never placeholder defaults. Saving an unrelated setting must preserve existing result-check timings. Missing or invalid configuration must prevent submission. Player balance adjustments require an explicitly chosen player.
 
 Administrator follow-up delivered: Mechtomine has owner-authorized administrator access, recorded in the audit trail. Saved settings now display correctly, unavailable configuration prevents editing, and balance adjustments require choosing a recipient. The live settings screen passes all required widths; the review dialog opens and closes safely without changing race results. Full mutation-flow verification remains outstanding.

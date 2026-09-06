@@ -128,3 +128,9 @@
 @media (max-width: 640px) { .peakpool-meeting-tabs { display: flex; margin-inline: -1px; max-width: 100%; overflow-x: auto; padding-bottom: 4px; } .peakpool-meeting-tabs button { flex: 0 0 158px; } .peakpool-race-head { padding: 13px; } .peakpool-race-meta { gap: 8px; } }
 @media (max-width: 600px) { .peakpool-runner { grid-template-columns: 34px minmax(0, 1fr) 62px; } .peakpool-runner-price { grid-column: 2 / -1; grid-row: 2; text-align: left; } }
 @media (prefers-reduced-motion: reduce) { .peakpool-race, .peakpool-disclosure { transition: none; } }
+.peakpool-winners { border-top: 1px solid var(--border); background: var(--panel-2); padding: 12px 16px; display: grid; gap: 6px; }
+.peakpool-winners > strong { color: var(--text); font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+.peakpool-winners ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.peakpool-winners li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; overflow-wrap: anywhere; }
+.peakpool-winners li > span:last-child { color: var(--muted); font-size: .85rem; }
+.peakpool-winner-name { font-weight: 700; }
