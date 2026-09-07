@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import { decorateHorseeToolSecuritySchemes } from "./horsee-tool-security.js";
 import {
   CHECK_COUNCIL_WRITE_ACCESS_ANNOTATIONS,
+  getHorseeToolSecuritySchemes,
   SAVE_COUNCIL_RESULT_ANNOTATIONS,
   UPDATE_COUNCIL_RUN_STATUS_ANNOTATIONS,
 } from "./horsee-mcp.js";
@@ -32,6 +33,22 @@ describe("HORSEE tool securitySchemes", () => {
         { type: "oauth2", scopes: ["horsee:council:write"] },
       ]);
     }
+  });
+
+  it("uses separate session and app-bet scopes and rejects unknown tools", () => {
+    const scopes = {
+      writeScope: "horsee:council:write",
+      smspariazSessionScope: "horsee:smspariaz:session",
+      smspariazAppBetScope: "horsee:smspariaz:app-bet",
+    };
+    assert.deepEqual(getHorseeToolSecuritySchemes("smspariaz_get_smsfootball", scopes), [{ type: "noauth" }]);
+    assert.deepEqual(getHorseeToolSecuritySchemes("smspariaz_session_status", scopes), [{
+      type: "oauth2", scopes: ["horsee:smspariaz:session"],
+    }]);
+    assert.deepEqual(getHorseeToolSecuritySchemes("smspariaz_place_app_bet", scopes), [{
+      type: "oauth2", scopes: ["horsee:smspariaz:app-bet"],
+    }]);
+    assert.throws(() => getHorseeToolSecuritySchemes("future_tool_without_policy", scopes));
   });
 
   it("marks the OAuth diagnostic as read-only and closed-world", () => {

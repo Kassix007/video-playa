@@ -33,6 +33,8 @@ describe("Council write authorization", () => {
     const authInfo = await authenticateCouncilRequest(request, config);
     assert.equal(config.mode, "development-token");
     assert.equal(authInfo?.scopes.includes(config.writeScope), true);
+    assert.equal(authInfo?.scopes.includes(config.smspariazSessionScope), true);
+    assert.equal(authInfo?.scopes.includes(config.smspariazAppBetScope), true);
     assert.equal(authInfo?.resource?.href, "http://localhost:8888/mcp");
   });
 
@@ -61,7 +63,11 @@ describe("Council write authorization", () => {
     assert.deepEqual(getCouncilProtectedResourceMetadata(config), {
       resource: "https://horsee.example/mcp",
       authorization_servers: ["https://identity.example/"],
-      scopes_supported: ["horsee:council:write"],
+      scopes_supported: [
+        "horsee:council:write",
+        "horsee:smspariaz:session",
+        "horsee:smspariaz:app-bet",
+      ],
       bearer_methods_supported: ["header"],
     });
 

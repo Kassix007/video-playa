@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import {
   createCouncilAuthChallenge,
+  type HorseeAuthScopes,
   type CouncilWritePolicy,
 } from "./council-auth.js";
 import { logCouncilSecurityEvent } from "./council-audit.js";
@@ -17,6 +18,11 @@ import {
   getSmspariazDailyRacecard,
   SmspariazRacecardResponseSchema,
 } from "./smspariaz-racecard.js";
+import {
+  registerSmspariazTools,
+  type SmspariazAuthPolicy,
+  type SmspariazSubsystem,
+} from "./smspariaz-mcp.js";
 import { createHorseeWidgetHtml } from "./widget-html.js";
 
 export const HORSEE_SERVER_NAME = "horsee-council";
@@ -145,15 +151,44 @@ export type HorseeSecurityScheme =
 
 export function getHorseeToolSecuritySchemes(
   toolName: string,
-  writeScope: string,
+  scopesOrWriteScope: HorseeAuthScopes | string,
 ): HorseeSecurityScheme[] {
-  return [
+  const scopes: HorseeAuthScopes = typeof scopesOrWriteScope === "string"
+    ? {
+        writeScope: scopesOrWriteScope,
+        smspariazSessionScope: "horsee:smspariaz:session",
+        smspariazAppBetScope: "horsee:smspariaz:app-bet",
+      }
+    : scopesOrWriteScope;
+  const publicTools = [
+    "open_horsee_council",
+    "get_smspariaz_daily_racecard",
+    "get_latest_council_result",
+    "get_council_history",
+    "smspariaz_get_smsfootball",
+  ];
+  if (publicTools.includes(toolName)) return [{ type: "noauth" }];
+
+  if ([
     "check_council_write_access",
     "update_council_run_status",
     "save_council_result",
-  ].includes(toolName)
-    ? [{ type: "oauth2", scopes: [writeScope] }]
-    : [{ type: "noauth" }];
+  ].includes(toolName)) return [{ type: "oauth2", scopes: [scopes.writeScope] }];
+
+  if ([
+    "smspariaz_session_status",
+    "smspariaz_start_login",
+    "smspariaz_confirm_otp",
+    "smspariaz_logout",
+    "smspariaz_prepare_app_bet",
+    "smspariaz_debug_status",
+  ].includes(toolName)) return [{ type: "oauth2", scopes: [scopes.smspariazSessionScope] }];
+
+  if (toolName === "smspariaz_place_app_bet") {
+    return [{ type: "oauth2", scopes: [scopes.smspariazAppBetScope] }];
+  }
+
+  throw new Error(`No explicit HORSEE security policy is registered for tool ${toolName}.`);
 }
 
 function authorizationFailure(
@@ -192,6 +227,7 @@ export function createHorseeMcpServer(
   statusStore: CouncilRunStatusStore,
   writePolicy: CouncilWritePolicy,
   securityContext: { requestId?: string } = {},
+  smspariaz?: { subsystem: SmspariazSubsystem; authPolicy: SmspariazAuthPolicy },
 ): McpServer {
   const server = new McpServer(
     { name: HORSEE_SERVER_NAME, version: HORSEE_SERVER_VERSION },
@@ -400,6 +436,10 @@ export function createHorseeMcpServer(
       };
     },
   );
+
+  if (smspariaz?.subsystem.config.configured) {
+    registerSmspariazTools(server, smspariaz.subsystem, smspariaz.authPolicy);
+  }
 
   server.registerTool(
     "get_latest_council_result",

@@ -2,6 +2,8 @@
 
 Long-term scheduler and archive operations are documented in [docs/horsee-scheduler.md](docs/horsee-scheduler.md).
 
+The authenticated SMSFootball app/leaderboard MCP capability is documented in [docs/smspariaz-app-bet.md](docs/smspariaz-app-bet.md). It is separate from the existing SMSPariaz racecard reader and is disabled until its encryption configuration is present; app placement is disabled by default.
+
 Video Playa is a React/Vite stream desk. Its Equidia page includes the HORSEE Horse Racing Council, implemented as a remote MCP server and an MCP Apps UI.
 
 The Equidia player remains a normal browser player. HORSEE adds this separate flow:
@@ -114,6 +116,19 @@ The authorization server must implement the OAuth 2.1 MCP flow and publish its o
 Each successful result publish creates a server-only audit record alongside the result store. The record contains server receipt time, OAuth client ID, a one-way hash of the subject when present, race ID, and a result hash; it never contains the bearer token or the full verdict. Netlify retains the newest 500 audit records per deployment namespace. Local development writes the equivalent private records to `.netlify/horsee-council-write-audit.json`. Denied request-source and authentication events, plus successful/denied result writes, are emitted as structured Netlify Function logs for monitoring.
 
 For local Inspector testing only, set `HORSEE_COUNCIL_DEV_WRITE_TOKEN` before starting Netlify Dev. This development bearer token is ignored in every non-`dev` Netlify deployment and is never a production authorization mode.
+
+## SMSPariaz local MCP debugging
+
+Use a throwaway local encryption key and leave app placement off:
+
+```powershell
+$env:HORSEE_COUNCIL_DEV_WRITE_TOKEN = "local-dev-token"
+$env:SMSPARIAZ_SESSION_ENCRYPTION_KEY = [Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Maximum 256 }))
+$env:SMSPARIAZ_APP_BET_ENABLED = "false"
+npx netlify dev
+```
+
+Connect an Inspector to `http://localhost:8888/mcp` using `Bearer local-dev-token`, then call `smspariaz_get_smsfootball` and `smspariaz_debug_status`. See [the SMSPariaz app-bet guide](docs/smspariaz-app-bet.md) for scopes, OTP setup, encrypted local state, and the strict no-wallet/no-paid-SMS guard. Calling OTP or validation tools against a live local server contacts SMSPariaz; the test suite does not.
 
 ## Test with MCP Inspector
 

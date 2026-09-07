@@ -6,6 +6,7 @@ import {
   CouncilAuthenticationError,
   createCouncilUnauthorizedResponse,
   getCouncilWritePolicy,
+  getHorseeAuthScopes,
   resolveCouncilAuthConfig,
 } from "../../server/council-auth.js";
 import { logCouncilSecurityEvent } from "../../server/council-audit.js";
@@ -15,6 +16,14 @@ import { createArchiveAwareCouncilResultStore } from "../../server/council-archi
 import { createHorseeMcpServer } from "../../server/horsee-mcp.js";
 import { addHorseeToolSecuritySchemes } from "../../server/horsee-tool-security.js";
 import { createCouncilRuntimeEnvironment } from "../../server/netlify-runtime.js";
+import { SmspariazAppBetService } from "../../server/smspariaz-app-bet.js";
+import { parseSmspariazConfig } from "../../server/smspariaz-config.js";
+import { SmspariazFootballClient } from "../../server/smspariaz-football.js";
+import { SmspariazSubsystem } from "../../server/smspariaz-mcp.js";
+import { createSmspariazObservability } from "../../server/smspariaz-observability.js";
+import { createSmspariazPreparedBetStore } from "../../server/smspariaz-prepared-store.js";
+import { SmspariazProviderClient } from "../../server/smspariaz-provider.js";
+import { createSmspariazSessionStore } from "../../server/smspariaz-session-store.js";
 
 export const config: Config = {
   path: "/mcp",
@@ -64,7 +73,33 @@ export default async function handler(
   const writePolicy = getCouncilWritePolicy(authConfig);
   const store = createArchiveAwareCouncilResultStore(runtimeEnvironment);
   const statusStore = createCouncilRunStatusStore(runtimeEnvironment);
-  const server = createHorseeMcpServer(store, statusStore, writePolicy, { requestId });
+  const smspariazConfig = parseSmspariazConfig(runtimeEnvironment);
+  let smspariazRuntime;
+  if (smspariazConfig.configured) {
+    const telemetry = createSmspariazObservability();
+    const provider = new SmspariazProviderClient(smspariazConfig, fetch, telemetry);
+    const football = new SmspariazFootballClient(provider, telemetry);
+    const preparedStore = createSmspariazPreparedBetStore(smspariazConfig, runtimeEnvironment);
+    const subsystem = new SmspariazSubsystem(
+      smspariazConfig,
+      createSmspariazSessionStore(smspariazConfig, runtimeEnvironment),
+      provider,
+      football,
+      new SmspariazAppBetService(smspariazConfig, provider, football, preparedStore, telemetry),
+      telemetry,
+    );
+    smspariazRuntime = {
+      subsystem,
+      authPolicy: {
+        enabled: authConfig.mode !== "disabled",
+        resource: authConfig.mode === "disabled" ? undefined : authConfig.resource,
+        resourceMetadataUrl: authConfig.resourceMetadataUrl,
+        sessionScope: authConfig.smspariazSessionScope,
+        appBetScope: authConfig.smspariazAppBetScope,
+      },
+    };
+  }
+  const server = createHorseeMcpServer(store, statusStore, writePolicy, { requestId }, smspariazRuntime);
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true,
@@ -73,7 +108,7 @@ export default async function handler(
   try {
     await server.connect(transport);
     const response = await transport.handleRequest(request, { authInfo });
-    return await addHorseeToolSecuritySchemes(response, writePolicy.writeScope);
+    return await addHorseeToolSecuritySchemes(response, getHorseeAuthScopes(authConfig));
   } finally {
     await server.close();
   }

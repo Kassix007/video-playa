@@ -3,12 +3,16 @@ import type { AuthInfo } from "@modelcontextprotocol/sdk/server/auth/types.js";
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
 
 export const DEFAULT_COUNCIL_WRITE_SCOPE = "horsee:council:write";
+export const DEFAULT_SMSPARIAZ_SESSION_SCOPE = "horsee:smspariaz:session";
+export const DEFAULT_SMSPARIAZ_APP_BET_SCOPE = "horsee:smspariaz:app-bet";
 
 type CouncilAuthEnvironment = Readonly<Record<string, string | undefined>>;
 
 interface BaseCouncilAuthConfig {
   resourceMetadataUrl: string;
   writeScope: string;
+  smspariazSessionScope: string;
+  smspariazAppBetScope: string;
 }
 
 export interface OAuthCouncilAuthConfig extends BaseCouncilAuthConfig {
@@ -39,6 +43,12 @@ export interface CouncilWritePolicy {
   resource?: string;
   resourceMetadataUrl: string;
   writeScope: string;
+}
+
+export interface HorseeAuthScopes {
+  writeScope: string;
+  smspariazSessionScope: string;
+  smspariazAppBetScope: string;
 }
 
 export class CouncilAuthenticationError extends Error {
@@ -108,6 +118,10 @@ export function resolveCouncilAuthConfig(
   const requestOrigin = new URL(requestUrl).origin;
   const writeScope = environment.HORSEE_OAUTH_WRITE_SCOPE?.trim()
     || DEFAULT_COUNCIL_WRITE_SCOPE;
+  const smspariazSessionScope = environment.HORSEE_OAUTH_SMSPARIAZ_SESSION_SCOPE?.trim()
+    || DEFAULT_SMSPARIAZ_SESSION_SCOPE;
+  const smspariazAppBetScope = environment.HORSEE_OAUTH_SMSPARIAZ_APP_BET_SCOPE?.trim()
+    || DEFAULT_SMSPARIAZ_APP_BET_SCOPE;
   const isNetlifyDeployment = environment.NETLIFY === "true" && environment.CONTEXT !== "dev";
   const requireHttps = isNetlifyDeployment;
 
@@ -128,6 +142,8 @@ export function resolveCouncilAuthConfig(
       resource,
       resourceMetadataUrl: new URL("/.well-known/oauth-protected-resource", resource).href,
       writeScope,
+      smspariazSessionScope,
+      smspariazAppBetScope,
     };
   }
 
@@ -139,6 +155,8 @@ export function resolveCouncilAuthConfig(
       resource: developmentResource,
       resourceMetadataUrl: new URL("/.well-known/oauth-protected-resource", requestOrigin).href,
       writeScope,
+      smspariazSessionScope,
+      smspariazAppBetScope,
     };
   }
 
@@ -146,6 +164,8 @@ export function resolveCouncilAuthConfig(
     mode: "disabled",
     resourceMetadataUrl: new URL("/.well-known/oauth-protected-resource", requestOrigin).href,
     writeScope,
+    smspariazSessionScope,
+    smspariazAppBetScope,
     reason: oauthValuesProvided
       ? "OAuth configuration is incomplete or contains an invalid URL."
       : "OAuth authorization is not configured for Council writes.",
@@ -158,6 +178,14 @@ export function getCouncilWritePolicy(config: CouncilAuthConfig): CouncilWritePo
     resource: config.mode === "disabled" ? undefined : config.resource,
     resourceMetadataUrl: config.resourceMetadataUrl,
     writeScope: config.writeScope,
+  };
+}
+
+export function getHorseeAuthScopes(config: CouncilAuthConfig): HorseeAuthScopes {
+  return {
+    writeScope: config.writeScope,
+    smspariazSessionScope: config.smspariazSessionScope,
+    smspariazAppBetScope: config.smspariazAppBetScope,
   };
 }
 
@@ -186,7 +214,7 @@ export async function authenticateCouncilRequest(
     return {
       token,
       clientId: "mcp-inspector-local",
-      scopes: [config.writeScope],
+      scopes: [config.writeScope, config.smspariazSessionScope, config.smspariazAppBetScope],
       resource: new URL(config.resource),
       extra: { developmentOnly: true },
     };
@@ -206,13 +234,6 @@ export async function authenticateCouncilRequest(
     if (!targetsCouncil) {
       throw new CouncilAuthenticationError("The access token was not issued for this MCP resource.");
     }
-    if (!scopes.includes(config.writeScope)) {
-      throw new CouncilAuthenticationError(
-        "The access token does not grant the Council write scope.",
-        "insufficient_scope",
-      );
-    }
-
     const clientId = [payload.client_id, payload.azp, payload.sub]
       .find((value): value is string => typeof value === "string")
       ?? "unknown-oauth-client";
@@ -275,7 +296,11 @@ export function getCouncilProtectedResourceMetadata(
   return {
     resource: config.resource,
     authorization_servers: [config.issuer],
-    scopes_supported: [config.writeScope],
+    scopes_supported: [
+      config.writeScope,
+      config.smspariazSessionScope,
+      config.smspariazAppBetScope,
+    ],
     bearer_methods_supported: ["header"],
   };
 }
