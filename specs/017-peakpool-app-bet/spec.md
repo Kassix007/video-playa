@@ -19,7 +19,6 @@
 - Documentation: environment variables, MCP tools, safe errors, drift response, and the exact owner-authorized no-cash verification gate are recorded in `docs/peakpool-app-bet.md` and `quickstart.md`.
 
 Task reconciliation: **35 of 36 complete**. T036 remains open because shared files currently contain overlapping feature-018 and pre-existing user changes, so an isolated feature-017 commit/push cannot be created safely without deliberate partitioning. This does not enable provider placement; live activation remains a separate manual gate under FR-016.
-
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Inspect the current Peakpool programme (Priority: P1)
