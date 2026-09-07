@@ -10,7 +10,15 @@ import { createTestSmspariazSubsystem } from "./smspariaz-test-helpers.js";
 
 const resource = "https://horsee.example/mcp";
 const writePolicy = { enabled: true, resource, resourceMetadataUrl: "https://horsee.example/.well-known/oauth-protected-resource", writeScope: "horsee:council:write" };
-const authPolicy = { enabled: true, resource, resourceMetadataUrl: writePolicy.resourceMetadataUrl, sessionScope: "horsee:smspariaz:session", appBetScope: "horsee:smspariaz:app-bet" };
+const authPolicy = {
+  enabled: true,
+  resource,
+  resourceMetadataUrl: writePolicy.resourceMetadataUrl,
+  sessionScope: "horsee:smspariaz:session",
+  appBetScope: "horsee:smspariaz:app-bet",
+  peakpoolPrepareScope: "horsee:peakpool:prepare",
+  peakpoolPlaceScope: "horsee:peakpool:place",
+};
 const resultStore: CouncilResultStore = { kind: "local-file", save: async () => undefined, getLatest: async () => null, getHistory: async () => [], getByDate: async () => [], getDateCounts: async () => [] };
 const statusStore: CouncilRunStatusStore = { set: async () => undefined, get: async () => null };
 const auth = (scopes: string[]): AuthInfo => ({ token: "not-returned", clientId: "client", scopes, resource: new URL(resource), extra: { subject: "user" } });

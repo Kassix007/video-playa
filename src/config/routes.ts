@@ -4,6 +4,7 @@ import Equidia from "../pages/Equidia";
 import Home from "../pages/Home";
 import Iptv from "../pages/Iptv";
 import Player from "../pages/Player";
+import Peakpool from "../pages/Peakpool";
 
 export type AppRoute = {
   path: string;
@@ -32,6 +33,12 @@ export const appRoutes = [
     label: "Equidia",
     description: "Open the dedicated French racing channel desk",
     Component: Equidia,
+  },
+  {
+    path: "/peakpool",
+    label: "Peakpool",
+    description: "Play a fantasy-credit horse-racing competition",
+    Component: Peakpool,
   },
   {
     path: "/player",

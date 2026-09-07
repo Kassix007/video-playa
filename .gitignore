@@ -29,3 +29,6 @@ dist-ssr
 .netlify
 .claude/settings.local.json
 .gstack/
+.env.supabase.production
+supabase/.temp/
+supabase/.branches/

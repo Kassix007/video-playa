@@ -5,6 +5,8 @@ import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
 export const DEFAULT_COUNCIL_WRITE_SCOPE = "horsee:council:write";
 export const DEFAULT_SMSPARIAZ_SESSION_SCOPE = "horsee:smspariaz:session";
 export const DEFAULT_SMSPARIAZ_APP_BET_SCOPE = "horsee:smspariaz:app-bet";
+export const DEFAULT_PEAKPOOL_PREPARE_SCOPE = "horsee:peakpool:prepare";
+export const DEFAULT_PEAKPOOL_PLACE_SCOPE = "horsee:peakpool:place";
 
 type CouncilAuthEnvironment = Readonly<Record<string, string | undefined>>;
 
@@ -13,6 +15,8 @@ interface BaseCouncilAuthConfig {
   writeScope: string;
   smspariazSessionScope: string;
   smspariazAppBetScope: string;
+  peakpoolPrepareScope: string;
+  peakpoolPlaceScope: string;
 }
 
 export interface OAuthCouncilAuthConfig extends BaseCouncilAuthConfig {
@@ -49,6 +53,8 @@ export interface HorseeAuthScopes {
   writeScope: string;
   smspariazSessionScope: string;
   smspariazAppBetScope: string;
+  peakpoolPrepareScope: string;
+  peakpoolPlaceScope: string;
 }
 
 export class CouncilAuthenticationError extends Error {
@@ -122,6 +128,10 @@ export function resolveCouncilAuthConfig(
     || DEFAULT_SMSPARIAZ_SESSION_SCOPE;
   const smspariazAppBetScope = environment.HORSEE_OAUTH_SMSPARIAZ_APP_BET_SCOPE?.trim()
     || DEFAULT_SMSPARIAZ_APP_BET_SCOPE;
+  const peakpoolPrepareScope = environment.HORSEE_OAUTH_PEAKPOOL_PREPARE_SCOPE?.trim()
+    || DEFAULT_PEAKPOOL_PREPARE_SCOPE;
+  const peakpoolPlaceScope = environment.HORSEE_OAUTH_PEAKPOOL_PLACE_SCOPE?.trim()
+    || DEFAULT_PEAKPOOL_PLACE_SCOPE;
   const isNetlifyDeployment = environment.NETLIFY === "true" && environment.CONTEXT !== "dev";
   const requireHttps = isNetlifyDeployment;
 
@@ -144,6 +154,8 @@ export function resolveCouncilAuthConfig(
       writeScope,
       smspariazSessionScope,
       smspariazAppBetScope,
+      peakpoolPrepareScope,
+      peakpoolPlaceScope,
     };
   }
 
@@ -157,6 +169,8 @@ export function resolveCouncilAuthConfig(
       writeScope,
       smspariazSessionScope,
       smspariazAppBetScope,
+      peakpoolPrepareScope,
+      peakpoolPlaceScope,
     };
   }
 
@@ -166,6 +180,8 @@ export function resolveCouncilAuthConfig(
     writeScope,
     smspariazSessionScope,
     smspariazAppBetScope,
+    peakpoolPrepareScope,
+    peakpoolPlaceScope,
     reason: oauthValuesProvided
       ? "OAuth configuration is incomplete or contains an invalid URL."
       : "OAuth authorization is not configured for Council writes.",
@@ -186,6 +202,8 @@ export function getHorseeAuthScopes(config: CouncilAuthConfig): HorseeAuthScopes
     writeScope: config.writeScope,
     smspariazSessionScope: config.smspariazSessionScope,
     smspariazAppBetScope: config.smspariazAppBetScope,
+    peakpoolPrepareScope: config.peakpoolPrepareScope,
+    peakpoolPlaceScope: config.peakpoolPlaceScope,
   };
 }
 
@@ -214,7 +232,13 @@ export async function authenticateCouncilRequest(
     return {
       token,
       clientId: "mcp-inspector-local",
-      scopes: [config.writeScope, config.smspariazSessionScope, config.smspariazAppBetScope],
+      scopes: [
+        config.writeScope,
+        config.smspariazSessionScope,
+        config.smspariazAppBetScope,
+        config.peakpoolPrepareScope,
+        config.peakpoolPlaceScope,
+      ],
       resource: new URL(config.resource),
       extra: { developmentOnly: true },
     };
@@ -300,6 +324,8 @@ export function getCouncilProtectedResourceMetadata(
       config.writeScope,
       config.smspariazSessionScope,
       config.smspariazAppBetScope,
+      config.peakpoolPrepareScope,
+      config.peakpoolPlaceScope,
     ],
     bearer_methods_supported: ["header"],
   };

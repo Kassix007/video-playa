@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { parseSmspariazConfig } from "./smspariaz-config.js";
 import { createSmspariazObservability } from "./smspariaz-observability.js";
+import { buildPeakpoolAppBetRequest } from "./peakpool-flow-profile.js";
 import { SmspariazProviderClient, SmspariazProviderError } from "./smspariaz-provider.js";
 
 const config = parseSmspariazConfig({
@@ -59,5 +60,37 @@ describe("SMSPariaz authentication transport", () => {
     await assert.rejects(() => client.postProviderForm("/wallet/placebet/", { wallet: "1" }), /allowlisted/);
     await assert.rejects(() => client.postProviderForm("/placebet/", { loginid: "1", phone: "2", token: "3", message: "deposit" }), /audited shape/);
     assert.equal(calls, 0);
+  });
+
+  it("uses only a builder-provenanced Peakpool form with the Peakpool referrer", async () => {
+    const calls: Array<{ url: string; init?: RequestInit }> = [];
+    const client = new SmspariazProviderClient(config, async (input, init) => {
+      calls.push({ url: String(input), init });
+      return Response.json({ status: 0, reply: { message: "Accepted" } });
+    });
+    const request = buildPeakpoolAppBetRequest(
+      { login_id: "42", phone: "23050000000", token: "secret-token" },
+      { unit_stake: 200, meeting_number: 3, race_number: 1, runner_number: 4, bet_type: "place" },
+    );
+
+    await client.postPeakpoolAppBet(request);
+
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0]?.url, "https://www.smspariaz.com/placebet/");
+    assert.equal(String(calls[0]?.init?.body), "loginid=42&phone=23050000000&token=secret-token&message=200R3C1H4P");
+    const headers = new Headers(calls[0]?.init?.headers);
+    assert.equal(headers.get("referer"), "https://www.smspariaz.com/peakpool/");
+    assert.equal(headers.get("origin"), "https://www.smspariaz.com");
+    assert.equal(headers.get("content-type"), "application/x-www-form-urlencoded; charset=UTF-8");
+
+    await assert.rejects(
+      () => client.postPeakpoolAppBet({ ...request } as never),
+      (error: unknown) => error instanceof SmspariazProviderError && error.code === "PEAKPOOL_APP_FLOW_CHANGED",
+    );
+    await assert.rejects(
+      () => client.postProviderForm("/placebet/", { loginid: "42", phone: "23050000000", token: "secret-token", message: "200R3C1H4P" }),
+      /audited shape/,
+    );
+    assert.equal(calls.length, 1);
   });
 });

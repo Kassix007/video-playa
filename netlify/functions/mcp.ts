@@ -16,6 +16,9 @@ import { createArchiveAwareCouncilResultStore } from "../../server/council-archi
 import { createHorseeMcpServer } from "../../server/horsee-mcp.js";
 import { addHorseeToolSecuritySchemes } from "../../server/horsee-tool-security.js";
 import { createCouncilRuntimeEnvironment } from "../../server/netlify-runtime.js";
+import { PeakpoolAppBetService } from "../../server/peakpool-app-bet.js";
+import { parsePeakpoolConfig } from "../../server/peakpool-config.js";
+import { PeakpoolProgrammeClient } from "../../server/peakpool-programme.js";
 import { SmspariazAppBetService } from "../../server/smspariaz-app-bet.js";
 import { parseSmspariazConfig } from "../../server/smspariaz-config.js";
 import { SmspariazFootballClient } from "../../server/smspariaz-football.js";
@@ -80,6 +83,24 @@ export default async function handler(
     const provider = new SmspariazProviderClient(smspariazConfig, fetch, telemetry);
     const football = new SmspariazFootballClient(provider, telemetry);
     const preparedStore = createSmspariazPreparedBetStore(smspariazConfig, runtimeEnvironment);
+    const peakpoolConfig = parsePeakpoolConfig(runtimeEnvironment, smspariazConfig);
+    const peakpool = peakpoolConfig.configured
+      ? {
+          config: peakpoolConfig,
+          appBet: new PeakpoolAppBetService(
+            peakpoolConfig,
+            provider,
+            new PeakpoolProgrammeClient({
+              baseUrl: smspariazConfig.baseUrl,
+              fetchImpl: fetch,
+              requestTimeoutMs: smspariazConfig.requestTimeoutMs,
+              maxResponseBytes: smspariazConfig.maxResponseBytes,
+            }),
+            preparedStore,
+            telemetry,
+          ),
+        }
+      : undefined;
     const subsystem = new SmspariazSubsystem(
       smspariazConfig,
       createSmspariazSessionStore(smspariazConfig, runtimeEnvironment),
@@ -87,6 +108,8 @@ export default async function handler(
       football,
       new SmspariazAppBetService(smspariazConfig, provider, football, preparedStore, telemetry),
       telemetry,
+      undefined,
+      peakpool,
     );
     smspariazRuntime = {
       subsystem,
@@ -96,6 +119,8 @@ export default async function handler(
         resourceMetadataUrl: authConfig.resourceMetadataUrl,
         sessionScope: authConfig.smspariazSessionScope,
         appBetScope: authConfig.smspariazAppBetScope,
+        peakpoolPrepareScope: authConfig.peakpoolPrepareScope,
+        peakpoolPlaceScope: authConfig.peakpoolPlaceScope,
       },
     };
   }

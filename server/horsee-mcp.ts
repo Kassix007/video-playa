@@ -17,6 +17,7 @@ import type { CouncilResultStore } from "./council-store.js";
 import {
   getSmspariazDailyRacecard,
   SmspariazRacecardResponseSchema,
+  SmspariazRacecardToolOutputSchema,
 } from "./smspariaz-racecard.js";
 import {
   registerSmspariazTools,
@@ -158,6 +159,8 @@ export function getHorseeToolSecuritySchemes(
         writeScope: scopesOrWriteScope,
         smspariazSessionScope: "horsee:smspariaz:session",
         smspariazAppBetScope: "horsee:smspariaz:app-bet",
+        peakpoolPrepareScope: "horsee:peakpool:prepare",
+        peakpoolPlaceScope: "horsee:peakpool:place",
       }
     : scopesOrWriteScope;
   const publicTools = [
@@ -166,6 +169,7 @@ export function getHorseeToolSecuritySchemes(
     "get_latest_council_result",
     "get_council_history",
     "smspariaz_get_smsfootball",
+    "smspariaz_get_peakpool",
   ];
   if (publicTools.includes(toolName)) return [{ type: "noauth" }];
 
@@ -182,10 +186,19 @@ export function getHorseeToolSecuritySchemes(
     "smspariaz_logout",
     "smspariaz_prepare_app_bet",
     "smspariaz_debug_status",
+    "smspariaz_debug_peakpool_status",
   ].includes(toolName)) return [{ type: "oauth2", scopes: [scopes.smspariazSessionScope] }];
 
   if (toolName === "smspariaz_place_app_bet") {
     return [{ type: "oauth2", scopes: [scopes.smspariazAppBetScope] }];
+  }
+
+  if (toolName === "smspariaz_prepare_peakpool_app_bet") {
+    return [{ type: "oauth2", scopes: [scopes.peakpoolPrepareScope] }];
+  }
+
+  if (toolName === "smspariaz_place_peakpool_app_bet") {
+    return [{ type: "oauth2", scopes: [scopes.peakpoolPlaceScope] }];
   }
 
   throw new Error(`No explicit HORSEE security policy is registered for tool ${toolName}.`);
@@ -413,7 +426,7 @@ export function createHorseeMcpServer(
       title: "Get current SMSPariaz daily racecard",
       description: "Fetch SMSPariaz directly from the HORSEE server, reject stale documents, and return the complete current Mauritius-day race programme in chronological order. This is programme discovery only and performs no Council analysis.",
       inputSchema: z.object({}).strict(),
-      outputSchema: SmspariazRacecardResponseSchema,
+      outputSchema: SmspariazRacecardToolOutputSchema,
       annotations: SMSPARIAZ_RACECARD_ANNOTATIONS,
       _meta: {
         securitySchemes: getHorseeToolSecuritySchemes(
@@ -423,7 +436,7 @@ export function createHorseeMcpServer(
       },
     },
     async () => {
-      const output = await getSmspariazDailyRacecard();
+      const output = SmspariazRacecardResponseSchema.parse(await getSmspariazDailyRacecard());
       return {
         content: [{
           type: "text",

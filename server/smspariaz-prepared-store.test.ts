@@ -8,6 +8,7 @@ import {
 function prepared(): SmspariazPreparedBet {
   return {
     schema_version: 1,
+    product: "smsfootball",
     handle: "A".repeat(43),
     state: "PREPARED",
     principal_hash: "a".repeat(64),
@@ -23,6 +24,26 @@ function prepared(): SmspariazPreparedBet {
     estimated_payout: 296,
     bookcode: "BOOK123",
     flow_fingerprint: "f".repeat(64),
+    created_at: "2026-09-01T10:00:00.000Z",
+    expires_at: "2026-09-01T10:03:00.000Z",
+  };
+}
+
+function peakpoolPrepared(): SmspariazPreparedBet {
+  return {
+    schema_version: 1,
+    product: "peakpool",
+    handle: "B".repeat(43),
+    state: "PREPARED",
+    principal_hash: "a".repeat(64),
+    session_generation: 3,
+    selection: {
+      meeting_number: "3", race_number: "1", runner_number: "0", selection_code: "R3C1H0",
+      bet_type: "place", runner_name: "Runner Zero", displayed_pool_value: "940",
+    },
+    unit_stake: 20,
+    programme_fingerprint: "b".repeat(64),
+    flow_fingerprint: "c".repeat(64),
     created_at: "2026-09-01T10:00:00.000Z",
     expires_at: "2026-09-01T10:03:00.000Z",
   };
@@ -51,5 +72,17 @@ describe("prepared app-bet state", () => {
     await expiredStore.create(prepared());
     await assert.rejects(() => expiredStore.claim(prepared().handle, prepared().principal_hash, 3, Date.parse("2026-09-01T10:04:00Z")));
     assert.equal((await expiredStore.get(prepared().handle))?.state, "EXPIRED");
+  });
+
+  it("binds each opaque ticket to its product before the atomic claim", async () => {
+    const store = new MemorySmspariazPreparedBetStore();
+    await store.create(prepared());
+    await store.create(peakpoolPrepared());
+    const now = Date.parse("2026-09-01T10:01:00Z");
+
+    await assert.rejects(() => store.claim(prepared().handle, prepared().principal_hash, 3, now, "peakpool"), /PREPARED_BET_INVALID/);
+    await assert.rejects(() => store.claim(peakpoolPrepared().handle, peakpoolPrepared().principal_hash, 3, now, "smsfootball"), /PREPARED_BET_INVALID/);
+    assert.equal((await store.get(prepared().handle))?.state, "PREPARED");
+    assert.equal((await store.get(peakpoolPrepared().handle))?.state, "PREPARED");
   });
 });

@@ -12,7 +12,7 @@ Add one deterministic read-only HORSEE discovery tool that directly retrieves an
 
 **Language/Version**: TypeScript 5.8, React TSX, CSS, Node.js 22 deployment runtime
 
-**Primary Dependencies**: Model Context Protocol SDK 1.30, Zod 4.4, `pdf-parse` 2.4, `@napi-rs/canvas` 0.1.80, Netlify Functions 6, Netlify Blobs 11, React 18.3, Vite 7.1
+**Primary Dependencies**: Model Context Protocol SDK 1.30, Zod 4.4, `pdf-parse` 2.4 with a platform-neutral text-only compatibility shim, Netlify Functions 6, Netlify Blobs 11, React 18.3, Vite 7.1
 
 **Storage**: Existing strongly consistent Netlify Blob store in deployed environments; existing atomic local JSON file store during development
 

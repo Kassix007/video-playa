@@ -1,0 +1,142 @@
+.peakpool-page { display: grid; gap: 18px; min-width: 0; }
+.peakpool-workspace-nav { align-items: center; backdrop-filter: blur(14px); background: color-mix(in srgb, var(--panel-elevated) 94%, transparent); border: 1px solid var(--border-strong); box-shadow: var(--shadow); display: grid; gap: 14px; grid-template-columns: minmax(180px, .55fr) minmax(0, 1.45fr); padding: 12px; position: sticky; top: 12px; z-index: 12; }
+.peakpool-workspace-intro { display: grid; gap: 2px; padding: 0 6px; }
+.peakpool-workspace-intro span { color: var(--brand-strong); font-size: .66rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+.peakpool-workspace-intro strong { font-family: Georgia, serif; font-size: 1.05rem; }
+.peakpool-workspace-actions { display: grid; gap: 7px; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); }
+.peakpool-workspace-actions button { align-items: center; background: var(--panel-2); border: 1px solid transparent; color: var(--muted); cursor: pointer; display: flex; gap: 8px; justify-content: space-between; min-height: 46px; padding: 0 12px; }
+.peakpool-workspace-actions button strong { align-items: center; background: var(--bg); border-radius: 999px; color: var(--text); display: inline-flex; font-size: .72rem; height: 24px; justify-content: center; min-width: 24px; padding: 0 7px; }
+.peakpool-workspace-actions button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand-strong); color: var(--button-text); }
+.peakpool-workspace-actions button[aria-pressed="true"] strong { background: color-mix(in srgb, var(--button-text) 16%, transparent); color: var(--button-text); }
+.peakpool-workspace-actions button:focus-visible { box-shadow: var(--focus-ring); outline: none; }
+.peakpool-notice { align-items: start; background: var(--panel); border: 1px solid var(--border); display: grid; gap: 18px; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); padding: 18px; }
+.peakpool-notice h2, .peakpool-notice p { margin: 0; }
+.peakpool-kicker { color: var(--brand-strong); font-size: .68rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+.peakpool-account, .peakpool-account-stack { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+.peakpool-avatar { border: 1px solid var(--border-strong); border-radius: 50%; height: 36px; object-fit: cover; width: 36px; }
+.peakpool-primary-button, .peakpool-secondary-button { border: 1px solid var(--border-strong); cursor: pointer; min-height: 42px; padding: 0 14px; }
+.peakpool-primary-button { background: var(--brand); color: var(--button-text); }
+.peakpool-danger-button { background: var(--danger); border: 1px solid var(--danger); color: #fff; cursor: pointer; min-height: 42px; padding: 0 14px; }
+.peakpool-danger-button:disabled { cursor: not-allowed; filter: grayscale(1); opacity: .58; }
+.peakpool-secondary-button { background: var(--panel-2); color: var(--text); }
+.peakpool-primary-button:focus-visible, .peakpool-secondary-button:focus-visible, .peakpool-danger-button:focus-visible { box-shadow: var(--focus-ring); outline: none; }
+.peakpool-account-status, .peakpool-error { color: var(--muted); margin: 0; }
+.peakpool-error { color: var(--danger); }
+.peakpool-balance { align-items: baseline; background: var(--accent-soft); border: 1px solid var(--accent); display: flex; flex-wrap: wrap; gap: 8px 14px; padding: 16px 18px; }
+.peakpool-balance span, .peakpool-balance small { color: var(--muted); }
+.peakpool-balance strong { font-family: Georgia, serif; font-size: 2rem; }
+.peakpool-programme-section { display: grid; gap: 14px; }
+.peakpool-section-head { align-items: end; display: flex; gap: 16px; justify-content: space-between; }
+.peakpool-section-head h2, .peakpool-meeting h3, .peakpool-race h4 { margin: 0; }
+.peakpool-programme-browser, .peakpool-races { display: grid; gap: 14px; }
+.peakpool-programme-summary { align-items: baseline; background: linear-gradient(135deg, var(--accent-soft), var(--panel)); border: 1px solid var(--accent); display: flex; flex-wrap: wrap; gap: 5px 10px; padding: 15px 18px; }
+.peakpool-programme-summary strong { font-family: Georgia, serif; font-size: 1.45rem; }
+.peakpool-programme-summary span { color: var(--text); }
+.peakpool-programme-summary small { color: var(--muted); flex-basis: 100%; }
+.peakpool-meeting-tabs { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.peakpool-meeting-tabs button { background: var(--panel); border: 1px solid var(--border); color: var(--text); cursor: pointer; display: grid; gap: 2px; min-height: 72px; padding: 10px 12px; text-align: left; }
+.peakpool-meeting-tabs button > span { color: var(--brand-strong); font-size: .66rem; font-weight: 850; letter-spacing: .1em; }
+.peakpool-meeting-tabs button > strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.peakpool-meeting-tabs button > small { color: var(--muted); }
+.peakpool-meeting-tabs button.is-active { background: var(--accent-soft); border-color: var(--accent); box-shadow: inset 3px 0 0 var(--brand); }
+.peakpool-meeting-tabs button:focus-visible { box-shadow: var(--focus-ring); outline: none; }
+.peakpool-meeting { display: grid; gap: 10px; }
+.peakpool-meeting > header { align-items: end; display: flex; gap: 10px; justify-content: space-between; padding-top: 4px; }
+.peakpool-meeting > header > div { display: grid; gap: 2px; }
+.peakpool-meeting > header > small { color: var(--muted); }
+.peakpool-meeting > header span, .peakpool-race-id { color: var(--brand-strong); font-size: .68rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.peakpool-race { background: var(--panel); border: 1px solid var(--border); min-width: 0; transition: border-color 160ms ease, box-shadow 160ms ease; }
+.peakpool-race.is-expanded { border-color: var(--border-strong); box-shadow: var(--shadow); }
+.peakpool-race-head { align-items: start; background: transparent; border: 0; color: var(--text); cursor: pointer; display: flex; gap: 14px; justify-content: space-between; padding: 14px 16px; text-align: left; width: 100%; }
+.peakpool-race-head:hover { background: var(--panel-2); }
+.peakpool-race-head:focus-visible { box-shadow: var(--focus-ring); outline: none; }
+.peakpool-race-head > div:first-child { display: grid; gap: 3px; min-width: 0; }
+.peakpool-race-head h4 { overflow-wrap: anywhere; }
+.peakpool-race-meta { align-items: center; display: flex; flex: 0 0 auto; gap: 13px; }
+.peakpool-race-time { display: grid; text-align: right; }
+.peakpool-race-time span { color: var(--muted); font-size: .7rem; text-transform: uppercase; }
+.peakpool-disclosure { align-items: center; border: 1px solid var(--border); border-radius: 50%; display: inline-flex; font-size: 1.15rem; height: 30px; justify-content: center; transform: rotate(0); transition: transform 160ms ease; width: 30px; }
+.peakpool-race.is-expanded .peakpool-disclosure { transform: rotate(180deg); }
+.peakpool-runner-list { display: grid; }
+.peakpool-runner { align-items: center; border-bottom: 1px solid var(--border); display: grid; gap: 10px; grid-template-columns: 36px minmax(130px, 1fr) minmax(120px, auto) 64px; padding: 10px 14px; }
+.peakpool-runner:last-child { border-bottom: 0; }
+.peakpool-runner-number { align-items: center; background: var(--panel-2); display: inline-flex; font-weight: 850; height: 30px; justify-content: center; width: 30px; }
+.peakpool-runner-name { font-weight: 750; min-width: 0; overflow-wrap: anywhere; }
+.peakpool-runner-price { display: grid; text-align: right; }
+.peakpool-runner-price small, .peakpool-runners-unavailable, .peakpool-empty span { color: var(--muted); }
+.peakpool-runner button { background: var(--brand); border: 1px solid var(--brand-strong); color: var(--button-text); cursor: pointer; min-height: 38px; }
+.peakpool-runner button:disabled { background: var(--panel-2); border-color: var(--border); color: var(--muted); cursor: not-allowed; }
+.peakpool-runner button:focus-visible { box-shadow: var(--focus-ring); outline: none; }
+.peakpool-runners-unavailable { margin: 0; padding: 16px; }
+.peakpool-empty { background: var(--panel); border: 1px dashed var(--border-strong); display: grid; gap: 4px; padding: 22px; }
+.peakpool-betslip { background: var(--panel-elevated); border: 1px solid var(--border-strong); box-shadow: var(--shadow); display: grid; gap: 14px; padding: 18px; position: sticky; bottom: 12px; z-index: 10; }
+.peakpool-betslip-head { align-items: start; display: flex; justify-content: space-between; }
+.peakpool-betslip h2 { margin: 0; }
+.peakpool-icon-button { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); cursor: pointer; font-size: 1.4rem; height: 40px; width: 40px; }
+.peakpool-betslip dl { display: grid; gap: 7px; margin: 0; }
+.peakpool-betslip dl div { display: grid; gap: 8px; grid-template-columns: minmax(100px, .35fr) 1fr; }
+.peakpool-betslip dt { color: var(--muted); }
+.peakpool-betslip dd { font-weight: 750; margin: 0; }
+.peakpool-field { display: grid; font-weight: 750; gap: 6px; }
+.peakpool-field input { background: var(--panel); border: 1px solid var(--border-strong); color: var(--text); min-height: 44px; padding: 0 12px; }
+.peakpool-field input:focus-visible, .peakpool-icon-button:focus-visible { box-shadow: var(--focus-ring); outline: none; }
+.peakpool-return { align-items: baseline; background: var(--accent-soft); display: flex; justify-content: space-between; padding: 12px; }
+.peakpool-return strong { font-size: 1.35rem; }
+.peakpool-place-button { width: 100%; }
+.peakpool-place-button:disabled { cursor: not-allowed; filter: grayscale(1); opacity: .58; }
+.peakpool-help { color: var(--muted); margin: 0; }
+.peakpool-receipt { background: var(--accent-soft); border: 1px solid var(--accent); display: grid; gap: 4px; padding: 12px; }
+.peakpool-private-grid { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.peakpool-card { background: var(--panel); border: 1px solid var(--border); display: grid; gap: 14px; min-width: 0; padding: 16px; }
+.peakpool-filter-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.peakpool-filter-row button { background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); cursor: pointer; min-height: 36px; padding: 0 11px; }
+.peakpool-filter-row button[aria-pressed="true"] { background: var(--brand); color: var(--button-text); }
+.peakpool-filter-row button:focus-visible { box-shadow: var(--focus-ring); outline: none; }
+.peakpool-history-list { display: grid; gap: 8px; }
+.peakpool-history-list article { align-items: start; background: var(--panel-2); display: flex; gap: 12px; justify-content: space-between; padding: 12px; }
+.peakpool-history-list article > div { display: grid; gap: 3px; min-width: 0; }
+.peakpool-history-list article span { color: var(--muted); font-size: .8rem; overflow-wrap: anywhere; }
+.peakpool-history-list dl { display: flex; gap: 12px; margin: 0; text-align: right; }
+.peakpool-history-list dl div { display: grid; }
+.peakpool-history-list dt { color: var(--muted); font-size: .68rem; text-transform: uppercase; }
+.peakpool-history-list dd { font-weight: 800; margin: 0; }
+.peakpool-table-wrap { max-width: 100%; overflow-x: auto; }
+.peakpool-table-wrap table { border-collapse: collapse; min-width: 650px; width: 100%; }
+.peakpool-table-wrap th, .peakpool-table-wrap td { border-bottom: 1px solid var(--border); padding: 10px; text-align: left; }
+.peakpool-table-wrap th { color: var(--muted); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; }
+.peakpool-player-cell { align-items: center; display: inline-flex; gap: 8px; }
+.peakpool-player-cell img { border-radius: 50%; height: 28px; width: 28px; }
+.peakpool-admin { border-top: 3px solid var(--brand); display: grid; gap: 14px; padding-top: 18px; }
+.peakpool-admin-danger { border: 1px solid var(--danger); display: grid; gap: 12px; padding: 14px; }
+.peakpool-admin-danger h3, .peakpool-admin-danger p { margin: 0; }
+.peakpool-admin-danger > div { display: grid; gap: 6px; }
+.peakpool-admin-danger > div > p:last-child { color: var(--muted); max-width: 76ch; }
+.peakpool-admin-form { align-items: end; background: var(--panel-2); display: grid; gap: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 14px; }
+.peakpool-admin-form label { display: grid; gap: 5px; }
+.peakpool-admin-form input, .peakpool-admin-form select, .peakpool-dialog textarea { background: var(--panel); border: 1px solid var(--border-strong); color: var(--text); min-height: 42px; padding: 8px; }
+.peakpool-admin-form input:focus-visible, .peakpool-admin-form select:focus-visible, .peakpool-dialog button:focus-visible, .peakpool-dialog textarea:focus-visible { box-shadow: var(--focus-ring); outline: none; }
+.peakpool-form-wide { grid-column: span 2; }
+.peakpool-code-list { display: grid; gap: 5px; max-height: 260px; overflow: auto; }
+.peakpool-code-list code { background: var(--bg); overflow-wrap: anywhere; padding: 8px; white-space: pre-wrap; }
+.peakpool-admin-races { display: grid; gap: 7px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.peakpool-admin-races button { align-items: start; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); cursor: pointer; display: grid; gap: 4px; padding: 11px; text-align: left; }
+.peakpool-admin-races button strong { color: var(--muted); font-size: .7rem; }
+.peakpool-dialog { background: var(--panel-elevated); border: 1px solid var(--border-strong); color: var(--text); max-height: min(84dvh, 720px); max-width: min(92vw, 620px); overflow: auto; width: 100%; }
+.peakpool-dialog::backdrop { background: var(--overlay); }
+.peakpool-dialog form, .peakpool-dialog fieldset { display: grid; gap: 10px; }
+.peakpool-dialog fieldset { border: 1px solid var(--border); }
+.peakpool-dialog-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.peakpool-dialog-actions button, .peakpool-dialog h2 + button { background: var(--panel-2); border: 1px solid var(--border-strong); color: var(--text); cursor: pointer; min-height: 42px; padding: 0 12px; }
+@media (max-width: 760px) { .peakpool-private-grid { grid-template-columns: 1fr; } .peakpool-history-list article { display: grid; } .peakpool-history-list dl { text-align: left; } }
+@media (max-width: 760px) { .peakpool-admin-form { grid-template-columns: 1fr; } .peakpool-form-wide { grid-column: auto; } }
+@media (max-width: 760px) { .peakpool-workspace-nav { grid-template-columns: 1fr; position: static; } .peakpool-workspace-intro { display: none; } .peakpool-workspace-actions { display: flex; max-width: 100%; overflow-x: auto; padding-bottom: 2px; } .peakpool-workspace-actions button { flex: 0 0 auto; min-width: 116px; } }
+@media (max-width: 640px) { .peakpool-notice { grid-template-columns: 1fr; } .peakpool-account, .peakpool-account-stack { justify-content: flex-start; } }
+@media (max-width: 640px) { .peakpool-meeting-tabs { display: flex; margin-inline: -1px; max-width: 100%; overflow-x: auto; padding-bottom: 4px; } .peakpool-meeting-tabs button { flex: 0 0 158px; } .peakpool-race-head { padding: 13px; } .peakpool-race-meta { gap: 8px; } }
+@media (max-width: 600px) { .peakpool-runner { grid-template-columns: 34px minmax(0, 1fr) 62px; } .peakpool-runner-price { grid-column: 2 / -1; grid-row: 2; text-align: left; } }
+@media (prefers-reduced-motion: reduce) { .peakpool-race, .peakpool-disclosure { transition: none; } }
+.peakpool-winners { border-top: 1px solid var(--border); background: var(--panel-2); padding: 12px 16px; display: grid; gap: 6px; }
+.peakpool-winners > strong { color: var(--text); font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+.peakpool-winners ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.peakpool-winners li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; overflow-wrap: anywhere; }
+.peakpool-winners li > span:last-child { color: var(--muted); font-size: .85rem; }
+.peakpool-winner-name { font-weight: 700; }

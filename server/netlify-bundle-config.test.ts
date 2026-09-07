@@ -13,4 +13,14 @@ describe("Netlify MCP bundle configuration", () => {
       /included_files\s*=\s*\[[^\]]*node_modules\/pdfjs-dist\/legacy\/build\/pdf\.worker\.mjs[^\]]*\]/,
     );
   });
+
+  it("does not externalize a host-native canvas binding for the Linux function runtime", async () => {
+    const config = await readFile(new URL("../netlify.toml", import.meta.url), "utf8");
+    const source = await readFile(new URL("./smspariaz-racecard.ts", import.meta.url), "utf8");
+    const mcpFunction = config.match(/\[functions\.mcp\]([\s\S]*?)(?=\r?\n\[|$)/);
+
+    assert.ok(mcpFunction, "netlify.toml must define an MCP function section");
+    assert.doesNotMatch(mcpFunction[1], /@napi-rs\/canvas/);
+    assert.doesNotMatch(source, /import\(["']@napi-rs\/canvas["']\)/);
+  });
 });

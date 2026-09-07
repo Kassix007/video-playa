@@ -177,6 +177,7 @@ export class SmspariazAppBetService {
     const handle = randomBytes(32).toString("base64url");
     const record: SmspariazPreparedBet = {
       schema_version: 1,
+      product: "smsfootball",
       handle,
       state: "PREPARED",
       principal_hash: principalHash(principal),
@@ -218,6 +219,7 @@ export class SmspariazAppBetService {
     if (approved !== true) throw new Error("PREPARED_BET_INVALID");
     const current = await this.preparedStore.get(handle);
     if (!current) throw new Error("PREPARED_BET_INVALID");
+    if (current.product !== "smsfootball") throw new Error("PREPARED_BET_INVALID");
     if (current.state !== "PREPARED") throw new Error("PREPARED_BET_ALREADY_USED");
     if (!session.app_registered) throw new Error("APP_REGISTRATION_REQUIRED");
     if (!await this.provider.checkLogin(session)) throw new Error("SESSION_EXPIRED");
@@ -228,7 +230,8 @@ export class SmspariazAppBetService {
       const live = findExactSelection(programme, selection);
       if (Math.abs(live.odds - selection.odds) > 0.000001 || live.bet_code !== selection.bet_code) throw new Error("ODDS_CHANGED");
     }
-    const claimed = await this.preparedStore.claim(handle, principalHash(principal), session.generation, this.now());
+    const claimed = await this.preparedStore.claim(handle, principalHash(principal), session.generation, this.now(), "smsfootball");
+    if (claimed.product !== "smsfootball") throw new Error("PREPARED_BET_INVALID");
     const request = buildGuardedAppBetRequest(this.config.baseUrl, AUDITED_SMSPARIAZ_FLOW.paths.placeAppBet, session, claimed.bookcode);
     this.telemetry?.emit("app_bet_submitting", { selection_count: claimed.selections.length, flow_fingerprint: flow.fingerprint });
     let responseText: string;

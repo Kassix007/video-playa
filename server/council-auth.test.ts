@@ -35,6 +35,8 @@ describe("Council write authorization", () => {
     assert.equal(authInfo?.scopes.includes(config.writeScope), true);
     assert.equal(authInfo?.scopes.includes(config.smspariazSessionScope), true);
     assert.equal(authInfo?.scopes.includes(config.smspariazAppBetScope), true);
+    assert.equal(authInfo?.scopes.includes(config.peakpoolPrepareScope), true);
+    assert.equal(authInfo?.scopes.includes(config.peakpoolPlaceScope), true);
     assert.equal(authInfo?.resource?.href, "http://localhost:8888/mcp");
   });
 
@@ -67,6 +69,8 @@ describe("Council write authorization", () => {
         "horsee:council:write",
         "horsee:smspariaz:session",
         "horsee:smspariaz:app-bet",
+        "horsee:peakpool:prepare",
+        "horsee:peakpool:place",
       ],
       bearer_methods_supported: ["header"],
     });
