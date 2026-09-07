@@ -16,8 +16,10 @@
 .peakpool-avatar { border: 1px solid var(--border-strong); border-radius: 50%; height: 36px; object-fit: cover; width: 36px; }
 .peakpool-primary-button, .peakpool-secondary-button { border: 1px solid var(--border-strong); cursor: pointer; min-height: 42px; padding: 0 14px; }
 .peakpool-primary-button { background: var(--brand); color: var(--button-text); }
+.peakpool-danger-button { background: var(--danger); border: 1px solid var(--danger); color: #fff; cursor: pointer; min-height: 42px; padding: 0 14px; }
+.peakpool-danger-button:disabled { cursor: not-allowed; filter: grayscale(1); opacity: .58; }
 .peakpool-secondary-button { background: var(--panel-2); color: var(--text); }
-.peakpool-primary-button:focus-visible, .peakpool-secondary-button:focus-visible { box-shadow: var(--focus-ring); outline: none; }
+.peakpool-primary-button:focus-visible, .peakpool-secondary-button:focus-visible, .peakpool-danger-button:focus-visible { box-shadow: var(--focus-ring); outline: none; }
 .peakpool-account-status, .peakpool-error { color: var(--muted); margin: 0; }
 .peakpool-error { color: var(--danger); }
 .peakpool-balance { align-items: baseline; background: var(--accent-soft); border: 1px solid var(--accent); display: flex; flex-wrap: wrap; gap: 8px 14px; padding: 16px 18px; }
@@ -105,6 +107,10 @@
 .peakpool-player-cell { align-items: center; display: inline-flex; gap: 8px; }
 .peakpool-player-cell img { border-radius: 50%; height: 28px; width: 28px; }
 .peakpool-admin { border-top: 3px solid var(--brand); display: grid; gap: 14px; padding-top: 18px; }
+.peakpool-admin-danger { border: 1px solid var(--danger); display: grid; gap: 12px; padding: 14px; }
+.peakpool-admin-danger h3, .peakpool-admin-danger p { margin: 0; }
+.peakpool-admin-danger > div { display: grid; gap: 6px; }
+.peakpool-admin-danger > div > p:last-child { color: var(--muted); max-width: 76ch; }
 .peakpool-admin-form { align-items: end; background: var(--panel-2); display: grid; gap: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 14px; }
 .peakpool-admin-form label { display: grid; gap: 5px; }
 .peakpool-admin-form input, .peakpool-admin-form select, .peakpool-dialog textarea { background: var(--panel); border: 1px solid var(--border-strong); color: var(--text); min-height: 42px; padding: 8px; }

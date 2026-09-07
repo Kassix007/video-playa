@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { extractAtrIdentity, isAtrAccessChallenge, matchEdgeObservation, type ObservedRaceIdentity } from "../supabase/functions/_shared/results.js";
+import { extractAtrIdentity, finishingRows, isAtrAccessChallenge, matchEdgeObservation, type ObservedRaceIdentity } from "../supabase/functions/_shared/results.js";
 
 export type FantasyResultState = "PENDING" | "PROVISIONAL" | "CONFIRMED" | "VOID" | "NEEDS_REVIEW";
 export type ResultOrderRow = {
@@ -87,7 +87,7 @@ export function parseAtrResultHtml(html: string, metadata: ObservationMetadata):
   if (/race abandoned|race void|no contest/i.test(cleanText(html))) {
     return { ...common, status: "VOID", finishingOrder: [], nonRunners: [], sanitizedRelevantFragment: "Race reported void or abandoned" };
   }
-  const finishingOrder = parseFinishingOrder(html);
+  const finishingOrder = finishingRows(html);
   const nonRunners: ResultNonRunner[] = [];
   for (const match of html.matchAll(/class=["']non-runner["'][^>]*data-number=["'](\d+)["'][^>]*>([^<]+)</gi)) {
     nonRunners.push({ runnerNumber: Number(match[1]), runnerName: cleanText(match[2]) });

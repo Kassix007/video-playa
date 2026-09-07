@@ -282,6 +282,12 @@
 
 - [x] T110 Show today's confirmed winners and final PMU dividends on settled programme cards, including dead heats; verify public projection/privacy, pending/void exclusion, responsive rendering, deploy and commit. Netlify 6a9dcd1418b95a9fac837aca and migration 202609060006 live; repository tests/build and 149 SQL assertions pass. Local single/dead-heat cards verified at 375/768/1280; real production projection returns AVEC TOI at PMU ×1.20. No production test data added.
 
+- [x] T111 Specify the audited active-round semantics, immutable balance restoration, pending-bet gate, idempotency, and administrator confirmation contract for leaderboard reset.
+- [ ] T112 Add database and UI regressions for authorization, pending-bet rejection, exact confirmation, immutable adjustments, aggregate reset, replay, and safe rendering.
+- [ ] T113 Implement the protected reset RPC, round-aware leaderboard projection, browser service call, and administrator danger-zone control.
+- [ ] T114 Run focused, database, repository, build, diff, secret, and 375/768/1280 responsive checks without executing a production reset.
+- [ ] T115 Apply the production migration, deploy the browser build, verify the live option and data boundary without mutation, and commit only completed work without secrets or unfinished ATR files.
+
 - [x] T109 Fix administrator settings hydration and hidden timing preservation; reject missing configuration, require explicit adjustment recipient, test and deploy, then verify the real administrator screen without production test mutations. Netlify 6a9d800e1555bbbcde84c239 and migration 202609060005 live; 259 repository tests, 141 SQL assertions and build pass. Saved settings verified at all three widths; review dialog opens/closes with Escape; no console errors. Full mutation-flow matrix remains T059.
 
 - [x] T106 Backfill empty PDF race fields from strictly matched PMU participants, with evidence, bounded work and no overwrite of existing selections. Migration 202609060004 and worker deployed; local RPC regressions pass. Production already has fields for all 31 races, so this invocation correctly performed no backfill; a live empty-field write remains unexercised.

@@ -43,6 +43,8 @@ Singleton row keyed by `id = true`.
 | `result_check_initial_delay_seconds` | integer | Delay after official off before first check. |
 | `result_check_max_age_seconds` | integer | Automatic-check cutoff. |
 | `result_confirmation_required` | text | Default `WEIGHED_IN`. |
+| `leaderboard_round` | bigint | Monotonically increases when an administrator starts a new competition round. |
+| `leaderboard_reset_at` | timestamp nullable | Trusted boundary for the active round's bet, win, and net-result aggregates. |
 | `version`, `updated_at`, `updated_by` | audit fields | Incremented and attributed through admin RPC only. |
 
 ## `wallets`
@@ -214,7 +216,7 @@ Immutable record of setting changes, wallet adjustments, result confirmation, ra
 
 ## Public leaderboard
 
-A security-invoker view or narrowly scoped RPC aggregates chosen `display_name`, avatar, wallet balance, sum of non-opening ledger amounts as net result, won bets, and total bets. It never exposes profile email, raw ledger rows, user auth metadata, or admin notes.
+A security-invoker view or narrowly scoped RPC aggregates chosen `display_name`, avatar, wallet balance, active-round non-opening/non-reset ledger amounts as net result, and active-round won and total bets. It never exposes profile email, raw ledger rows, user auth metadata, or admin notes. A leaderboard reset advances the trusted round boundary and restores balances with marked immutable adjustments; those reset entries remain in the ledger but do not count as profit or loss.
 
 ## Indexes
 

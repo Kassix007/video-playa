@@ -14,7 +14,38 @@ export type ObservedRaceIdentity = {
 };
 
 export function isAtrAccessChallenge(html: string): boolean {
-  return /_fs[-_]ch|client\s+challenge|checking your browser|f5 challenge|javascript is disabled in your browser|access challenge or unavailable result/i.test(html);
+  // ATR also includes /_fs-ch-.../assets/script.js on genuine result pages.
+  const withoutPassiveScript = html.replace(/<script\b[^>]*src=["']\/_fs-ch-[^"']+\/assets\/script\.js["'][^>]*>\s*<\/script>/gi, "");
+  return /_fs[-_]ch|client\s+challenge|checking your browser|f5 challenge|javascript is disabled in your browser|access challenge or unavailable result/i.test(withoutPassiveScript);
+}
+
+function londonInstant(local: string): string | undefined {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(local)) return undefined;
+  const possible = [0, 60].map(offset => new Date(Date.parse(`${local}Z`) - offset * 60_000));
+  const matches = possible.filter(date => {
+    if (!Number.isFinite(date.getTime())) return false;
+    const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", year: "numeric", month: "2-digit",
+      day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).formatToParts(date).map(x => [x.type, x.value]));
+    return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}` === local;
+  });
+  return matches.length === 1 ? matches[0].toISOString() : undefined;
+}
+
+// Return complete nested DIV elements, rather than mixing adjacent result rows.
+function divBlocks(html: string, attribute: RegExp): string[] {
+  const blocks: string[] = [];
+  const tags = [...html.matchAll(/<\/?div\b[^>]*>/gi)];
+  for (let i = 0; i < tags.length; i++) {
+    if (!attribute.test(tags[i][0]) || /^<\//.test(tags[i][0])) continue;
+    let depth = 1, j = i + 1;
+    for (; j < tags.length; j++) {
+      depth += /^<\//.test(tags[j][0]) ? -1 : 1;
+      if (!depth) break;
+    }
+    if (!depth) blocks.push(html.slice(tags[i].index, tags[j].index! + tags[j][0].length));
+    i = j;
+  }
+  return blocks;
 }
 
 // Request parameters are deliberately not accepted by this extractor. Unsupported
@@ -33,8 +64,32 @@ export function extractAtrIdentity(html: string): ObservedRaceIdentity {
     try { visit(JSON.parse(match[1])); } catch { /* Not evidence. */ }
   }
   const headings = [...html.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi)];
-  if (events.length !== 1 || headings.length !== 1) return {};
+  if (events.length !== 1) return {};
   const event = events[0];
+  if (headings.length === 0 && typeof event.url === "string" && typeof event.startDate === "string") {
+    // Live ATR layout captured 2026-09-05: local London time + response URL,
+    // numbered race header and explicit title, all independently published.
+    const header = divBlocks(html, /class=["'][^"']*\brace-header\b[^"']*["']/i);
+    if (header.length !== 1) return {};
+    const h = header[0];
+    const number = h.match(/class=["']post__number["'][^>]*>\s*(\d+)\s*</i)?.[1];
+    const title = h.match(/<p class=["']p--medium["'][^>]*>\s*<b>([\s\S]*?)<\/b>/i)?.[1];
+    const heading = h.match(/<h2\b[^>]*>([\s\S]*?)<\/h2>/i)?.[1];
+    let url: URL;
+    try { url = new URL(event.url); } catch { return {}; }
+    const path = url.pathname.match(/^\/racecard\/([^/]+)\/(\d{2})-([A-Za-z]+)-(\d{4})\/(\d{2})(\d{2})$/);
+    if (url.origin !== "https://www.attheraces.com" || !path || !number || !title || !heading) return {};
+    const scheduledAt = londonInstant(event.startDate);
+    if (!scheduledAt || !event.startDate.endsWith(`T${path[5]}:${path[6]}:00`)) return {};
+    const course = decodeURIComponent(path[1]).replace(/-/g, " ");
+    const publishedDate = `${path[2]} ${path[3].slice(0, 3)} ${path[4]}`;
+    if (normalize(text(heading)) !== normalize(`${path[5]}:${path[6]} ${course} ${publishedDate}`)) return {};
+    const londonDate = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", day: "2-digit", month: "short", year: "numeric" }).format(new Date(scheduledAt));
+    if (normalize(londonDate.replace("Sept", "Sep")) !== normalize(publishedDate)) return {};
+    const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: "Indian/Mauritius", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(scheduledAt)).map(x => [x.type, x.value]));
+    return { course, programmeDate: `${p.year}-${p.month}-${p.day}`, scheduledAt, raceNumber: Number(number), raceName: text(title) };
+  }
+  if (headings.length !== 1) return {};
   const start = event.startDate;
   const location = event.location as { name?: unknown } | undefined;
   if (typeof start !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(start)
@@ -55,7 +110,7 @@ export function extractAtrIdentity(html: string): ObservedRaceIdentity {
 export type EdgeObservation = {
   observedIdentity?: ObservedRaceIdentity;
   race_id: string;
-  provider: "at-the-races";
+  provider: "at-the-races" | "zone-turf";
   source_url: string;
   retrieved_at: string;
   programme_date: string;
@@ -101,7 +156,20 @@ function finalizedStartingPrice(rowHtml: string): string | undefined {
     : undefined;
 }
 
-function finishingRows(html: string): EdgeObservation["finishing_order"] {
+export function finishingRows(html: string): EdgeObservation["finishing_order"] {
+  const resultPanels = divBlocks(html, /\bid=["']tab-full-result["']/i);
+  if (resultPanels.length === 1) {
+    const entries = divBlocks(resultPanels[0], /class=["'][^"']*\bcard-entry\b[^"']*["']/i);
+    if (entries.length && !/data-position=/.test(resultPanels[0])) return entries.map(entry => {
+      const positionText = text(divBlocks(entry, /class=["']card-no-draw__inner["']/i)[0] ?? "");
+      const horse = entry.match(/<h2\b[^>]*>\s*<span>\s*(\d+)\.\s*<\/span>\s*<a\b[^>]*class=["'][^"']*\bhorse__link\b[^"']*["'][^>]*>([\s\S]*?)<\/a>/i);
+      const odds = text(divBlocks(entry, /class=["'][^"']*\bcard-cell--odds\b[^"']*["']/i)[0] ?? "").replace(/\b([2-9]?|J)Fav\b/gi, "$1F");
+      if (!/^\d+$/.test(positionText) || !horse) throw new Error("ATR_RESULT_ROW_UNSUPPORTED");
+      const price = finalizedStartingPrice(`<span class="sp">${odds}</span>`);
+      return { position: Number(positionText), runnerNumber: Number(horse[1]), runnerName: text(horse[2]),
+        ...(price ? { finalizedStartingPriceRaw: price } : {}) };
+    });
+  }
   const starts = [...html.matchAll(/data-position=["'](\d+)["']/gi)];
   const rows: EdgeObservation["finishing_order"] = [];
   for (let index = 0; index < starts.length; index += 1) {
@@ -199,5 +267,39 @@ export function matchEdgeObservation(race: EdgeRace, runners: EdgeRunner[], obse
     winner_runner_ids: confirmed ? winners : [], non_runner_ids: confirmed ? nonRunners : [],
     confidence: confirmed ? 1 : Object.values(allEvidence).filter(Boolean).length / Object.keys(allEvidence).length,
     match_evidence: allEvidence,
+  };
+}
+
+export async function parseZoneTurfHtml(race: EdgeRace, sourceUrl: string, html: string): Promise<EdgeObservation> {
+  const retrievedAt = new Date().toISOString();
+  const common = {
+    race_id: race.id, provider: "zone-turf" as const, source_url: sourceUrl, retrieved_at: retrievedAt,
+    programme_date: race.programme_date, course: race.racecourse, race_number: race.race_number,
+    ...(race.race_name ? { race_name: race.race_name } : {}), payload_hash: await sha256(html),
+  };
+
+  const finishingOrder: EdgeObservation["finishing_order"] = [];
+  const rows = html.split(/<tr[^>]*>/gi).slice(1);
+  for (const row of rows) {
+    const posMatch = row.match(/<td[^>]*>(\d+)<\/td>/i);
+    const numMatch = row.match(/<td[^>]*>(\d+)<\/td>/i);
+    const nameMatch = row.match(/<a[^>]*>([\s\S]*?)<\/a>/i);
+    const oddsMatch = row.match(/\*\*([\d\.,]+)\*\*/);
+
+    if (posMatch && nameMatch && oddsMatch) {
+      const price = oddsMatch[1].replace(',', '.');
+      finishingOrder.push({
+        position: Number(posMatch[1]),
+        runnerNumber: Number(numMatch ? numMatch[1] : 0),
+        runnerName: text(nameMatch[1]),
+        finalizedStartingPriceRaw: price,
+      });
+    }
+  }
+
+  const confirmed = finishingOrder.length > 0;
+  return {
+    ...common, status: confirmed ? "CONFIRMED" : "NEEDS_REVIEW",
+    finishing_order: finishingOrder, non_runners: [], sanitized_fragment: text(html).slice(0, 2000),
   };
 }

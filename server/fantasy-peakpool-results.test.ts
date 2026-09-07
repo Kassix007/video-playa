@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { parseAtrHtml, matchEdgeObservation } from "../supabase/functions/_shared/results.js";
+import { ATR_LIVE_LAYOUT } from "./test-fixtures/fantasy-peakpool/atr-live-layout.js";
 import {
   matchFantasyResult,
   parseAtrResultHtml,
@@ -25,6 +26,16 @@ const runners = [
   { id: "alpha", number: 4, name: "Alpha Star" },
   { id: "beta", number: 2, name: "Beta Moon" },
 ];
+
+test("actual ATR layout accepts passive Fastly script, London local time and SP cell", async () => {
+  const target = { id: "h", programme_date: "2026-09-04", racecourse: "Haydock", official_off_at: "2026-09-04T13:05:00Z",
+    race_number: 2, race_name: "Lee Thomas Christy Memorial EBF Fillies' Novice Stakes" };
+  const observation = await parseAtrHtml(target, "https://www.attheraces.com/racecard/Haydock/04-September-2026/1405", ATR_LIVE_LAYOUT);
+  assert.equal(observation.finishing_order[0].finalizedStartingPriceRaw, "9/4 2F");
+  assert.equal(matchEdgeObservation(target, [{ id: "g", runner_number: 1, runner_name: "Girl Scout" }], observation).status, "CONFIRMED");
+  const wrong = await parseAtrHtml(target, observation.source_url, ATR_LIVE_LAYOUT.replace("Haydock 04 Sep", "Ascot 04 Sep"));
+  assert.equal(matchEdgeObservation(target, [], wrong).status, "NEEDS_REVIEW");
+});
 
 test("parses a final ATR result and supports multiple position-one winners", () => {
   const normal = parseAtrResultHtml(ATR_CONFIRMED_RESULT_HTML, {

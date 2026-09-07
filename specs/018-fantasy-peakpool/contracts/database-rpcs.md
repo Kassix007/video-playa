@@ -65,6 +65,20 @@ admin_adjust_wallet(
 
 Locks the target wallet, rejects zero/more-than-two-decimal changes and negative resulting balances, creates one `ADMIN_ADJUSTMENT`, updates balance/version, and creates an audit event. Unique actor/request identity makes retries idempotent.
 
+## `admin_reset_fantasy_leaderboard`
+
+**Grant**: `authenticated`; function requires admin.
+
+```text
+admin_reset_fantasy_leaderboard(
+  p_reason text,
+  p_confirmation text,
+  p_idempotency_key uuid
+) -> jsonb
+```
+
+Requires the exact confirmation phrase `RESET LEADERBOARD` and a reason. The function serializes settings and every wallet, rejects if any bet is `PENDING`, advances the leaderboard round and reset timestamp, restores every wallet to the current configured starting balance through marked immutable `ADMIN_ADJUSTMENT` rows, and writes one aggregate audit event. Historical bets and transactions are never deleted or updated. Reusing the same administrator/request identity returns the original reset receipt without applying another reset.
+
 ## `admin_confirm_race_result`
 
 **Grant**: `authenticated`; function requires admin.

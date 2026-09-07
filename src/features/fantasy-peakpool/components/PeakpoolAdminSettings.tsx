@@ -1,5 +1,5 @@
 import React from "react";
-import { adjustFantasyWallet, fantasyErrorMessage, updateFantasySettings } from "../../../services/fantasy-peakpool";
+import { adjustFantasyWallet, fantasyErrorMessage, resetFantasyLeaderboard, updateFantasySettings } from "../../../services/fantasy-peakpool";
 import { parseAdminSettings, type AdminSettings } from "../admin-settings";
 
 type PlayerRow = { id: string; display_name: string; role: string; balance: string | number };
@@ -23,6 +23,8 @@ function SettingsEditor({ players, onChanged, settings }: Props & { settings: Ad
   const [closeBuffer, setCloseBuffer] = useState(String(settings.close_buffer_seconds));
   const [quoteAge, setQuoteAge] = useState(String(settings.max_quote_age_seconds));
   const [settingsReason, setSettingsReason] = useState("");
+  const [resetReason, setResetReason] = useState("");
+  const [resetConfirmation, setResetConfirmation] = useState("");
   const [status, setStatus] = useState<string | null>(null);
 
   return <section className="peakpool-card" aria-labelledby="peakpool-admin-settings-title">
@@ -58,6 +60,26 @@ function SettingsEditor({ players, onChanged, settings }: Props & { settings: Ad
       <label className="peakpool-form-wide">Reason<input onChange={(event) => setAdjustReason(event.target.value)} required value={adjustReason} /></label>
       <button className="peakpool-primary-button" type="submit">Adjust balance</button>
     </form>
+    <div className="peakpool-admin-danger">
+      <div>
+        <p className="peakpool-kicker">Danger zone</p>
+        <h3>Reset leaderboard</h3>
+        <p>Starts a new competition round and restores every fantasy wallet to the current starting balance. Bet and ledger history is preserved. The reset is blocked while any bets are pending.</p>
+      </div>
+      <form className="peakpool-admin-form" onSubmit={(event) => {
+        event.preventDefault(); setStatus(null);
+        void resetFantasyLeaderboard({ reason: resetReason, confirmation: resetConfirmation, idempotencyKey: crypto.randomUUID() })
+          .then(async (receipt) => {
+            setStatus(`Leaderboard reset complete. Round ${String(receipt.leaderboard_round ?? "advanced")}.`);
+            setResetReason(""); setResetConfirmation(""); await onChanged();
+          })
+          .catch((error: unknown) => setStatus(fantasyErrorMessage(error)));
+      }}>
+        <label className="peakpool-form-wide">Reason<input onChange={(event) => setResetReason(event.target.value)} required value={resetReason} /></label>
+        <label>Type RESET LEADERBOARD<input autoComplete="off" onChange={(event) => setResetConfirmation(event.target.value)} required spellCheck={false} value={resetConfirmation} /></label>
+        <button className="peakpool-danger-button" disabled={resetReason.trim().length < 3 || resetConfirmation !== "RESET LEADERBOARD"} type="submit">Reset leaderboard</button>
+      </form>
+    </div>
     {status && <p role="status">{status}</p>}
   </section>;
 }

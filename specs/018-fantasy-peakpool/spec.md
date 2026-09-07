@@ -191,6 +191,7 @@ As an administrator, I want protected controls for game settings, player adjustm
 2. **Given** an administrator adjusting a wallet, **When** they submit a signed amount and reason, **Then** one immutable adjustment records the amount, reason, administrator, timestamp, and resulting balance.
 3. **Given** an administrator manually confirms or voids a race, **When** they provide an explicit reason, **Then** evidence and audit metadata are stored and settlement remains idempotent.
 4. **Given** a normal player, **When** they invoke any role, balance, odds, race, result, settlement, or configuration mutation, **Then** authorization denies it regardless of interface visibility.
+5. **Given** an administrator and no unsettled bets, **When** they explicitly confirm a leaderboard reset with a reason, **Then** every wallet returns to the configured starting balance through immutable ledger adjustments, current-round wins, bets, and net result restart from zero, and the prior competition history remains available for audit. A reset with pending bets, missing confirmation, or a replayed request MUST fail safely or return the original receipt without applying value twice.
 
 ---
 
@@ -222,6 +223,7 @@ As the maintainer, I want bounded result checks, source-controlled setup, and fa
 - Settlement, refund, manual confirmation, adjustment, or correction is retried concurrently.
 - A deleted or hidden public profile would otherwise leak an email on the leaderboard.
 - The result-check budget expires with races still unresolved.
+- An administrator requests a leaderboard reset while one or more bets remain pending or another balance mutation is in flight.
 - The application is loaded at 375px, 768px, or 1280px with long race and runner names.
 - The hosted Supabase API bundler does not load the function directory's local import map.
 - Server-side Supabase variables exist in Netlify while the build-scoped `VITE_SUPABASE_*` variables are absent from the browser bundle.
@@ -298,6 +300,7 @@ As the maintainer, I want bounded result checks, source-controlled setup, and fa
 - **FR-063**: While the page is visible, settled bets, balances, ledger, and leaderboard MUST refresh automatically within 30 seconds under normal connectivity, without clearing the selected meeting, race expansion, or stake input. Hidden pages MUST pause polling; returning to the page MUST refresh promptly. Responses from a previous signed-in identity MUST never restore private data.
 - **FR-064**: Before any settlement mutation, every declared winner MUST match a unique finalized ATR observation row with a valid price; provider, race ownership, winner set, and dead-heat count MUST agree even when nobody backed a winner. Invalid evidence MUST leave all pending bets and balances unchanged.
 - **FR-065**: Results retrieval MUST have bounded time, response size, and per-invocation work. Existing operator-configured retrieval may be verified, but no new paid provider, subscription, credentials purchase, or alternate odds authority is authorized by this follow-up.
+- **FR-066**: Administrators MUST have an explicit, audited leaderboard reset that starts a new competition round, resets every wallet to the current configured starting balance through immutable adjustment entries, and makes leaderboard bet, win, and net-result aggregates count only activity in the new round. The operation MUST require a reason and exact confirmation, reject while any bet is pending, serialize against concurrent balance changes, remain idempotent, preserve all historical bets and ledger records, and remain inaccessible to anonymous users and players.
 
 ### Result-validation follow-up acceptance (2026-09-05)
 

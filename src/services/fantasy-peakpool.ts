@@ -195,6 +195,12 @@ export function adjustFantasyWallet(input: { userId: string; amount: string; rea
   }, client);
 }
 
+export function resetFantasyLeaderboard(input: { reason: string; confirmation: string; idempotencyKey: string }, client?: SupabaseClient) {
+  return adminRpc("admin_reset_fantasy_leaderboard", {
+    p_reason: input.reason, p_confirmation: input.confirmation, p_idempotency_key: input.idempotencyKey,
+  }, client);
+}
+
 export function updateFantasySettings(input: {
   bettingEnabled: boolean; defaultStartingBalance: string; minimumStake: string; maximumStake?: string;
   closeBufferSeconds: number; maxQuoteAgeSeconds: number; initialDelaySeconds: number; maxCheckAgeSeconds: number;
@@ -240,6 +246,8 @@ export function fantasyErrorMessage(error: unknown): string {
     PRICE_CHANGED: "The price changed. Please review the new quote.",
     RACE_CLOSED: "Betting has closed for this race.",
     INSUFFICIENT_BALANCE: "Your fantasy balance is too low for that stake.",
+    LEADERBOARD_RESET_PENDING_BETS: "Settle or void every pending bet before resetting the leaderboard.",
+    RESET_CONFIRMATION_REQUIRED: "Type RESET LEADERBOARD exactly to confirm.",
     FANTASY_BACKEND_NOT_CONFIGURED: "Fantasy backend setup is incomplete.",
   };
   return Object.entries(known).find(([code]) => message.includes(code))?.[1] ?? "The fantasy service could not complete that request.";

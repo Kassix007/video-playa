@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { parseAdminSettings } from "../src/features/fantasy-peakpool/admin-settings.js";
-import { updateFantasySettings } from "../src/services/fantasy-peakpool.js";
+import { resetFantasyLeaderboard, updateFantasySettings } from "../src/services/fantasy-peakpool.js";
 
 // Load the browser component at test runtime; the MCP compiler has no JSX target.
 const { default: PeakpoolAdminSettings } = await import(new URL("../src/features/fantasy-peakpool/components/PeakpoolAdminSettings.tsx", import.meta.url).href);
@@ -23,6 +23,17 @@ test("settings screen renders saved values, not defaults, and no default adjustm
   assert.match(html, /checked=""/);
   for (const value of ["750.00", "35.00", "90", "180"]) assert.ok(html.includes(`value="${value}"`));
   assert.match(html, /<option[^>]*value=""[^>]*selected=""[^>]*>Select player/);
+  assert.match(html, /Reset leaderboard/);
+  assert.match(html, /RESET LEADERBOARD/);
+  assert.match(html, /bets are pending/i);
+  assert.match(html, /history is preserved/i);
+});
+test("leaderboard reset client sends only reason, confirmation, and request identity", async () => {
+  let name = ""; let captured: Record<string,unknown> = {};
+  const client = {rpc:async (rpcName:string,params:Record<string,unknown>)=>{name=rpcName;captured=params;return {data:{leaderboard_round:2},error:null};}} as unknown as SupabaseClient;
+  await resetFantasyLeaderboard({reason:"New monthly competition",confirmation:"RESET LEADERBOARD",idempotencyKey:"fixture-reset"},client);
+  assert.equal(name,"admin_reset_fantasy_leaderboard");
+  assert.deepEqual(captured,{p_reason:"New monthly competition",p_confirmation:"RESET LEADERBOARD",p_idempotency_key:"fixture-reset"});
 });
 test("missing settings do not render a submit button", () => {
   const html = renderToStaticMarkup(createElement(PeakpoolAdminSettings, { settings: null, players: [], onChanged:async()=>{} }));
